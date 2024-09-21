@@ -13,8 +13,8 @@ const RootLayout = () => {
 
     useEffect(() => {
         if (loaded) {
-          SplashScreen.preventAutoHideAsync();
-          router.replace("/onboarding");
+            SplashScreen.preventAutoHideAsync();
+            router.replace("/onboarding");
             SplashScreen.hideAsync();
         }
     }, [loaded]);
