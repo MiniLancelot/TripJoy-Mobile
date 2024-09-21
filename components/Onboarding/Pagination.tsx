@@ -1,4 +1,4 @@
-import {View } from "react-native";
+import { View } from "react-native";
 import Animated, {
     interpolate,
     useAnimatedStyle,
@@ -65,4 +65,3 @@ const Pagination = ({ data, x, screenWidth }: PaginationProps) => {
 };
 
 export default Pagination;
-
