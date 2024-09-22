@@ -18,6 +18,8 @@ import Title from "@/components/Onboarding/Title";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import request from "@/utils/request";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 import "@/global.css";
 
@@ -80,6 +82,22 @@ const Login = () => {
                 "An error occurred during Google login."
             );
         }
+    };
+
+    const handleLogin = async () => {
+        await request
+            .post("/Account/login", {
+                email: enteredUserName,
+                password: enteredPassword,
+            })
+            .then((response) => {
+                console.log(response.data.user.name);
+                AsyncStorage.setItem("info", JSON.stringify(response.data));
+                router.push("/home");
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     };
 
     return (
@@ -203,6 +221,7 @@ const Login = () => {
                 style={styles.shadow}
             >
                 <Pressable
+                    onPress={handleLogin}
                     disabled={isLoginDisabled}
                     android_ripple={isLoginDisabled ? null : { color: "gray" }}
                     // android_ripple={{ color: "gray" }}
