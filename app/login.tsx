@@ -96,7 +96,18 @@ const Login = () => {
                 router.push("/home");
             })
             .catch((error) => {
-                console.error(error);
+                if (error.response && error.response.data) {
+                    const values = Object.values(error.response.data.errors); 
+                    if (Array.isArray(values[0])) {
+                        console.error(values[0][0]);
+                    }
+                }
+                else if (error.request) {
+                    console.error("No response received from the server.");
+                }
+                else {
+                    console.error(error.message);
+                }
             });
     };
 
