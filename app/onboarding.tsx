@@ -15,6 +15,7 @@ import Pagination from "@/components/Onboarding/Pagination";
 import OnboardingButton from "@/components/Onboarding/OnboardingButton";
 import Title from "@/components/Onboarding/Title";
 import "@/global.css";
+import { StatusBar } from "expo-status-bar";
 
 const onboarding = () => {
     const { width: SCREEN_WIDTH } = useWindowDimensions();
@@ -105,6 +106,7 @@ const onboarding = () => {
                 className="flex-1 justify-center items-center"
                 style={{ width: SCREEN_WIDTH }}
             >
+                <StatusBar style="dark" />
                 <Animated.View style={lottieAnimationStyle}>
                     <LottieView
                         source={item.lottie}

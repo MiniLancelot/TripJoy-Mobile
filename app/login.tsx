@@ -7,6 +7,8 @@ import {
     Dimensions,
     TextInput,
     Alert,
+    useWindowDimensions,
+    ScrollView,
 } from "react-native";
 import { useState } from "react";
 import Animated, {
@@ -22,11 +24,13 @@ import request from "@/utils/request";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 import "@/global.css";
+import SeparateLine from "@/components/Others/SeparateLine";
 
-const { width, height } = Dimensions.get("window");
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const Login = () => {
+    const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
+        useWindowDimensions();
     const router = useRouter();
     const facebookIcon = require("@/assets/icons/facebook.png");
     const googleIcon = require("@/assets/icons/google.png");
@@ -64,7 +68,7 @@ const Login = () => {
     const handleGoogleLogin = async () => {
         try {
             const result = await WebBrowser.openBrowserAsync(
-                "http:/10.0.2.2:7100/api/v1/Account/login-google"
+                "http:/192.168.1.10:7100/api/v1/Account/login-google"
             );
             if (result.type === "opened") {
                 console.log(result);
@@ -97,170 +101,170 @@ const Login = () => {
             })
             .catch((error) => {
                 if (error.response && error.response.data) {
-                    const values = Object.values(error.response.data.errors); 
+                    const values = Object.values(error.response.data.errors);
                     if (Array.isArray(values[0])) {
                         console.error(values[0][0]);
                     }
-                }
-                else if (error.request) {
+                } else if (error.request) {
                     console.error("No response received from the server.");
-                }
-                else {
+                } else {
                     console.error(error.message);
                 }
             });
     };
 
     return (
-        <View className="flex-1 pt-[75px] items-center bg-[#F2FDFF] min-h-screen">
-            <View className="flex-[0.25] bg-[#F2FDFF] w-full items-center">
-                <Title />
-            </View>
-            <View className="p-[10px] w-full items-center">
-                <View
-                    className="rounded-full overflow-hidden m-[10px] w-4/5"
-                    style={styles.shadow}
-                >
-                    <Pressable
-                        className="flex-row bg-[#fff] p-[10px] justify-center items-center"
-                        onPress={handleGoogleLogin}
-                        android_ripple={{ color: "gray" }}
-                    >
-                        <Image
-                            source={googleIcon}
-                            style={{ width: 30, height: 30 }}
-                        />
-                        <Text className="ml-[10px] text-[#000] text-2xl">
-                            Login with Google
-                        </Text>
-                    </Pressable>
+        <ScrollView className="flex-1 bg-[#fff] ">
+            <View className="flex-1 pt-[60px] items-center  min-h-screen">
+                <View className="flex-[0.25] w-full items-center">
+                    <Title />
                 </View>
-                <View
-                    className="rounded-full overflow-hidden m-[10px] w-4/5"
-                    style={styles.shadow}
-                >
-                    <Pressable
-                        className="flex-row bg-[#fff] p-[10px] justify-center items-center"
-                        onPress={() => alert("Facebook")}
-                        android_ripple={{ color: "gray" }}
-                    >
-                        <Image
-                            source={facebookIcon}
-                            style={{ width: 30, height: 30 }}
-                        />
-                        <Text className="ml-[10px] text-[#000] text-2xl">
-                            Login with Facebook
-                        </Text>
-                    </Pressable>
-                </View>
-            </View>
-            <View className="flex-row items-center my-[20px] mx-[40px]">
-                <View className="flex-1 h-[1px] bg-[#9FB7B9]" />
-                <Text className="mx-[10px] text-2xl text-[#9FB7B9]">or</Text>
-                <View className="flex-1 h-[1px] bg-[#9FB7B9]" />
-            </View>
-            <View className="items-center w-4/5">
-                <View className="flex-row">
-                    <AnimatedTextInput
-                        className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
-                        style={animatedBorderStyle(userNameBorderColor)}
-                        placeholder="Tên đăng nhập"
-                        maxLength={30}
-                        value={enteredUserName}
-                        onChangeText={(text) => setEnteredUserName(text)}
-                        onFocus={() => handleFocus(userNameBorderColor)}
-                        onBlur={() => handleBlur(userNameBorderColor)}
-                        selectionColor="#657ef8"
-                    />
-                    {enteredUserName.length > 0 && (
-                        <Pressable
-                            className="right-[31px] top-[29px] absolute"
-                            onPress={() => clearText(setEnteredUserName)}
-                        >
-                            <Ionicons
-                                name="close-circle-outline"
-                                size={24}
-                                color="#9FB7B9"
-                            />
-                        </Pressable>
-                    )}
-                </View>
-                <View className="flex-row items-center">
-                    <AnimatedTextInput
-                        className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
-                        style={animatedBorderStyle(passwordBorderColor)}
-                        placeholder="Mật khẩu"
-                        maxLength={30}
-                        secureTextEntry={!isPasswordVisible}
-                        value={enteredPassword}
-                        onChangeText={(text) => setEnteredPassword(text)}
-                        onFocus={() => handleFocus(passwordBorderColor)}
-                        onBlur={() => handleBlur(passwordBorderColor)}
-                        selectionColor="#657ef8"
-                    />
-                    {enteredPassword.length > 0 && (
-                        <Pressable
-                            className="right-[73px] top-[29px] absolute"
-                            onPress={() => clearText(setEnteredPassword)}
-                        >
-                            <Ionicons
-                                name="close-circle-outline"
-                                size={24}
-                                color="#9FB7B9"
-                            />
-                        </Pressable>
-                    )}
-                    <Pressable
-                        className="absolute right-[20px] p-[10px]"
-                        onPress={togglePasswordVisibility}
-                    >
-                        <Ionicons
-                            name={
-                                isPasswordVisible
-                                    ? "eye-outline"
-                                    : "eye-off-outline"
-                            }
-                            size={24}
-                            color="#9FB7B9"
-                        />
-                    </Pressable>
-                </View>
-            </View>
-
-            <View
-                className="bg-[#13c892] rounded-lg overflow-hidden m-[10px] mt[20px] w-4/5"
-                style={styles.shadow}
-            >
-                <Pressable
-                    onPress={handleLogin}
-                    disabled={isLoginDisabled}
-                    android_ripple={isLoginDisabled ? null : { color: "gray" }}
-                    // android_ripple={{ color: "gray" }}
-                >
+                <View className="p-[10px] w-full items-center">
                     <View
-                        className="p-[10px] justify-center items-center"
-                        style={isLoginDisabled && styles.loginButtonDisabled}
+                        className="rounded-full overflow-hidden m-[10px] w-4/5"
+                        style={styles.shadow}
                     >
-                        <Text className="ml-[10px] text-[#fff] text-2xl">
-                            Đăng nhập
-                        </Text>
+                        <Pressable
+                            className="flex-row bg-[#fff] p-[10px] justify-center items-center"
+                            onPress={handleGoogleLogin}
+                            android_ripple={{ color: "gray" }}
+                        >
+                            <Image
+                                source={googleIcon}
+                                style={{ width: 30, height: 30 }}
+                            />
+                            <Text className="ml-[10px] text-[#000] text-2xl">
+                                Login with Google
+                            </Text>
+                        </Pressable>
                     </View>
-                </Pressable>
-            </View>
+                    <View
+                        className="rounded-full overflow-hidden m-[10px] w-4/5"
+                        style={styles.shadow}
+                    >
+                        <Pressable
+                            className="flex-row bg-[#fff] p-[10px] justify-center items-center"
+                            onPress={() => alert("Facebook")}
+                            android_ripple={{ color: "gray" }}
+                        >
+                            <Image
+                                source={facebookIcon}
+                                style={{ width: 30, height: 30 }}
+                            />
+                            <Text className="ml-[10px] text-[#000] text-2xl">
+                                Login with Facebook
+                            </Text>
+                        </Pressable>
+                    </View>
+                </View>
+                <SeparateLine />
+                <View className="items-center w-4/5">
+                    <View className="flex-row">
+                        <AnimatedTextInput
+                            className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
+                            style={animatedBorderStyle(userNameBorderColor)}
+                            placeholder="Tên đăng nhập"
+                            maxLength={30}
+                            value={enteredUserName}
+                            onChangeText={(text) => setEnteredUserName(text)}
+                            onFocus={() => handleFocus(userNameBorderColor)}
+                            onBlur={() => handleBlur(userNameBorderColor)}
+                            selectionColor="#657ef8"
+                        />
+                        {enteredUserName.length > 0 && (
+                            <Pressable
+                                className="right-[31px] top-[29px] absolute"
+                                onPress={() => clearText(setEnteredUserName)}
+                            >
+                                <Ionicons
+                                    name="close-circle-outline"
+                                    size={24}
+                                    color="#9FB7B9"
+                                />
+                            </Pressable>
+                        )}
+                    </View>
+                    <View className="flex-row items-center">
+                        <AnimatedTextInput
+                            className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
+                            style={animatedBorderStyle(passwordBorderColor)}
+                            placeholder="Mật khẩu"
+                            maxLength={30}
+                            secureTextEntry={!isPasswordVisible}
+                            value={enteredPassword}
+                            onChangeText={(text) => setEnteredPassword(text)}
+                            onFocus={() => handleFocus(passwordBorderColor)}
+                            onBlur={() => handleBlur(passwordBorderColor)}
+                            selectionColor="#657ef8"
+                        />
+                        {enteredPassword.length > 0 && (
+                            <Pressable
+                                className="right-[73px] top-[29px] absolute"
+                                onPress={() => clearText(setEnteredPassword)}
+                            >
+                                <Ionicons
+                                    name="close-circle-outline"
+                                    size={24}
+                                    color="#9FB7B9"
+                                />
+                            </Pressable>
+                        )}
+                        <Pressable
+                            className="absolute right-[20px] p-[10px]"
+                            onPress={togglePasswordVisibility}
+                        >
+                            <Ionicons
+                                name={
+                                    isPasswordVisible
+                                        ? "eye-outline"
+                                        : "eye-off-outline"
+                                }
+                                size={24}
+                                color="#9FB7B9"
+                            />
+                        </Pressable>
+                    </View>
+                </View>
 
-            <View className="mt-[3px] flex-row justify-between items-center pb-[45px] w-4/5">
-                <Pressable onPress={() => alert("Forgot password")}>
-                    <Text className="text-[#758bf9] text-lg font-semibold">
-                        Quên mật khẩu?
-                    </Text>
-                </Pressable>
-                <Pressable onPress={() => alert("Sign up")}>
-                    <Text className="text-[#758bf9] text-lg font-semibold">
-                        Đăng ký
-                    </Text>
-                </Pressable>
+                <View
+                    className="bg-[#13c892] rounded-lg overflow-hidden m-[10px] mt[20px] w-4/5"
+                    style={styles.shadow}
+                >
+                    <Pressable
+                        onPress={handleLogin}
+                        disabled={isLoginDisabled}
+                        android_ripple={
+                            isLoginDisabled ? null : { color: "gray" }
+                        }
+                        // android_ripple={{ color: "gray" }}
+                    >
+                        <View
+                            className="p-[10px] justify-center items-center"
+                            style={
+                                isLoginDisabled && styles.loginButtonDisabled
+                            }
+                        >
+                            <Text className="ml-[10px] text-[#fff] text-2xl">
+                                Đăng nhập
+                            </Text>
+                        </View>
+                    </Pressable>
+                </View>
+
+                <View className="mt-[3px] flex-row justify-between items-center pb-[45px] w-4/5">
+                    <Pressable onPress={() => alert("Forgot password")}>
+                        <Text className="text-[#758bf9] text-lg font-semibold">
+                            Quên mật khẩu?
+                        </Text>
+                    </Pressable>
+                    <Pressable onPress={() => router.push("/register")}>
+                        <Text className="text-[#758bf9] text-lg font-semibold">
+                            Đăng ký
+                        </Text>
+                    </Pressable>
+                </View>
             </View>
-        </View>
+        </ScrollView>
     );
 };
 
