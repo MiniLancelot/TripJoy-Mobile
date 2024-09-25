@@ -251,7 +251,7 @@ const Login = () => {
                         </Pressable>
                         <View className="flex-row">
                             <AnimatedTextInput
-                                className="rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
+                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl pr-[100px]"
                                 style={animatedBorderStyle(userNameBorderColor)}
                                 // placeholder={"Tên đăng nhập"}
                                 ref={usernameRef}
@@ -312,7 +312,7 @@ const Login = () => {
                         </Pressable>
                         <View className="flex-row items-center">
                             <AnimatedTextInput
-                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
+                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl pr-[100px]"
                                 style={animatedBorderStyle(passwordBorderColor)}
                                 ref={passwordRef}
                                 maxLength={30}

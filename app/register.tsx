@@ -133,7 +133,7 @@ const register = () => {
                     <View className="w-4/5">
                         <View className="flex-row">
                             <AnimatedTextInput
-                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-xl"
+                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-xl pr-[100px]"
                                 style={animatedBorderStyle(userNameBorderColor)}
                                 placeholder="Tên đăng nhập"
                                 maxLength={30}
@@ -163,7 +163,7 @@ const register = () => {
 
                         <View className="flex-row">
                             <AnimatedTextInput
-                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-xl"
+                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-xl pr-[100px]"
                                 style={animatedBorderStyle(emailBorderColor)}
                                 placeholder="Email"
                                 maxLength={30}
@@ -191,7 +191,7 @@ const register = () => {
                                 className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-4/6 h-[60px] text-xl"
                                 style={animatedBorderStyle(otpBorderColor)}
                                 placeholder="OTP"
-                                maxLength={30}
+                                maxLength={6}
                                 value={enteredOtp}
                                 onChangeText={(text) => setEnteredOtp(text)}
                                 onFocus={() => handleFocus(otpBorderColor)}
@@ -274,7 +274,7 @@ const register = () => {
                         </View>
                         <View className="flex-row items-center">
                             <AnimatedTextInput
-                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-xl"
+                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-xl pr-[100px]"
                                 style={animatedBorderStyle(
                                     valPasswordBorderColor
                                 )}
