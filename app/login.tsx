@@ -4,13 +4,12 @@ import {
     StyleSheet,
     Pressable,
     Image,
-    Dimensions,
     TextInput,
     Alert,
     useWindowDimensions,
     ScrollView,
 } from "react-native";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -38,14 +37,28 @@ const Login = () => {
     const [enteredUserName, setEnteredUserName] = useState("");
     const [enteredPassword, setEnteredPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
     const usernameRef = useRef<TextInput>(null);
     const passwordRef = useRef<TextInput>(null);
 
     const handleUsernameFocus = () => {
         usernameRef.current?.focus();
-    }
+    };
     const handlePasswordFocus = () => {
         passwordRef.current?.focus();
+    };
+
+    const [usernameHeight, setUsernameHeight] = useState(0);
+    const [passwordHeight, setPasswordHeight] = useState(0);
+
+    const onLayoutUsername = (event: any) => {
+        const { height } = event.nativeEvent.layout;
+        setUsernameHeight(height);
+    }
+
+    const onLayoutPassword = (event: any) => {
+        const { height } = event.nativeEvent.layout;
+        setPasswordHeight(height);
     }
 
     const userNameBorderColor = useSharedValue("#e7e8ee");
@@ -53,18 +66,28 @@ const Login = () => {
 
     const inputAnimation: { [key: string]: any } = {
         username: [
-            useSharedValue(21),
+            useSharedValue(0), //21
             useSharedValue("#6b707b"),
-            useSharedValue(-158),
-            useSharedValue(26),
+            useSharedValue(0), //26
         ],
         password: [
-            useSharedValue(21),
+            useSharedValue(0),
             useSharedValue("#6b707b"),
-            useSharedValue(-183),
-            useSharedValue(26),
+            useSharedValue(0),
         ],
     };
+
+    useEffect(() => {
+        if (usernameHeight > 0) {
+            inputAnimation["username"][0].value = usernameHeight * 0.35;
+        }
+    }, [passwordHeight]);
+
+    useEffect(() => {
+        if (passwordHeight > 0) {
+            inputAnimation["password"][0].value = passwordHeight * 0.35;
+        }
+    }, [passwordHeight]);
 
     // react-native-reanimated rất ngu khi xử lý font size với transition vậy nên khi làm phải tách chúng ra
     const animatedUsernameFontSize = useAnimatedStyle(() => ({
@@ -73,10 +96,7 @@ const Login = () => {
     }));
 
     const animatedusernameTransform = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: inputAnimation["username"][2].value },
-            { translateY: inputAnimation["username"][3].value },
-        ],
+        transform: [{ translateY: inputAnimation["username"][2].value }],
     }));
 
     const animatedPasswordFontSize = useAnimatedStyle(() => ({
@@ -85,27 +105,20 @@ const Login = () => {
     }));
 
     const animatedPasswordTransform = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: inputAnimation["password"][2].value },
-            { translateY: inputAnimation["password"][3].value },
-        ],
+        transform: [{ translateY: inputAnimation["password"][2].value }],
     }));
 
     const animateInput = (
         input: string,
         fontSize: number,
         color: string,
-        translateX: number,
         translateY: number
     ) => {
         inputAnimation[input][0].value = withTiming(fontSize, {
             duration: 200,
         });
         inputAnimation[input][1].value = withTiming(color, { duration: 250 });
-        inputAnimation[input][2].value = withTiming(translateX, {
-            duration: 200,
-        });
-        inputAnimation[input][3].value = withTiming(translateY, {
+        inputAnimation[input][2].value = withTiming(translateY, {
             duration: 200,
         });
     };
@@ -183,7 +196,7 @@ const Login = () => {
 
     return (
         <ScrollView className="flex-1 bg-[#fff] ">
-            <View className="flex-1 pt-[60px] items-center  min-h-screen">
+            <View className="flex-1 pt-[60px] items-center min-h-screen">
                 <View className="flex-[0.25] w-full items-center">
                     <Title />
                 </View>
@@ -228,19 +241,20 @@ const Login = () => {
                 <SeparateLine />
                 <View className="items-center w-4/5">
                     <View className="items-center">
-                        <Animated.Text
-                            className="absolute z-10 bg-[#fff] color-[#9FB7B9] px-[2px] rounded-lg"
-                            style={[
-                                animatedUsernameFontSize,
-                                animatedusernameTransform,
-                            ]}
-                        >
-                            Tên đăng nhập
-                        </Animated.Text>
+                        <Pressable className="absolute z-10 bg-transparent self-start px-3 translate-y-[26]" onPress={handleUsernameFocus}>
+                            <Animated.Text
+                                className="bg-[#fff] color-[#9FB7B9] mx-[20px] rounded-lg"
+                                style={[animatedUsernameFontSize, animatedusernameTransform]}
+                            >
+                                Tên đăng nhập
+                            </Animated.Text>
+                        </Pressable>
                         <View className="flex-row">
                             <AnimatedTextInput
-                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
+                                className="rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
                                 style={animatedBorderStyle(userNameBorderColor)}
+                                // placeholder={"Tên đăng nhập"}
+                                ref={usernameRef}
                                 maxLength={30}
                                 value={enteredUserName}
                                 onChangeText={(text) =>
@@ -248,35 +262,27 @@ const Login = () => {
                                 }
                                 onFocus={() => {
                                     handleFocus(userNameBorderColor);
-                                    animateInput(
-                                        "username",
-                                        15,
-                                        "#657ef8",
-                                        -178,
-                                        0
-                                    );
+                                    animateInput("username", usernameHeight * 0.21, "#657ef8", -26);
                                 }}
                                 onBlur={() => {
                                     handleBlur(userNameBorderColor);
-                                    if(enteredUserName.trim() === "") {
+                                    if (enteredUserName.trim() === "") {
                                         animateInput(
                                             "username",
-                                            21,
+                                            usernameHeight * 0.35,
                                             "#6b707b",
-                                            -158,
-                                            26
-                                        );
-                                    }
-                                    else {
-                                        animateInput(
-                                            "username",
-                                            15,
-                                            "#6b707b",
-                                            -178,
                                             0
+                                        );
+                                    } else {
+                                        animateInput(
+                                            "username",
+                                            usernameHeight * 0.21,
+                                            "#6b707b",
+                                            -26
                                         );
                                     }
                                 }}
+                                onLayout={onLayoutUsername}
                                 selectionColor="#657ef8"
                             />
                             {enteredUserName.length > 0 && (
@@ -296,19 +302,19 @@ const Login = () => {
                         </View>
                     </View>
                     <View className="items-center">
-                        <Animated.Text
-                            className="absolute z-10 bg-[#fff] color-[#9FB7B9] px-[2px] rounded-lg"
-                            style={[
-                                animatedPasswordFontSize,
-                                animatedPasswordTransform,
-                            ]}
-                        >
-                            Mật khẩu
-                        </Animated.Text>
+                        <Pressable className="absolute z-10 bg-transparent self-start px-3 translate-y-[26]" onPress={handlePasswordFocus}>
+                            <Animated.Text
+                                className="bg-[#fff] color-[#9FB7B9] mx-[20px] rounded-lg"
+                                style={[animatedPasswordFontSize, animatedPasswordTransform]}
+                            >
+                                Mật khẩu
+                            </Animated.Text>
+                        </Pressable>
                         <View className="flex-row items-center">
                             <AnimatedTextInput
                                 className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
                                 style={animatedBorderStyle(passwordBorderColor)}
+                                ref={passwordRef}
                                 maxLength={30}
                                 secureTextEntry={!isPasswordVisible}
                                 value={enteredPassword}
@@ -317,35 +323,27 @@ const Login = () => {
                                 }
                                 onFocus={() => {
                                     handleFocus(passwordBorderColor);
-                                    animateInput(
-                                        "password",
-                                        15,
-                                        "#657ef8",
-                                        -196,
-                                        0
-                                    );
+                                    animateInput("password", passwordHeight * 0.21, "#657ef8", -26);
                                 }}
                                 onBlur={() => {
                                     handleBlur(passwordBorderColor);
-                                    if(enteredPassword.trim() === "") {
+                                    if (enteredPassword.trim() === "") {
                                         animateInput(
                                             "password",
-                                            21,
+                                            passwordHeight * 0.35,
                                             "#6b707b",
-                                            -183,
-                                            26
-                                        );
-                                    }
-                                    else {
-                                        animateInput(
-                                            "password",
-                                            15,
-                                            "#6b707b",
-                                            -196,
                                             0
+                                        );
+                                    } else {
+                                        animateInput(
+                                            "password",
+                                            passwordHeight * 0.21,
+                                            "#6b707b",
+                                            -26
                                         );
                                     }
                                 }}
+                                onLayout={onLayoutPassword}
                                 selectionColor="#657ef8"
                             />
                             {enteredPassword.length > 0 && (
@@ -385,8 +383,10 @@ const Login = () => {
                     style={styles.shadow}
                 >
                     <Pressable
-                        // onPress={() => {console.log(enteredUserName, enteredPassword)}}
-                        onPress={handleLogin}
+                        onPress={() => {
+                            console.log(enteredUserName, enteredPassword);
+                        }}
+                        // onPress={handleLogin}
                         disabled={isLoginDisabled}
                         android_ripple={
                             isLoginDisabled ? null : { color: "gray" }
