@@ -10,7 +10,7 @@ import {
     useWindowDimensions,
     ScrollView,
 } from "react-native";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -38,9 +38,77 @@ const Login = () => {
     const [enteredUserName, setEnteredUserName] = useState("");
     const [enteredPassword, setEnteredPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const usernameRef = useRef<TextInput>(null);
+    const passwordRef = useRef<TextInput>(null);
+
+    const handleUsernameFocus = () => {
+        usernameRef.current?.focus();
+    }
+    const handlePasswordFocus = () => {
+        passwordRef.current?.focus();
+    }
 
     const userNameBorderColor = useSharedValue("#e7e8ee");
     const passwordBorderColor = useSharedValue("#e7e8ee");
+
+    const inputAnimation: { [key: string]: any } = {
+        username: [
+            useSharedValue(21),
+            useSharedValue("#6b707b"),
+            useSharedValue(-158),
+            useSharedValue(26),
+        ],
+        password: [
+            useSharedValue(21),
+            useSharedValue("#6b707b"),
+            useSharedValue(-183),
+            useSharedValue(26),
+        ],
+    };
+
+    // react-native-reanimated rất ngu khi xử lý font size với transition vậy nên khi làm phải tách chúng ra
+    const animatedUsernameFontSize = useAnimatedStyle(() => ({
+        fontSize: inputAnimation["username"][0].value,
+        color: inputAnimation["username"][1].value,
+    }));
+
+    const animatedusernameTransform = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: inputAnimation["username"][2].value },
+            { translateY: inputAnimation["username"][3].value },
+        ],
+    }));
+
+    const animatedPasswordFontSize = useAnimatedStyle(() => ({
+        fontSize: inputAnimation["password"][0].value,
+        color: inputAnimation["password"][1].value,
+    }));
+
+    const animatedPasswordTransform = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: inputAnimation["password"][2].value },
+            { translateY: inputAnimation["password"][3].value },
+        ],
+    }));
+
+    const animateInput = (
+        input: string,
+        fontSize: number,
+        color: string,
+        translateX: number,
+        translateY: number
+    ) => {
+        inputAnimation[input][0].value = withTiming(fontSize, {
+            duration: 200,
+        });
+        inputAnimation[input][1].value = withTiming(color, { duration: 250 });
+        inputAnimation[input][2].value = withTiming(translateX, {
+            duration: 200,
+        });
+        inputAnimation[input][3].value = withTiming(translateY, {
+            duration: 200,
+        });
+    };
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -159,70 +227,156 @@ const Login = () => {
                 </View>
                 <SeparateLine />
                 <View className="items-center w-4/5">
-                    <View className="flex-row">
-                        <AnimatedTextInput
-                            className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
-                            style={animatedBorderStyle(userNameBorderColor)}
-                            placeholder="Tên đăng nhập"
-                            maxLength={30}
-                            value={enteredUserName}
-                            onChangeText={(text) => setEnteredUserName(text)}
-                            onFocus={() => handleFocus(userNameBorderColor)}
-                            onBlur={() => handleBlur(userNameBorderColor)}
-                            selectionColor="#657ef8"
-                        />
-                        {enteredUserName.length > 0 && (
-                            <Pressable
-                                className="right-[31px] top-[29px] absolute"
-                                onPress={() => clearText(setEnteredUserName)}
-                            >
-                                <Ionicons
-                                    name="close-circle-outline"
-                                    size={24}
-                                    color="#9FB7B9"
-                                />
-                            </Pressable>
-                        )}
-                    </View>
-                    <View className="flex-row items-center">
-                        <AnimatedTextInput
-                            className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
-                            style={animatedBorderStyle(passwordBorderColor)}
-                            placeholder="Mật khẩu"
-                            maxLength={30}
-                            secureTextEntry={!isPasswordVisible}
-                            value={enteredPassword}
-                            onChangeText={(text) => setEnteredPassword(text)}
-                            onFocus={() => handleFocus(passwordBorderColor)}
-                            onBlur={() => handleBlur(passwordBorderColor)}
-                            selectionColor="#657ef8"
-                        />
-                        {enteredPassword.length > 0 && (
-                            <Pressable
-                                className="right-[73px] top-[29px] absolute"
-                                onPress={() => clearText(setEnteredPassword)}
-                            >
-                                <Ionicons
-                                    name="close-circle-outline"
-                                    size={24}
-                                    color="#9FB7B9"
-                                />
-                            </Pressable>
-                        )}
-                        <Pressable
-                            className="absolute right-[20px] p-[10px]"
-                            onPress={togglePasswordVisibility}
+                    <View className="items-center">
+                        <Animated.Text
+                            className="absolute z-10 bg-[#fff] color-[#9FB7B9] px-[2px] rounded-lg"
+                            style={[
+                                animatedUsernameFontSize,
+                                animatedusernameTransform,
+                            ]}
                         >
-                            <Ionicons
-                                name={
-                                    isPasswordVisible
-                                        ? "eye-outline"
-                                        : "eye-off-outline"
+                            Tên đăng nhập
+                        </Animated.Text>
+                        <View className="flex-row">
+                            <AnimatedTextInput
+                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
+                                style={animatedBorderStyle(userNameBorderColor)}
+                                maxLength={30}
+                                value={enteredUserName}
+                                onChangeText={(text) =>
+                                    setEnteredUserName(text)
                                 }
-                                size={24}
-                                color="#9FB7B9"
+                                onFocus={() => {
+                                    handleFocus(userNameBorderColor);
+                                    animateInput(
+                                        "username",
+                                        15,
+                                        "#657ef8",
+                                        -178,
+                                        0
+                                    );
+                                }}
+                                onBlur={() => {
+                                    handleBlur(userNameBorderColor);
+                                    if(enteredUserName.trim() === "") {
+                                        animateInput(
+                                            "username",
+                                            21,
+                                            "#6b707b",
+                                            -158,
+                                            26
+                                        );
+                                    }
+                                    else {
+                                        animateInput(
+                                            "username",
+                                            15,
+                                            "#6b707b",
+                                            -178,
+                                            0
+                                        );
+                                    }
+                                }}
+                                selectionColor="#657ef8"
                             />
-                        </Pressable>
+                            {enteredUserName.length > 0 && (
+                                <Pressable
+                                    className="right-[31px] top-[29px] absolute"
+                                    onPress={() =>
+                                        clearText(setEnteredUserName)
+                                    }
+                                >
+                                    <Ionicons
+                                        name="close-circle-outline"
+                                        size={24}
+                                        color="#9FB7B9"
+                                    />
+                                </Pressable>
+                            )}
+                        </View>
+                    </View>
+                    <View className="items-center">
+                        <Animated.Text
+                            className="absolute z-10 bg-[#fff] color-[#9FB7B9] px-[2px] rounded-lg"
+                            style={[
+                                animatedPasswordFontSize,
+                                animatedPasswordTransform,
+                            ]}
+                        >
+                            Mật khẩu
+                        </Animated.Text>
+                        <View className="flex-row items-center">
+                            <AnimatedTextInput
+                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-2xl"
+                                style={animatedBorderStyle(passwordBorderColor)}
+                                maxLength={30}
+                                secureTextEntry={!isPasswordVisible}
+                                value={enteredPassword}
+                                onChangeText={(text) =>
+                                    setEnteredPassword(text)
+                                }
+                                onFocus={() => {
+                                    handleFocus(passwordBorderColor);
+                                    animateInput(
+                                        "password",
+                                        15,
+                                        "#657ef8",
+                                        -196,
+                                        0
+                                    );
+                                }}
+                                onBlur={() => {
+                                    handleBlur(passwordBorderColor);
+                                    if(enteredPassword.trim() === "") {
+                                        animateInput(
+                                            "password",
+                                            21,
+                                            "#6b707b",
+                                            -183,
+                                            26
+                                        );
+                                    }
+                                    else {
+                                        animateInput(
+                                            "password",
+                                            15,
+                                            "#6b707b",
+                                            -196,
+                                            0
+                                        );
+                                    }
+                                }}
+                                selectionColor="#657ef8"
+                            />
+                            {enteredPassword.length > 0 && (
+                                <Pressable
+                                    className="right-[73px] top-[29px] absolute"
+                                    onPress={() =>
+                                        clearText(setEnteredPassword)
+                                    }
+                                >
+                                    <Ionicons
+                                        name="close-circle-outline"
+                                        size={24}
+                                        color="#9FB7B9"
+                                    />
+                                </Pressable>
+                            )}
+                            <Pressable
+                                className="absolute right-[20px] p-[10px]"
+                                onPress={togglePasswordVisibility}
+                            >
+                                <Ionicons
+                                    name={
+                                        isPasswordVisible
+                                            ? "eye-outline"
+                                            : "eye-off-outline"
+                                    }
+                                    size={24}
+                                    color="#9FB7B9"
+                                />
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
 
@@ -231,6 +385,7 @@ const Login = () => {
                     style={styles.shadow}
                 >
                     <Pressable
+                        // onPress={() => {console.log(enteredUserName, enteredPassword)}}
                         onPress={handleLogin}
                         disabled={isLoginDisabled}
                         android_ripple={
