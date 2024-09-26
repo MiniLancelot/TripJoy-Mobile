@@ -24,6 +24,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 import "@/global.css";
 import SeparateLine from "@/components/Others/SeparateLine";
+import { user_login } from "@/utils/user_api";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -54,12 +55,12 @@ const Login = () => {
     const onLayoutUsername = (event: any) => {
         const { height } = event.nativeEvent.layout;
         setUsernameHeight(height);
-    }
+    };
 
     const onLayoutPassword = (event: any) => {
         const { height } = event.nativeEvent.layout;
         setPasswordHeight(height);
-    }
+    };
 
     const userNameBorderColor = useSharedValue("#e7e8ee");
     const passwordBorderColor = useSharedValue("#e7e8ee");
@@ -89,7 +90,6 @@ const Login = () => {
         }
     }, [passwordHeight]);
 
-    // react-native-reanimated rất ngu khi xử lý font size với transition vậy nên khi làm phải tách chúng ra
     const animatedUsernameFontSize = useAnimatedStyle(() => ({
         fontSize: inputAnimation["username"][0].value,
         color: inputAnimation["username"][1].value,
@@ -194,6 +194,26 @@ const Login = () => {
             });
     };
 
+    const handleLoginTest = () => {
+        user_login({
+            email: enteredUserName,
+            password: enteredPassword,
+        })
+            .then((response) => {
+                console.log(response.data);
+                if (response.status == 200) {
+                    AsyncStorage.setItem(
+                        "AccessToken",
+                        JSON.stringify(response.data)
+                    );
+                    router.replace("/home");
+                }
+            })
+            .catch((err) => {
+                console.log(err.message);
+            });
+    };
+
     return (
         <ScrollView className="flex-1 bg-[#fff] ">
             <View className="flex-1 pt-[60px] items-center min-h-screen">
@@ -241,10 +261,16 @@ const Login = () => {
                 <SeparateLine />
                 <View className="items-center w-4/5">
                     <View className="items-center">
-                        <Pressable className="absolute z-10 bg-transparent self-start px-3 translate-y-[26]" onPress={handleUsernameFocus}>
+                        <Pressable
+                            className="absolute z-10 bg-transparent self-start px-3 translate-y-[26]"
+                            onPress={handleUsernameFocus}
+                        >
                             <Animated.Text
-                                className="bg-[#fff] color-[#9FB7B9] mx-[20px] rounded-lg"
-                                style={[animatedUsernameFontSize, animatedusernameTransform]}
+                                className="bg-[#fff] color-[#9FB7B9] mx-[20px] rounded-lg px-[2px]"
+                                style={[
+                                    animatedUsernameFontSize,
+                                    animatedusernameTransform,
+                                ]}
                             >
                                 Tên đăng nhập
                             </Animated.Text>
@@ -262,7 +288,12 @@ const Login = () => {
                                 }
                                 onFocus={() => {
                                     handleFocus(userNameBorderColor);
-                                    animateInput("username", usernameHeight * 0.21, "#657ef8", -26);
+                                    animateInput(
+                                        "username",
+                                        usernameHeight * 0.21,
+                                        "#657ef8",
+                                        -26
+                                    );
                                 }}
                                 onBlur={() => {
                                     handleBlur(userNameBorderColor);
@@ -302,10 +333,16 @@ const Login = () => {
                         </View>
                     </View>
                     <View className="items-center">
-                        <Pressable className="absolute z-10 bg-transparent self-start px-3 translate-y-[26]" onPress={handlePasswordFocus}>
+                        <Pressable
+                            className="absolute z-10 bg-transparent self-start px-3 translate-y-[26]"
+                            onPress={handlePasswordFocus}
+                        >
                             <Animated.Text
-                                className="bg-[#fff] color-[#9FB7B9] mx-[20px] rounded-lg"
-                                style={[animatedPasswordFontSize, animatedPasswordTransform]}
+                                className="bg-[#fff] color-[#9FB7B9] mx-[20px] rounded-lg px-[2px]"
+                                style={[
+                                    animatedPasswordFontSize,
+                                    animatedPasswordTransform,
+                                ]}
                             >
                                 Mật khẩu
                             </Animated.Text>
@@ -323,7 +360,12 @@ const Login = () => {
                                 }
                                 onFocus={() => {
                                     handleFocus(passwordBorderColor);
-                                    animateInput("password", passwordHeight * 0.21, "#657ef8", -26);
+                                    animateInput(
+                                        "password",
+                                        passwordHeight * 0.21,
+                                        "#657ef8",
+                                        -26
+                                    );
                                 }}
                                 onBlur={() => {
                                     handleBlur(passwordBorderColor);
@@ -383,10 +425,10 @@ const Login = () => {
                     style={styles.shadow}
                 >
                     <Pressable
-                        onPress={() => {
-                            console.log(enteredUserName, enteredPassword);
-                        }}
-                        // onPress={handleLogin}
+                        // onPress={() => {
+                        //     console.log(enteredUserName, enteredPassword);
+                        // }}
+                        onPress={handleLoginTest}
                         disabled={isLoginDisabled}
                         android_ripple={
                             isLoginDisabled ? null : { color: "gray" }

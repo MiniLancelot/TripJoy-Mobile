@@ -19,29 +19,67 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import SeparateLine from "@/components/Others/SeparateLine";
+import { send_otp_verify_email, user_register } from "@/utils/user_api";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const register = () => {
-    const rounter = useRouter();
+    const router = useRouter();
     const facebookIcon = require("@/assets/icons/facebook.png");
     const googleIcon = require("@/assets/icons/google.png");
 
-    const [enteredUserName, setEnteredUserName] = useState("");
-    const [enteredEmail, setEnteredEmail] = useState("");
-    const [enteredOtp, setEnteredOtp] = useState("");
-    const [enteredPassword, setEnteredPassword] = useState("");
-    const [enteredValPassword, setEnteredValPassword] = useState("");
+    // const [enteredName, setEnteredName] = useState("");
+    // const [enteredEmail, setEnteredEmail] = useState("");
+    // const [enteredOtp, setEnteredOtp] = useState("");
+    // const [enteredPhoneNumber, setEnteredPhoneNumber] = useState("");
+    // const [enteredPassword, setEnteredPassword] = useState("");
+    // const [enteredValPassword, setEnteredValPassword] = useState("");
+
+    const [registerData, setRegisterData] = useState({
+        enteredName: "",
+        enteredEmail: "",
+        enteredOtp: "",
+        enteredPhoneNumber: "",
+        enteredPassword: "",
+        enteredValPassword: "",
+    });
+    const {
+        enteredName,
+        enteredEmail,
+        enteredOtp,
+        enteredPhoneNumber,
+        enteredPassword,
+        enteredValPassword,
+    } = registerData;
+
+    const handleChangeRegisterState = (field: any, value: any) => {
+        setRegisterData(
+            (prev) =>
+                (prev = {
+                    ...prev,
+                    [field]: value,
+                })
+        );
+    };
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isValPasswordVisible, setIsValPasswordVisible] = useState(false);
 
-    const userNameBorderColor = useSharedValue("#e7e8ee");
+    const nameBorderColor = useSharedValue("#e7e8ee");
     const passwordBorderColor = useSharedValue("#e7e8ee");
     const otpBorderColor = useSharedValue("#e7e8ee");
+    const phoneNumberBorderColor = useSharedValue("#e7e8ee");
     const emailBorderColor = useSharedValue("#e7e8ee");
     const valPasswordBorderColor = useSharedValue("#e7e8ee");
 
-    const isRegisterDisabled = !enteredUserName || !enteredEmail || !enteredOtp || !enteredPassword || !enteredValPassword;
+    const isRegisterDisabled =
+        !enteredName ||
+        !enteredEmail ||
+        !enteredOtp ||
+        !enteredPhoneNumber ||
+        !enteredPassword ||
+        !enteredValPassword;
+
+    const isOtpDisabled = !enteredEmail;
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -51,9 +89,9 @@ const register = () => {
         setIsValPasswordVisible(!isValPasswordVisible);
     };
 
-    const clearText = (setText: (text: string) => void) => {
-        setText("");
-    };
+    // const clearText = (setText: (text: string) => void) => {
+    //     setText("");
+    // };
 
     const handleFocus = (borderColor: { value: string }) => {
         borderColor.value = withTiming("#657ef8", { duration: 250 });
@@ -67,28 +105,75 @@ const register = () => {
         useAnimatedStyle(() => ({
             borderColor: borderColor.value,
         }));
+
+    const handleVerifyOtpEmail = () => {
+        send_otp_verify_email({
+            email: enteredEmail.trim(),
+        })
+            .then((response) => {
+                console.log(response);
+                if (response.status === 200) {
+                    alert("Gửi OTP thành công");
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const handleRegister = () => {
+        if (enteredPassword !== enteredValPassword) {
+            alert("Mật khẩu không khớp");
+            return;
+        }
+        user_register({
+            name: enteredName.trim(),
+            email: enteredEmail.trim(),
+            otp: enteredOtp.trim(),
+            phoneNumber: enteredPhoneNumber.trim(),
+            password: enteredPassword.trim(),
+            confirmPassword: enteredValPassword.trim(),
+        })
+            .then((response) => {
+                console.log(response);
+                if (response.status === 200) {
+                    alert("Đăng ký thành công");
+                    router.replace("/login");
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const testHandleRegister = () => {
+        console.log(registerData);
+        handleRegister();
+    };
     return (
         <ScrollView className="flex-1 bg-[#fff]">
             <StatusBar style="dark" />
-            <View className="flex-1 px-[15px] pt-[30px]  min-h-screen">
-                <View className="rounded-[100px]  overflow-hidden self-start">
-                    <Pressable
-                        className="p-[7px]"
-                        android_ripple={{ color: "gray" }}
-                        onPress={() => rounter.back()}
-                    >
-                        <Ionicons
-                            name="chevron-back-outline"
-                            size={25}
-                            color="#4a4d52"
-                            className="translate-x-[-2px]"
-                        />
-                    </Pressable>
-                </View>
+            <View className="flex-1 px-[15px] pt-[25px] min-h-screen">
                 <View className="width-full items-center">
-                    <Title />
+                    <View className="rounded-[100px]  overflow-hidden self-start ">
+                        <Pressable
+                            className="p-[7px]"
+                            android_ripple={{ color: "gray" }}
+                            onPress={() => router.back()}
+                        >
+                            <Ionicons
+                                name="chevron-back-outline"
+                                size={25}
+                                color="#4a4d52"
+                                className="translate-x-[-2px]"
+                            />
+                        </Pressable>
+                    </View>
+                    <View className="flex-1 self-center translate-y-[-20px]">
+                        <Title />
+                    </View>
                 </View>
-                <View className="p-[10px] w-full items-center">
+                <View className="p-[10px] pt-[0px] w-full items-center">
                     <View
                         className="rounded-full overflow-hidden m-[10px] w-4/5"
                         style={styles.shadow}
@@ -134,22 +219,28 @@ const register = () => {
                         <View className="flex-row">
                             <AnimatedTextInput
                                 className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-xl pr-[100px]"
-                                style={animatedBorderStyle(userNameBorderColor)}
+                                style={animatedBorderStyle(nameBorderColor)}
                                 placeholder="Tên đăng nhập"
                                 maxLength={30}
-                                value={enteredUserName}
+                                value={enteredName}
                                 onChangeText={(text) =>
-                                    setEnteredUserName(text)
+                                    handleChangeRegisterState(
+                                        "enteredName",
+                                        text
+                                    )
                                 }
-                                onFocus={() => handleFocus(userNameBorderColor)}
-                                onBlur={() => handleBlur(userNameBorderColor)}
+                                onFocus={() => handleFocus(nameBorderColor)}
+                                onBlur={() => handleBlur(nameBorderColor)}
                                 selectionColor="#657ef8"
                             />
-                            {enteredUserName.length > 0 && (
+                            {enteredName.length > 0 && (
                                 <Pressable
                                     className="right-[11px] top-[29px] absolute"
                                     onPress={() =>
-                                        clearText(setEnteredUserName)
+                                        handleChangeRegisterState(
+                                            "enteredName",
+                                            ""
+                                        )
                                     }
                                 >
                                     <Ionicons
@@ -168,7 +259,12 @@ const register = () => {
                                 placeholder="Email"
                                 maxLength={30}
                                 value={enteredEmail}
-                                onChangeText={(text) => setEnteredEmail(text)}
+                                onChangeText={(text) =>
+                                    handleChangeRegisterState(
+                                        "enteredEmail",
+                                        text
+                                    )
+                                }
                                 onFocus={() => handleFocus(emailBorderColor)}
                                 onBlur={() => handleBlur(emailBorderColor)}
                                 selectionColor="#657ef8"
@@ -176,7 +272,12 @@ const register = () => {
                             {enteredEmail.length > 0 && (
                                 <Pressable
                                     className="right-[11px] top-[29px] absolute"
-                                    onPress={() => clearText(setEnteredEmail)}
+                                    onPress={() =>
+                                        handleChangeRegisterState(
+                                            "enteredEmail",
+                                            ""
+                                        )
+                                    }
                                 >
                                     <Ionicons
                                         name="close-circle-outline"
@@ -193,7 +294,13 @@ const register = () => {
                                 placeholder="OTP"
                                 maxLength={6}
                                 value={enteredOtp}
-                                onChangeText={(text) => setEnteredOtp(text)}
+                                keyboardType={"number-pad"}
+                                onChangeText={(text) =>
+                                    handleChangeRegisterState(
+                                        "enteredOtp",
+                                        text
+                                    )
+                                }
                                 onFocus={() => handleFocus(otpBorderColor)}
                                 onBlur={() => handleBlur(otpBorderColor)}
                                 selectionColor="#657ef8"
@@ -217,15 +324,67 @@ const register = () => {
                                 // style={styles.shadow}
                             >
                                 <Pressable
-                                    className="justify-center items-center py-[15px] px-[15px]"
-                                    onPress={() => alert("Gửi OTP")}
-                                    android_ripple={{ color: "gray" }}
+                                    onPress={handleVerifyOtpEmail}
+                                    disabled={isOtpDisabled}
+                                    android_ripple={
+                                        isOtpDisabled ? null : { color: "gray" }
+                                    }
                                 >
-                                    <Text className="text-[#fff] text-xl">
-                                        Gửi
-                                    </Text>
+                                    <View
+                                        className="justify-center items-center py-[15px] px-[15px]"
+                                        style={
+                                            isOtpDisabled &&
+                                            styles.registerButtonDisabled
+                                        }
+                                    >
+                                        <Text className="text-[#fff] text-xl">
+                                            Gửi
+                                        </Text>
+                                    </View>
                                 </Pressable>
                             </View>
+                        </View>
+
+                        <View className="flex-row">
+                            <AnimatedTextInput
+                                className="bg-[#fff] rounded-lg border-2 m-[10px] p-[10px] px-[20px] justify-center items-center w-full h-[60px] text-xl pr-[100px]"
+                                style={animatedBorderStyle(
+                                    phoneNumberBorderColor
+                                )}
+                                placeholder="Số điện thoại"
+                                maxLength={15}
+                                value={enteredPhoneNumber}
+                                onChangeText={(text) =>
+                                    handleChangeRegisterState(
+                                        "enteredPhoneNumber",
+                                        text
+                                    )
+                                }
+                                onFocus={() =>
+                                    handleFocus(phoneNumberBorderColor)
+                                }
+                                onBlur={() =>
+                                    handleBlur(phoneNumberBorderColor)
+                                }
+                                selectionColor="#657ef8"
+                            />
+                            {enteredPhoneNumber.length > 0 && (
+                                <Pressable
+                                    className="right-[11px] top-[29px] absolute"
+                                    onPress={() =>
+                                        handleChangeRegisterState(
+                                            "enteredPhoneNumber",
+                                            ""
+                                        )
+                                    }
+                                >
+                                    <Ionicons
+                                        name="close-circle-outline"
+                                        size={24}
+                                        color="#9FB7B9"
+                                    />
+                                </Pressable>
+                            )}
                         </View>
 
                         <View className="flex-row items-center">
@@ -237,7 +396,10 @@ const register = () => {
                                 secureTextEntry={!isPasswordVisible}
                                 value={enteredPassword}
                                 onChangeText={(text) =>
-                                    setEnteredPassword(text)
+                                    handleChangeRegisterState(
+                                        "enteredPassword",
+                                        text
+                                    )
                                 }
                                 onFocus={() => handleFocus(passwordBorderColor)}
                                 onBlur={() => handleBlur(passwordBorderColor)}
@@ -247,7 +409,10 @@ const register = () => {
                                 <Pressable
                                     className="right-[48px] top-[29px] absolute"
                                     onPress={() =>
-                                        clearText(setEnteredPassword)
+                                        handleChangeRegisterState(
+                                            "enteredPassword",
+                                            ""
+                                        )
                                     }
                                 >
                                     <Ionicons
@@ -283,7 +448,10 @@ const register = () => {
                                 secureTextEntry={!isValPasswordVisible}
                                 value={enteredValPassword}
                                 onChangeText={(text) =>
-                                    setEnteredValPassword(text)
+                                    handleChangeRegisterState(
+                                        "enteredValPassword",
+                                        text
+                                    )
                                 }
                                 onFocus={() =>
                                     handleFocus(valPasswordBorderColor)
@@ -297,7 +465,10 @@ const register = () => {
                                 <Pressable
                                     className="right-[48px] top-[29px] absolute"
                                     onPress={() =>
-                                        clearText(setEnteredValPassword)
+                                        handleChangeRegisterState(
+                                            "enteredValPassword",
+                                            ""
+                                        )
                                     }
                                 >
                                     <Ionicons
@@ -328,16 +499,17 @@ const register = () => {
                         style={styles.shadow}
                     >
                         <Pressable
-                            onPress={() => alert("Đăng ký")}
+                            onPress={testHandleRegister}
                             disabled={isRegisterDisabled}
                             android_ripple={
-                              isRegisterDisabled ? null : { color: "gray" }
+                                isRegisterDisabled ? null : { color: "gray" }
                             }
                         >
                             <View
                                 className="p-[10px] justify-center items-center"
                                 style={
-                                  isRegisterDisabled && styles.registerButtonDisabled
+                                    isRegisterDisabled &&
+                                    styles.registerButtonDisabled
                                 }
                             >
                                 <Text className="ml-[10px] text-[#fff] text-2xl">
