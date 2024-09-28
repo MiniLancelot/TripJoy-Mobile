@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const instance = axios.create({
-    baseURL: "http://192.168.1.16:2100/api/v1",
+export const instance = axios.create({
+    baseURL: "https://192.168.1.13:6260/api/v1",
     headers: {
         "Content-Type": "application/json",
         "Allow-Control-Allow-Origin": "*",
@@ -11,4 +11,15 @@ const instance = axios.create({
     withCredentials: true,
 });
 
-export default instance;
+export const login = axios.create({
+    baseURL: "https://localhost:6360",
+    headers: {
+        "Content-Type": "application/json",
+        "Allow-Control-Allow-Origin": "*",
+        "Allow-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+    },
+    responseType: "json",
+    withCredentials: true,
+});
+
+

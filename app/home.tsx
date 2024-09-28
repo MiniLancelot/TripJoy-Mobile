@@ -20,9 +20,9 @@ const home = () => {
 
     }
     return (
-        <View >
-            <Text className="pt-[50px]">Congratualtions, you have log in as {user}</Text>
-            <Pressable onPress={LogoutHandler}>
+        <View className="flex-1 items-center justify-center">
+            <Text className="pt-[50px] text-5xl text-">Hello</Text>
+            <Pressable onPress={LogoutHandler} className="mt-[100px]">
                 <Text>Logout</Text>
             </Pressable>
         </View>

@@ -106,20 +106,30 @@ const register = () => {
             borderColor: borderColor.value,
         }));
 
-    const handleVerifyOtpEmail = () => {
-        send_otp_verify_email({
-            email: enteredEmail.trim(),
-        })
-            .then((response) => {
-                console.log(response);
-                if (response.status === 200) {
-                    alert("Gửi OTP thành công");
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
+
+
+
+
+        const handleVerifyOtpEmail = () => {
+            const data = {
+                email: enteredEmail,
+            };
+        
+            send_otp_verify_email(data)
+                .then((response) => {
+                    console.log('Response:', response);
+                    if (response && response.status === 200) {
+                        alert("Gửi OTP thành công");
+                    } else {
+                        console.error('Unexpected response structure:', response);
+                        alert("Failed to send OTP");
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert("An error occurred while sending OTP");
+                });
+        };
 
     const handleRegister = () => {
         if (enteredPassword !== enteredValPassword) {

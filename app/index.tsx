@@ -30,7 +30,7 @@ const Index = () => {
         if (dataToken) {
             router.replace("/home");
         } else {
-            router.replace("/login");
+            router.replace("/onboarding");
         }
     }
     return (
