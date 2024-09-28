@@ -117,7 +117,7 @@ const register = () => {
         
             send_otp_verify_email(data)
                 .then((response) => {
-                    console.log('Response:', response);
+                    //console.log('Response:', response);
                     if (response && response.status === 200) {
                         alert("Gửi OTP thành công");
                     } else {
