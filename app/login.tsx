@@ -169,30 +169,30 @@ const Login = () => {
         }
     };
 
-    const handleLogin = async () => {
-        await request
-            .post("/Account/login", {
-                email: enteredUserName,
-                password: enteredPassword,
-            })
-            .then((response) => {
-                console.log(response.data.user.name);
-                AsyncStorage.setItem("info", JSON.stringify(response.data));
-                router.push("/home");
-            })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    const values = Object.values(error.response.data.errors);
-                    if (Array.isArray(values[0])) {
-                        console.error(values[0][0]);
-                    }
-                } else if (error.request) {
-                    console.error("No response received from the server.");
-                } else {
-                    console.error(error.message);
-                }
-            });
-    };
+    // const handleLogin = async () => {
+    //     await request
+    //         .post("/Account/login", {
+    //             email: enteredUserName,
+    //             password: enteredPassword,
+    //         })
+    //         .then((response) => {
+    //             console.log(response.data.user.name);
+    //             AsyncStorage.setItem("info", JSON.stringify(response.data));
+    //             router.push("/home");
+    //         })
+    //         .catch((error) => {
+    //             if (error.response && error.response.data) {
+    //                 const values = Object.values(error.response.data.errors);
+    //                 if (Array.isArray(values[0])) {
+    //                     console.error(values[0][0]);
+    //                 }
+    //             } else if (error.request) {
+    //                 console.error("No response received from the server.");
+    //             } else {
+    //                 console.error(error.message);
+    //             }
+    //         });
+    // };
 
     const handleLoginTest = () => {
         user_login({
@@ -203,14 +203,18 @@ const Login = () => {
                 console.log(response.data);
                 if (response.status == 200) {
                     AsyncStorage.setItem(
-                        "AccessToken",
-                        JSON.stringify(response.data)
+                        "info",
+                        JSON.stringify({
+                            accessToken: response.data.userLogin.accessToken,
+                            refreshToken: response.data.userLogin.refreshToken,
+                        })
                     );
                     router.replace("/home");
                 }
             })
             .catch((err) => {
-                console.info(err.message);
+                console.error(err.detail);
+                // console.info(err.message);
             });
     };
 

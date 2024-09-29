@@ -1,13 +1,9 @@
 import * as api from "@/utils/instance";
 
-
 export const user_login = async (data: any) => {
     try {
-        const result = await api.login("/login", {
+        const result = await api.instance("/login", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
             data: JSON.stringify(data),
         });
         return result;
@@ -18,9 +14,22 @@ export const user_login = async (data: any) => {
     }
 };
 
+export const user_logout = async (data: any, headers: any) => {
+    try {
+        const result = await api.instance("/logout",{
+            method: "POST",
+            headers: headers,
+            data: JSON.stringify(data),
+        });
+        return result;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
 export const user_register = async (data: any) => {
     try {
-        const result = await api.instance("/Account/register-with-otp", {
+        const result = await api.instance("/api/v1/Account/register-with-otp", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
