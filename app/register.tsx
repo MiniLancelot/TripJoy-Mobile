@@ -79,7 +79,31 @@ const register = () => {
         !enteredPassword ||
         !enteredValPassword;
 
-    const isOtpDisabled = !enteredEmail;
+    const validateEmail = (email: string) => {
+        if (email.length === 0) {
+            console.log("Email không được để trống");
+            return true;
+        }
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+            console.log("Email sai cú pháp");
+            return true;
+        }
+        return false;   
+    };
+
+    const validateOtp = (otp: string) => {
+        if (otp.length === 0) {
+            console.log("OTP không được để trống");
+            return true;
+        }
+        if (!/^[0-9]{6}$/.test(otp)) {
+            console.log("OTP phải là 6 số");
+            return true;
+        }
+    };
+
+
+    var isOtpDisabled = !enteredEmail;
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -97,8 +121,10 @@ const register = () => {
         borderColor.value = withTiming("#657ef8", { duration: 250 });
     };
 
-    const handleBlur = (borderColor: { value: string }) => {
-        borderColor.value = withTiming("#e7e8ee", { duration: 250 });
+    const handleBlur = (borderColor: { value: string }, isHavingProblem?: boolean) => {
+        borderColor.value = withTiming(isHavingProblem ? "#ff0000" : "#e7e8ee", {
+            duration: 250,
+        });
     };
 
     const animatedBorderStyle = (borderColor: { value: any }) =>
@@ -107,6 +133,10 @@ const register = () => {
         }));
 
     const handleVerifyOtpEmail = () => {
+        if (validateEmail(enteredEmail)) {
+            alert("Email không hợp lệ");
+            return;
+        }
         send_otp_verify_email({
             email: enteredEmail.trim(),
         })
@@ -230,7 +260,12 @@ const register = () => {
                                     )
                                 }
                                 onFocus={() => handleFocus(nameBorderColor)}
-                                onBlur={() => handleBlur(nameBorderColor)}
+                                onBlur={() =>
+                                    handleBlur(
+                                        nameBorderColor,
+                                        enteredName.length === 0
+                                    )
+                                }
                                 selectionColor="#657ef8"
                             />
                             {enteredName.length > 0 && (
@@ -266,7 +301,12 @@ const register = () => {
                                     )
                                 }
                                 onFocus={() => handleFocus(emailBorderColor)}
-                                onBlur={() => handleBlur(emailBorderColor)}
+                                onBlur={() =>
+                                    handleBlur(
+                                        emailBorderColor,
+                                        validateEmail(enteredEmail)
+                                    )
+                                }
                                 selectionColor="#657ef8"
                             />
                             {enteredEmail.length > 0 && (
@@ -294,7 +334,7 @@ const register = () => {
                                 placeholder="OTP"
                                 maxLength={6}
                                 value={enteredOtp}
-                                keyboardType={"number-pad"}
+                                keyboardType={"phone-pad"}
                                 onChangeText={(text) =>
                                     handleChangeRegisterState(
                                         "enteredOtp",
@@ -302,7 +342,12 @@ const register = () => {
                                     )
                                 }
                                 onFocus={() => handleFocus(otpBorderColor)}
-                                onBlur={() => handleBlur(otpBorderColor)}
+                                onBlur={() =>
+                                    handleBlur(
+                                        otpBorderColor,
+                                        enteredOtp.length === 0
+                                    )
+                                }
                                 selectionColor="#657ef8"
                             />
                             {/* {enteredOtp.length > 0 && (
@@ -364,7 +409,10 @@ const register = () => {
                                     handleFocus(phoneNumberBorderColor)
                                 }
                                 onBlur={() =>
-                                    handleBlur(phoneNumberBorderColor)
+                                    handleBlur(
+                                        phoneNumberBorderColor,
+                                        enteredPhoneNumber.length === 0
+                                    )
                                 }
                                 selectionColor="#657ef8"
                             />
@@ -402,7 +450,12 @@ const register = () => {
                                     )
                                 }
                                 onFocus={() => handleFocus(passwordBorderColor)}
-                                onBlur={() => handleBlur(passwordBorderColor)}
+                                onBlur={() =>
+                                    handleBlur(
+                                        passwordBorderColor,
+                                        enteredPassword.length === 0
+                                    )
+                                }
                                 selectionColor="#657ef8"
                             />
                             {enteredPassword.length > 0 && (
@@ -457,7 +510,10 @@ const register = () => {
                                     handleFocus(valPasswordBorderColor)
                                 }
                                 onBlur={() =>
-                                    handleBlur(valPasswordBorderColor)
+                                    handleBlur(
+                                        valPasswordBorderColor,
+                                        enteredValPassword.length === 0
+                                    )
                                 }
                                 selectionColor="#657ef8"
                             />

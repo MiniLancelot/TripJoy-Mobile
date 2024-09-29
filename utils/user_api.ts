@@ -9,7 +9,8 @@ export const user_login = async (data: any) => {
         return result;
     } catch (error: any) {
         console.info(error.response.data);
-        return error.response.data;
+        // return error.response.data;
+        throw error.response.data;
     }
 };
 
