@@ -26,7 +26,7 @@ const Index = () => {
     }
 
     const handleToken = async () => {
-        const dataToken = await AsyncStorage.getItem("AccessToken");
+        const dataToken = await AsyncStorage.getItem("info");
         if (dataToken) {
             router.replace("/home");
         } else {

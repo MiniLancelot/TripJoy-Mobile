@@ -1,6 +1,6 @@
 import axios from "axios";
 export const instance = axios.create({
-    baseURL: "http://192.168.30.120:6200/api/v1",
+    baseURL: "http://192.168.1.13:6200/api/v1",
     headers: {
         "Content-Type": "application/json",
         "Allow-Control-Allow-Origin": "*",
@@ -12,7 +12,7 @@ export const instance = axios.create({
 });
 
 export const login = axios.create({
-    baseURL: "http://192.168.30.120:6300",
+    baseURL: "http://192.168.1.13:6300",
     headers: {
         "Content-Type": "application/json",
         "Allow-Control-Allow-Origin": "*",
