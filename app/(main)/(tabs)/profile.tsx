@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import ColorList from '@/components/Others/ColorList'
 // import { user_logout } from '@/utils/user_api';
@@ -31,11 +31,29 @@ const profile = () => {
         }
     };
 
+    const confirmLogout = () => {
+        Alert.alert(
+            "Xác nhận đăng xuất",
+            "Bạn có muốn đăng xuất không?",
+            [
+                {
+                    text: "Huỷ",
+                    style: "cancel",
+                },
+                {
+                    text: "Đăng xuất",
+                    onPress: LogoutHandler,
+                },
+            ],
+            { cancelable: false }
+        );
+    };
+
     return (
         <View className="flex-1 items-center justify-center bg-white">
             <Text className="pt-[50px] text-5xl">Goodbye</Text>
             {/* <Link href={'/(main)/details'}>Details</Link> */}
-            <Pressable onPress={LogoutHandler} className="mt-[100px]">
+            <Pressable onPress={confirmLogout} className="mt-[100px]">
                 <Text>Logout</Text>
             </Pressable>
         </View>

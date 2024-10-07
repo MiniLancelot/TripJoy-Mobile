@@ -38,7 +38,7 @@ const Home = () => {
                     name="Mạng xã hội"
                     component={NewsfeedScreen}
                     options={{
-                        tabBarIndicatorStyle: { backgroundColor: "#17a1fa" },
+                        tabBarIndicatorStyle: { backgroundColor: "#17a1fa", height: 3 },
                         tabBarLabel: ({ color }) => (
                             <Text style={{ color, textTransform: 'none' }}>Tripsfeed</Text>
                         ),
@@ -48,7 +48,7 @@ const Home = () => {
                     name="Bạn bè"
                     component={FriendScreen}
                     options={{
-                        tabBarIndicatorStyle: { backgroundColor: "#ff8170" },
+                        tabBarIndicatorStyle: { backgroundColor: "#ff8170", height: 3 },
                         tabBarLabel: ({ color }) => (
                             <Text style={{ color, textTransform: 'none' }}>Bạn bè</Text>
                         ),
@@ -58,7 +58,7 @@ const Home = () => {
                     name="Trang cá nhân"
                     component={PersonalScreen}
                     options={{
-                        tabBarIndicatorStyle: { backgroundColor: "#46e8a5" },
+                        tabBarIndicatorStyle: { backgroundColor: "#46e8a5", height: 3 },
                         tabBarLabel: ({ color }) => (
                             <Text style={{ color, textTransform: 'none' }}>Cá nhân</Text>
                         ),
