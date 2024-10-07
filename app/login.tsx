@@ -9,7 +9,7 @@ import {
     useWindowDimensions,
     ScrollView,
 } from "react-native";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -19,12 +19,12 @@ import Title from "@/components/Onboarding/Title";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import request from "@/utils/request";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 import "@/global.css";
 import SeparateLine from "@/components/Others/SeparateLine";
 import { user_login } from "@/utils/user_api";
+// import { useAuth } from "@/utils/AuthContext";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -32,6 +32,7 @@ const Login = () => {
     const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
         useWindowDimensions();
     const router = useRouter();
+    // const { login, authState } = useAuth();
     const facebookIcon = require("@/assets/icons/facebook.png");
     const googleIcon = require("@/assets/icons/google.png");
 
@@ -169,30 +170,30 @@ const Login = () => {
         }
     };
 
-    const handleLogin = async () => {
-        await request
-            .post("/Account/login", {
-                email: enteredUserName,
-                password: enteredPassword,
-            })
-            .then((response) => {
-                console.log(response.data.user.name);
-                AsyncStorage.setItem("info", JSON.stringify(response.data));
-                router.push("/home");
-            })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    const values = Object.values(error.response.data.errors);
-                    if (Array.isArray(values[0])) {
-                        console.error(values[0][0]);
-                    }
-                } else if (error.request) {
-                    console.error("No response received from the server.");
-                } else {
-                    console.error(error.message);
-                }
-            });
-    };
+    // const handleLogin = async () => {
+    //     await request
+    //         .post("/Account/login", {
+    //             email: enteredUserName,
+    //             password: enteredPassword,
+    //         })
+    //         .then((response) => {
+    //             console.log(response.data.user.name);
+    //             AsyncStorage.setItem("info", JSON.stringify(response.data));
+    //             router.push("/home");
+    //         })
+    //         .catch((error) => {
+    //             if (error.response && error.response.data) {
+    //                 const values = Object.values(error.response.data.errors);
+    //                 if (Array.isArray(values[0])) {
+    //                     console.error(values[0][0]);
+    //                 }
+    //             } else if (error.request) {
+    //                 console.error("No response received from the server.");
+    //             } else {
+    //                 console.error(error.message);
+    //             }
+    //         });
+    // };
 
     const handleLoginTest = () => {
         user_login({
@@ -203,16 +204,43 @@ const Login = () => {
                 console.log(response.data);
                 if (response.status == 200) {
                     AsyncStorage.setItem(
-                        "AccessToken",
-                        JSON.stringify(response.data)
+                        "info",
+                        JSON.stringify({
+                            accessToken: response.data.accessToken,
+                            refreshToken: response.data.refreshToken,
+                        })
                     );
                     router.replace("/home");
                 }
             })
             .catch((err) => {
-                console.log(err.message);
+                console.error(err);
+                // console.info(err.message);
             });
     };
+
+    // useEffect(() => {console.info(authState)}, [authState]);
+
+    // const handleLoginTest = async () => {
+    //     try {
+    //         await login!({
+    //             email: enteredUserName,
+    //             password: enteredPassword,
+    //         });
+    //         router.replace("/home");
+    //     } catch (error: any) {
+    //         if (error.response && error.response.data) {
+    //             const values = Object.values(error.response.data.errors);
+    //             if (Array.isArray(values[0])) {
+    //                 console.error(values[0][0]);
+    //             }
+    //         } else if (error.request) {
+    //             console.error("No response received from the server.");
+    //         } else {
+    //             console.error(error.message);
+    //         }
+    //     }
+    // };
 
     return (
         <ScrollView className="flex-1 bg-[#fff] ">
