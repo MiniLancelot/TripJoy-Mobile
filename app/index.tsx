@@ -4,21 +4,26 @@ import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
+import { useAuth } from "@/app/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
 const Index = () => {
     const router = useRouter();
+    const { session } = useAuth();
     const [loaded] = useFonts({
         LeckerliOne: require("@/assets/fonts/LeckerliOne-Regular.ttf"),
     });
 
     useEffect(() => {
-        if (loaded) {
-            SplashScreen.preventAutoHideAsync();
-            handleToken();
-            SplashScreen.hideAsync();
+        const loading = async () => {
+            if (loaded) {
+                SplashScreen.preventAutoHideAsync();
+                await handleToken();
+                SplashScreen.hideAsync();
+            }
         }
+        loading();
     }, [loaded]);
 
     if (!loaded) {
@@ -26,8 +31,7 @@ const Index = () => {
     }
 
     const handleToken = async () => {
-        const dataToken = await AsyncStorage.getItem("info");
-        if (dataToken) {
+        if (session) {
             router.replace("/home");
         } else {
             router.replace("/onboarding");

@@ -24,7 +24,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import "@/global.css";
 import SeparateLine from "@/components/Others/SeparateLine";
 import { user_login } from "@/utils/user_api";
-// import { useAuth } from "@/utils/AuthContext";
+import { useAuth } from "@/app/AuthContext";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -32,7 +32,7 @@ const Login = () => {
     const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
         useWindowDimensions();
     const router = useRouter();
-    // const { login, authState } = useAuth();
+    const { login } = useAuth();
     const facebookIcon = require("@/assets/icons/facebook.png");
     const googleIcon = require("@/assets/icons/google.png");
 
@@ -195,52 +195,52 @@ const Login = () => {
     //         });
     // };
 
-    const handleLoginTest = () => {
-        user_login({
-            email: enteredUserName,
-            password: enteredPassword,
-        })
-            .then((response) => {
-                console.log(response.data);
-                if (response.status == 200) {
-                    AsyncStorage.setItem(
-                        "info",
-                        JSON.stringify({
-                            accessToken: response.data.accessToken,
-                            refreshToken: response.data.refreshToken,
-                        })
-                    );
-                    router.replace("/home");
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-                // console.info(err.message);
-            });
-    };
+    // const handleLoginTest = () => {
+    //     user_login({
+    //         email: enteredUserName,
+    //         password: enteredPassword,
+    //     })
+    //         .then((response) => {
+    //             console.log(response.data);
+    //             if (response.status == 200) {
+    //                 AsyncStorage.setItem(
+    //                     "info",
+    //                     JSON.stringify({
+    //                         accessToken: response.data.accessToken,
+    //                         refreshToken: response.data.refreshToken,
+    //                     })
+    //                 );
+    //                 router.replace("/home");
+    //             }
+    //         })
+    //         .catch((err) => {
+    //             console.error(err);
+    //             // console.info(err.message);
+    //         });
+    // };
 
     // useEffect(() => {console.info(authState)}, [authState]);
 
-    // const handleLoginTest = async () => {
-    //     try {
-    //         await login!({
-    //             email: enteredUserName,
-    //             password: enteredPassword,
-    //         });
-    //         router.replace("/home");
-    //     } catch (error: any) {
-    //         if (error.response && error.response.data) {
-    //             const values = Object.values(error.response.data.errors);
-    //             if (Array.isArray(values[0])) {
-    //                 console.error(values[0][0]);
-    //             }
-    //         } else if (error.request) {
-    //             console.error("No response received from the server.");
-    //         } else {
-    //             console.error(error.message);
-    //         }
-    //     }
-    // };
+    const handleLoginTest = async () => {
+        try {
+            await login!({
+                email: enteredUserName,
+                password: enteredPassword,
+            });
+            router.replace("/home");
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                const values = Object.values(error.response.data.errors);
+                if (Array.isArray(values[0])) {
+                    console.error(values[0][0]);
+                }
+            } else if (error.request) {
+                console.error("No response received from the server.");
+            } else {
+                console.error(error.message);
+            }
+        }
+    };
 
     return (
         <ScrollView className="flex-1 bg-[#fff] ">

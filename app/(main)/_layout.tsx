@@ -9,9 +9,25 @@ import {
 import React from "react";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/app/AuthContext";
 
 const _layout = () => {
     const tempAvatar = require("@/assets/images/others/avatar.jpg");
+    // const { session } = useAuth();
+    // if (session === null) {
+    //     return (
+    //         <Stack
+    //             screenOptions={{
+    //                 headerShown: false,
+    //             }}
+    //         >
+    //             <Stack.Screen name="login" />
+    //             <Stack.Screen name="register" />
+    //             <Stack.Screen name="forgot-password" />
+    //         </Stack>
+    //     );
+
+    // }
     return (
         <Stack
             screenOptions={{

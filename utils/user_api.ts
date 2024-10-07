@@ -18,7 +18,6 @@ export const user_logout = async (data: any, headers: any) => {
     try {
         const result = await api.identity("/logout",{
             method: "POST",
-            headers: headers,
             data: JSON.stringify(data),
         });
         return result;

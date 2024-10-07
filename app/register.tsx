@@ -6,6 +6,7 @@ import {
     TextInput,
     Image,
     StyleSheet,
+    Alert,
 } from "react-native";
 import "@/global.css";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -19,7 +20,8 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import SeparateLine from "@/components/Others/SeparateLine";
-import { send_otp_verify_email, user_register } from "@/utils/user_api";
+// import { send_otp_verify_email, user_register } from "@/utils/user_api";
+import { useAuth } from "./AuthContext";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -27,6 +29,7 @@ const register = () => {
     const router = useRouter();
     const facebookIcon = require("@/assets/icons/facebook.png");
     const googleIcon = require("@/assets/icons/google.png");
+    const { send_otp_verify_email, register } = useAuth();
 
     // const [enteredName, setEnteredName] = useState("");
     // const [enteredEmail, setEnteredEmail] = useState("");
@@ -88,7 +91,7 @@ const register = () => {
             console.log("Email sai cú pháp");
             return true;
         }
-        return false;   
+        return false;
     };
 
     const validateOtp = (otp: string) => {
@@ -102,7 +105,6 @@ const register = () => {
         }
     };
 
-
     var isOtpDisabled = !enteredEmail;
 
     const togglePasswordVisibility = () => {
@@ -113,18 +115,20 @@ const register = () => {
         setIsValPasswordVisible(!isValPasswordVisible);
     };
 
-    // const clearText = (setText: (text: string) => void) => {
-    //     setText("");
-    // };
-
     const handleFocus = (borderColor: { value: string }) => {
         borderColor.value = withTiming("#657ef8", { duration: 250 });
     };
 
-    const handleBlur = (borderColor: { value: string }, isHavingProblem?: boolean) => {
-        borderColor.value = withTiming(isHavingProblem ? "#ff0000" : "#e7e8ee", {
-            duration: 250,
-        });
+    const handleBlur = (
+        borderColor: { value: string },
+        isHavingProblem?: boolean
+    ) => {
+        borderColor.value = withTiming(
+            isHavingProblem ? "#ff0000" : "#e7e8ee",
+            {
+                duration: 250,
+            }
+        );
     };
 
     const animatedBorderStyle = (borderColor: { value: any }) =>
@@ -132,48 +136,39 @@ const register = () => {
             borderColor: borderColor.value,
         }));
 
-    const handleVerifyOtpEmail = () => {
+    const handleVerifyOtpEmail = async () => {
         if (validateEmail(enteredEmail)) {
             alert("Email không hợp lệ");
             return;
         }
-        send_otp_verify_email({
+        await send_otp_verify_email!({
             email: enteredEmail.trim(),
-        })
-            .then((response) => {
-                console.log(response);
-                if (response.status === 200) {
-                    alert("Gửi OTP thành công");
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        });
     };
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (enteredPassword !== enteredValPassword) {
             alert("Mật khẩu không khớp");
             return;
         }
-        user_register({
-            name: enteredName.trim(),
-            email: enteredEmail.trim(),
-            otp: enteredOtp.trim(),
-            phoneNumber: enteredPhoneNumber.trim(),
-            password: enteredPassword.trim(),
-            confirmPassword: enteredValPassword.trim(),
-        })
-            .then((response) => {
-                console.log(response);
-                if (response.status === 200) {
-                    alert("Đăng ký thành công");
-                    router.replace("/login");
-                }
-            })
-            .catch((error) => {
-                console.log(error);
+        try {
+            await register!({
+                name: enteredName.trim(),
+                email: enteredEmail.trim(),
+                otp: enteredOtp.trim(),
+                phoneNumber: enteredPhoneNumber.trim(),
+                password: enteredPassword.trim(),
+                confirmPassword: enteredValPassword.trim(),
             });
+            Alert.alert(
+                "Alert",
+                "Register successfully",
+                [{ text: "OK", onPress: () => router.replace("/login") }],
+                { cancelable: false }
+            );
+        } catch (error: any) {
+            console.error(error.response);
+        }
     };
 
     const testHandleRegister = () => {
