@@ -1,12 +1,12 @@
-import { View, Text, Pressable } from "react-native";
-import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
-import { user_logout } from "@/utils/user_api";
-// import { jwtDecode } from "jwt-decode";
+import { View, Text, Pressable } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import ColorList from '@/components/Others/ColorList'
+import { user_logout } from '@/utils/user_api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Link, useRouter } from 'expo-router';
 
-const home = () => {
-    const [user, setUser] = useState<any>(null);
+const profile = () => {
+  const [user, setUser] = useState<any>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -44,13 +44,14 @@ const home = () => {
     };
 
     return (
-        <View className="flex-1 items-center justify-center">
-            <Text className="pt-[50px] text-5xl">Hello</Text>
+        <View className="flex-1 items-center justify-center bg-white">
+            <Text className="pt-[50px] text-5xl">Goodbye</Text>
+            <Link href={'/(main)/details'}>Details</Link>
             <Pressable onPress={LogoutHandler} className="mt-[100px]">
                 <Text>Logout</Text>
             </Pressable>
         </View>
     );
-};
+}
 
-export default home;
+export default profile
