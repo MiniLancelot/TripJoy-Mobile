@@ -4,7 +4,7 @@ import ColorList from '@/components/Others/ColorList'
 
 const budget = () => {
   return (
-    <View  className='flex-1 bg-white'>
+    <View  className='flex-1 bg-[#fff]'>
       <ColorList color='#787169' />
     </View>
   )

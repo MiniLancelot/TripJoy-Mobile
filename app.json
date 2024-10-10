@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash1.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F2FDFF"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true
@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.minilancelot.TripJoyMobile"
     },
     "web": {
       "bundler": "metro",

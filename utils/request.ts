@@ -1,6 +1,6 @@
 import axios from "axios";
 export const identity = axios.create({
-    baseURL: "http://192.168.1.9:6200/api/v1/Account",
+    baseURL: "http://192.168.1.10:6200/api/v1/Account",
     headers: {
         "Content-Type": "application/json",
         "Allow-Control-Allow-Origin": "*",

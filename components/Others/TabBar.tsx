@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
@@ -29,7 +29,7 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
 
     return (
         // <View className="flex-row justify-between items-center bg-white py-[15px]">
-        <View className="flex-row absolute bottom-[25px] justify-between items-center bg-white mx-[20px] py-[15px] rounded-3xl shadow-2xl shadow-black">
+        <View  style={styles.tabBar}>
             {state.routes.map((route, index) => {
                 const { options } = descriptors[route.key];
                 const label =
@@ -108,5 +108,24 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    tabBar: {
+      flexDirection: 'row',
+      position: 'absolute',
+      bottom: 30,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: 'white',
+      marginHorizontal: 20,
+      paddingVertical: 15,
+      borderRadius: 30,
+      shadowColor: 'black',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+  });
 
 export default TabBar;

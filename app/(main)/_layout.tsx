@@ -10,6 +10,7 @@ import React from "react";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/app/AuthContext";
+import "@/global.css";
 
 const _layout = () => {
     const tempAvatar = require("@/assets/images/others/avatar.jpg");
@@ -59,7 +60,7 @@ const _layout = () => {
                                     name="notifications-outline"
                                     size={24}
                                     color="#737373"
-                                    className="mr-[20px]"
+                                    style={{ marginRight: 20 }} 
                                 />
                             </Pressable>
                             <Pressable
@@ -71,13 +72,14 @@ const _layout = () => {
                                     name="mail"
                                     size={24}
                                     color="#737373"
-                                    className="mr-[20px]"
+                                    style={{ marginRight: 20 }} 
                                 />
                             </Pressable>
                             <Image
                                 source={tempAvatar}
-                                className="w-[30px] h-[30px] rounded-2xl"
+                                // className="w-[0.5rem] h-[0.5rem] rounded-2xl"
                                 resizeMode="cover"
+                                style={{ width: 30, height: 30 , borderRadius: 15}}
                             />
                         </>
                     ),
