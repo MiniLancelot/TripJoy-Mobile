@@ -144,8 +144,9 @@ const Login = () => {
         useAnimatedStyle(() => ({
             borderColor: borderColor.value,
         }));
-
-    const isLoginDisabled = !enteredUserName || !enteredPassword;
+    
+    const emailValidate = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isLoginDisabled = !enteredUserName || !enteredPassword  || !emailValidate.test(enteredUserName);
 
     const handleGoogleLogin = async () => {
         try {
@@ -300,7 +301,7 @@ const Login = () => {
                                     animatedusernameTransform,
                                 ]}
                             >
-                                Tên đăng nhập
+                                Email
                             </Animated.Text>
                         </Pressable>
                         <View className="flex-row">

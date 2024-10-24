@@ -73,6 +73,7 @@ const register = () => {
     const phoneNumberBorderColor = useSharedValue("#e7e8ee");
     const emailBorderColor = useSharedValue("#e7e8ee");
     const valPasswordBorderColor = useSharedValue("#e7e8ee");
+    const emailValidate = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const isRegisterDisabled =
         !enteredName ||
@@ -80,7 +81,7 @@ const register = () => {
         !enteredOtp ||
         !enteredPhoneNumber ||
         !enteredPassword ||
-        !enteredValPassword;
+        !enteredValPassword;   
 
     const validateEmail = (email: string) => {
         if (email.length === 0) {
@@ -105,7 +106,7 @@ const register = () => {
         }
     };
 
-    var isOtpDisabled = !enteredEmail;
+    var isOtpDisabled = !enteredEmail || !emailValidate.test(enteredEmail);
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
