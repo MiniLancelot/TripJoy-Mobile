@@ -20,11 +20,11 @@ import React from "react";
 
 const ColorList = ({ color }: any) => {
     return (
-        <ScrollView className="px-[20px] py-[10px] h-full">
+        <ScrollView style={styles.container}>
             {[1, 0.8, 0.5].map((opacity) => (
                 <View
                     key={opacity}
-                    style={{ backgroundColor: color, opacity }}
+                    style={[{ backgroundColor: color, opacity }, styles.color1]}
                     className={`w-full h-[150px] rounded-xl mb-[15px]`}
                 />
             ))}
@@ -33,7 +33,7 @@ const ColorList = ({ color }: any) => {
 };
 
 const styles = StyleSheet.create({
-    color: {
+    color1: {
         width: "100%",
         height: 150,
         borderRadius: 25,

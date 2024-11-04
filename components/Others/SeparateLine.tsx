@@ -1,14 +1,38 @@
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 
-const SeparateLine = () => {
+type SeparateLineProps = {
+    text: string;
+};
+
+const SeparateLine = ( {text} : SeparateLineProps) => {
     return (
-        <View className="flex-row items-center my-[10px] mx-[40px]">
-            <View className="flex-1 h-[1px] bg-[#9FB7B9]" />
-            <Text className="mx-[10px] text-2xl text-[#9FB7B9]">or</Text>
-            <View className="flex-1 h-[1px] bg-[#9FB7B9]" />
+        <View style={styles.container}>
+            <View style={styles.line}/>
+            <Text style={styles.text}>{text}</Text>
+            <View style={styles.line}/>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginVertical: 10,
+        marginHorizontal: 40,
+    },
+    line: {
+        flex: 1,
+        height: 0.8,
+        backgroundColor: "#9FB7B9",
+    },
+    text: {
+        marginHorizontal: 7,
+        fontSize: 15,
+        lineHeight: 24,
+        color: "#9FB7B9",
+    }
+})
 
 export default SeparateLine;

@@ -18,7 +18,6 @@ export const user_logout = async (data: any, headers: any) => {
     try {
         const result = await api.identity("/logout",{
             method: "POST",
-            headers: headers,
             data: JSON.stringify(data),
         });
         return result;
@@ -38,7 +37,8 @@ export const user_register = async (data: any) => {
         });
         return result;
     } catch (error: any) {
-        return error.response.data;
+        // return error.response.data;
+        throw error;
     }
 };
 
