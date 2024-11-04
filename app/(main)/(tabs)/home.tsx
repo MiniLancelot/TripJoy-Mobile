@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 import {
   createMaterialTopTabNavigator,
   MaterialTopTabNavigationOptions,
@@ -16,31 +16,32 @@ const MaterialTopTabs = createMaterialTopTabNavigator();
 
 const Home = () => {
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
-      <Text>Hello</Text>
+    <View style={{ flex: 1, backgroundColor: "white", paddingTop:25}}>
+      {/* <Text>Search Bar Coming Soon</Text> */}
       <MaterialTopTabs.Navigator
         screenOptions={{
-          tabBarLabelStyle: { fontSize: 10, color: "black" },
+          tabBarLabelStyle: { fontSize: 10, color: "black", fontWeight: "bold", textTransform: "capitalize" },
           tabBarStyle: {
             backgroundColor: "white",
-            marginHorizontal: 20,
-            borderRadius: 10,
+            // marginHorizontal: 20,
+            // borderRadius: 10,
             overflow: "hidden",
           },
           tabBarItemStyle: {
             marginHorizontal: 30,
             padding: 0,
           },
+          tabBarIndicatorStyle: { width: '20%' },
 
           tabBarPressColor: "transparent",
           lazy: true,
         }}
       >
         <MaterialTopTabs.Screen
-          name="Mạng xã hội"
+          name="Tripfeed"
           component={NewsfeedScreen}
           options={{
-            tabBarIndicatorStyle: { backgroundColor: "#17a1fa", height: 3 },
+            tabBarIndicatorStyle: { backgroundColor: "#17a1fa", height: 3},
             tabBarLabel: ({ color, focused }) => (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Ionicons
@@ -48,7 +49,7 @@ const Home = () => {
                     color={focused ? "#17a1fa" : color}
                     size={20}
                   />
-                  <Text style={{ color, textTransform: "none", marginLeft: 5 }}>
+                  <Text style={{ color,  marginLeft: 5, fontWeight: "600" }}>
                     Tripfeed
                   </Text>
                 </View>
@@ -56,10 +57,10 @@ const Home = () => {
           }}
         />
         <MaterialTopTabs.Screen
-          name="Bạn bè"
+          name="Friends"
           component={FriendScreen}
           options={{
-            tabBarIndicatorStyle: { backgroundColor: "#ff8170", height: 3 },
+            tabBarIndicatorStyle: { backgroundColor: "#ff8170", height: 3},
             tabBarLabel: ({ color, focused }) => (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Ionicons
@@ -67,15 +68,15 @@ const Home = () => {
                   color={focused ? "#ff8170" : color}
                   size={20}
                 />
-                <Text style={{ color, textTransform: "none", marginLeft: 5 }}>
+                <Text style={{ color,  marginLeft: 5, fontWeight: "600" }}>
                   Bạn bè
                 </Text>
               </View>
             ),
           }}
         />
-        <MaterialTopTabs.Screen
-          name="Trang cá nhân"
+        {/* <MaterialTopTabs.Screen
+          name="Profile"
           component={PersonalScreen}
           options={{
             tabBarIndicatorStyle: { backgroundColor: "#46e8a5", height: 3 },
@@ -86,13 +87,13 @@ const Home = () => {
                   color={focused ? "#46e8a5" : color}
                   size={20}
                 />
-                <Text style={{ color, textTransform: "none", marginLeft: 5 }}>
+                <Text style={{ color, marginLeft: 5, fontWeight: "600" }}>
                   Cá Nhân
                 </Text>
               </View>
             ),
           }}
-        />
+        /> */}
       </MaterialTopTabs.Navigator>
     </View>
   );

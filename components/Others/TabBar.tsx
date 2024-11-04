@@ -2,8 +2,9 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+
 
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import FriendScreen from "@/app/(main)/(tabs)/(HomeTabs)/FriendScreen";
@@ -45,7 +46,9 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                     [
                         "(HomeTabs)/FriendScreen",
                         "(HomeTabs)/NewsfeedScreen",
-                        "(HomeTabs)/PersonalScreen"
+                        "(HomeTabs)/PersonalScreen",
+                        "(HomeTabs)/(FriendTabs)/FriendList",
+                        "(HomeTabs)/(FriendTabs)/FriendInvitation",
                     ].includes(route.name)
                 )
                     return null;

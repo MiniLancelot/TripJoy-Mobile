@@ -37,7 +37,8 @@ export const user_register = async (data: any) => {
         });
         return result;
     } catch (error: any) {
-        return error.response.data;
+        // return error.response.data;
+        throw error;
     }
 };
 

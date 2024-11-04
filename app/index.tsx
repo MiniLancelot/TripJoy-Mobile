@@ -1,4 +1,4 @@
-import { ActivityIndicator, View, Text } from "react-native";
+import { ActivityIndicator, View, Text, StyleSheet } from "react-native";
 import "@/global.css";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -38,10 +38,18 @@ const Index = () => {
         }
     }
     return (
-        <View className="flex-1 justify-center items-center">
+        <View style={styles.container}>
             <ActivityIndicator size="large" color="#CECCCC" />
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    }
+})
 
 export default Index;

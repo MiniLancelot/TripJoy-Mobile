@@ -13,6 +13,7 @@
 // export default NewsfeedScreen
 
 import StarRailChar from "@/components/Others/StarRailChar";
+import StarRailChar2 from "@/components/Others/StarRailChar2";
 import React, { useState, useEffect } from "react";
 import { FlatList, Text, View } from "react-native";
 
@@ -51,7 +52,7 @@ const NewsfeedScreen = () => {
         onEndReached={loadMoreItems}
         onEndReachedThreshold={0.5} // Trigger load more when the list is halfway scrolled
       /> */}
-      <StarRailChar />
+      <StarRailChar2 />
     </View>
   );
 };

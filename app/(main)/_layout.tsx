@@ -11,6 +11,7 @@ import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/app/AuthContext";
 import "@/global.css";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const _layout = () => {
     const tempAvatar = require("@/assets/images/others/avatar.jpg");
@@ -33,8 +34,9 @@ const _layout = () => {
         <Stack
             screenOptions={{
                 headerTitleAlign: "center",
-                headerStyle: { backgroundColor: "#defff6" },
+                headerStyle: { backgroundColor: "#fff" },
                 headerShadowVisible: false,
+                // headerShown: false,
             }}
         >
             <Stack.Screen
@@ -85,10 +87,14 @@ const _layout = () => {
                     ),
 
                     headerTitle: "",
+                    headerShown: false,
                 }}
             />
 
             <Stack.Screen name="details" options={{headerTitle: "Details"}} />
+            <Stack.Screen name="(ids)" options={{headerShown: false}} />
+            <Stack.Screen name="(create)" options={{headerShown: false}} />
+            
         </Stack>
     );
 };

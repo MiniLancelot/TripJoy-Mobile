@@ -28,7 +28,20 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiZGlseXMyMyIsImEiOiJjbTI5MHJ2ZGUwMGxnMmpxcDhla2E2dWE2In0.1Uv0G24aZ9sUA6KlEx5g1w",
+          "RNMapboxMapsVersion": "11.0.0"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show current location on map."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -5,20 +5,16 @@ import {
   Image,
   StyleSheet,
   Pressable,
+  Dimensions,
+  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import { useState, useEffect, memo } from "react";
 import axios from "axios";
-import { useNavigation, useRouter } from "expo-router";
-import ReadMoreText from "./ReadMoreText";
+import { useRouter } from "expo-router";
+import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import Animated, {
-  runOnJS,
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from "react-native-reanimated";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import ReadMoreText from "./ReadMoreText";
 
 type CharProps = {
   id: number;
@@ -32,17 +28,11 @@ type CharProps = {
   liked: number;
 };
 
-// const DATA = Array.from({ length: 100 }, (_, i) => `Item ${i + 1}`);
-
-const StarRailChar = () => {
+const StarRailChar2 = () => {
   const [chars, setChars] = useState<CharProps[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [allItemsLoaded, setAllItemsLoaded] = useState(false);
   const router = useRouter();
-
-  const [page, setPage] = useState(1);
-  const ITEMS_PER_PAGE = 20;
 
   const tempTextContent =
     "Đà Nẵng, với vẻ đẹp thiên nhiên tuyệt vời và sự phát triển vượt bậc, xứng đáng là một trong những điểm đến hấp dẫn nhất Việt Nam. Thành phố này không chỉ sở hữu đường bờ biển dài với cát trắng mịn màng, làn nước trong xanh mà còn có những hòn đảo hoang sơ, những ngọn núi hùng vĩ và các khu rừng nguyên sinh đa dạng.\n Bà Nà Hills, Cầu Rồng, bãi biển Mỹ Khê chỉ là một vài trong số những điểm đến nổi tiếng mà Đà Nẵng mang đến cho du khách.\n Với sự phát triển mạnh mẽ của ngành du lịch, Đà Nẵng đã và đang trở thành một điểm đến không thể bỏ qua cho những ai yêu thích khám phá và trải nghiệm. Du lịch Đà Nẵng tự túc thì nên chuẩn bị những gì? Có địa điểm du lịch Đà Nẵng nào đang được hội cuồng chân săn đón? Cùng tìm hiểu nhé!";
@@ -53,31 +43,15 @@ const StarRailChar = () => {
   }, []);
 
   const fetchChars = async () => {
-    if (allItemsLoaded) return;
-
     try {
+      setLoading(true);
       const response = await axios.get(
         "https://hsr-api.vercel.app/api/v1/characters"
       );
-
-      // const newData = response.data.slice(
-      //   (page - 1) * ITEMS_PER_PAGE,
-      //   page * ITEMS_PER_PAGE
-      // );
-
-      const newData = response.data
-        .slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
-        .map((item: CharProps) => ({ ...item, isLiked: false, liked: 99 })); // Initialize liked property
-
-      if (newData.length < ITEMS_PER_PAGE) {
-        setAllItemsLoaded(true);
-      }
-
-      setChars((prevData) => [...prevData, ...newData]);
-      setPage((prevPage) => prevPage + 1);
-
+      const newData = response.data.map((item: CharProps) => ({...item, isLiked: false, liked: 99})); // Initialize liked property
       // setChars(response.data);
-      console.log("Loading more items");
+      setChars(newData);
+      // console.log(JSON.stringify(response.data, null, 2));
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -85,44 +59,10 @@ const StarRailChar = () => {
     }
   };
 
-  const loadMoreItems = () => {
-    if (!loading && !allItemsLoaded) {
-      fetchChars();
-    }
-  };
-
-  // const navigation = useNavigation();
-  // const scrollOffset = useSharedValue(0);
-  // const tabBarHeight = useBottomTabBarHeight();
-  // const isFocused = useIsFocused();
-
-  // const updateTabBar = () => {
-  //   let newMarginBottom = 0;
-  //   if (scrollOffset.value >= 0 && scrollOffset.value <= tabBarHeight) {
-  //     newMarginBottom = -scrollOffset.value;
-  //   } else if (scrollOffset.value > tabBarHeight) {
-  //     newMarginBottom = -tabBarHeight;
-  //   }
-  //   navigation.getParent()?.setOptions({
-  //     tabBarStyle: {
-  //       marginBottom: newMarginBottom,
-  //     },
-  //   });
-  // };
-
-  // const scrollHandler = useAnimatedScrollHandler({
-  //   onScroll: (event) => {
-  //     // console.log(event.contentOffset.y);
-  //     if (isFocused) {
-  //       scrollOffset.value = event.contentOffset.y;
-  //       runOnJS(updateTabBar)();
-  //     }
-  //   },
-  // });
-
-  if (loading && page === 1) {
+  if (loading) {
     return (
-      <View style={styles.footerContainer}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color="gray" />
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
@@ -136,15 +76,21 @@ const StarRailChar = () => {
     );
   }
 
-  const listFooter = () => {
-    return (
-      <View style={styles.footerContainer}>
-        <Text style={styles.footerText}>Đã đến cuối</Text>
-      </View>
-    );
-  };
+  // const renderItem = ({ item }: { item: CharProps }) => {
+  //   return (
+  //     <Pressable onPress={() => router.push(`/post/${item.id}`)}>
+  //       <View style={styles.itemContainer2}>
+  //         <Image source={{ uri: item.img }} style={styles.avatar2} />
+  //         <View style={styles.infoContainer}>
+  //           <Text style={styles.name}>{item.name}</Text>
+  //           <Text style={styles.path}>{item.path}</Text>
+  //         </View>
+  //       </View>
+  //     </Pressable>
+  //   );
+  // };
 
-  const ListItem = memo(({ item }: { item: CharProps }) => {
+  const RenderItem = ({ item }: { item: CharProps }) => {
     const [itemIsLiked, setItemIsLiked] = useState(item.isLiked);
     const [likeQuantity, setLikeQuantity] = useState(item.liked);
 
@@ -168,15 +114,16 @@ const StarRailChar = () => {
     return (
       <Pressable>
         <View style={styles.itemOuterContainer}>
-          <Text style={styles.title}>{tempTitle}</Text>
-          <View style={styles.itemContainer}>
+          
+          <Pressable style={styles.itemContainer} onPress={() => router.push(`/post/${item.id}`)}>
             <Image source={{ uri: item.img }} style={styles.avatar} />
             <View style={styles.infoContainer}>
               <Text style={styles.name}>{item.name}</Text>
               <Text style={styles.path}>12 tiếng trước</Text>
             </View>
-          </View>
+          </Pressable>
           <View style={styles.textContainer}>
+          <Text style={[styles.title, {paddingBottom: 5}]}>{tempTitle}</Text>
             <ReadMoreText text={tempTextContent} numberOfLines={3} />
             {/* <ReadMoreText
               text={tempTextContent}
@@ -203,45 +150,66 @@ const StarRailChar = () => {
 
               <Text style={styles.like}>{likeQuantity}</Text>
             </View>
-            <View style={styles.likeContainer}>
+            <Pressable style={styles.likeContainer} onPress={() => router.push(`/comment/${item.id}`)}>
               <Ionicons name="chatbubble-outline" size={24} color="black" />
               <Text style={styles.like}>12</Text>
-            </View>
+            </Pressable>
           </View>
         </View>
       </Pressable>
     );
-  });
+  };
+
+  
+  const listFooter = () => {
+    return (
+      <View style={styles.footerContainer}>
+        <Text style={styles.footerText}>Đã đến cuối</Text>
+      </View>
+    );
+  };
+
+  const refreshHandler = () => {
+    setChars([]);
+    fetchChars();
+  };
 
   return (
-    <View>
-      <Animated.FlatList
-        // onScroll={scrollHandler}
-        // scrollEventThrottle={16}
+    <View style={styles.container}>
+      <FlashList
         data={chars}
         // renderItem={renderItem}
-        renderItem={({ item }) => <ListItem item={item} />}
-        keyExtractor={(item: any) => item.id.toString()}
-        // contentContainerStyle={{ paddingBottom: 80 }}
-        ListFooterComponent={allItemsLoaded ? listFooter : null}
-        onEndReached={loadMoreItems}
+        renderItem={({ item }) => <RenderItem item={item} />}
+        keyExtractor={(item: any) => item.id}
+        //   contentContainerStyle={{ paddingBottom:  80 }}
+        ListFooterComponent={listFooter}
+        estimatedItemSize={500}
         onEndReachedThreshold={0.5}
+        refreshing={loading}
+        onRefresh={refreshHandler}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  itemOuterContainer: {
-    padding: 15,
+  container: {
     flex: 1,
-    flexDirection: "column",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e7e8ee",
+    width: "100%",
+    height: "100%",
   },
   itemContainer: {
-    marginTop: 5,
     flexDirection: "row",
+    padding: 10,
+    // borderBottomWidth: 0.5,
+    // borderBottomColor: "#ddd",
+    alignItems: "center",
+  },
+  itemContainer2: {
+    padding: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#ddd",
     alignItems: "center",
   },
   avatar: {
@@ -249,8 +217,12 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 10,
-    borderWidth: 1,
-    borderColor: "black",
+  },
+  avatar2: {
+    width: 250,
+    height: 250,
+    // borderRadius: 100,
+    marginRight: 10,
   },
 
   infoContainer: {
@@ -259,14 +231,9 @@ const styles = StyleSheet.create({
 
   name: {
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "bold",
   },
 
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    // paddingLeft: 10,
-  },
   path: {
     fontSize: 14,
     color: "#666",
@@ -283,12 +250,24 @@ const styles = StyleSheet.create({
     color: "red",
   },
   footerContainer: {
-    padding: 100,
+    padding: 20,
     alignItems: "center",
   },
   footerText: {
     fontSize: 16,
     color: "#666",
+  },
+  itemOuterContainer: {
+    padding: 15,
+    flex: 1,
+    flexDirection: "column",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e7e8ee",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    // paddingLeft: 10,
   },
   imageContainer: {
     alignItems: "center",
@@ -321,4 +300,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StarRailChar;
+export default StarRailChar2;

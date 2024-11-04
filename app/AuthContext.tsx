@@ -2,9 +2,10 @@ import * as api from "@/utils/request";
 import { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import register from "@/app/register";
+import Toast from "react-native-toast-message";
 
 interface AuthProps {
-    session: { accessToken: string | null; refreshToken: string | null };   
+    session: { accessToken: string | null; refreshToken: string | null; name: string | null };   
     login?: (data: any) => Promise<any>;
     logout?: (data: any) => Promise<any>;
     register?: (data: any) => Promise<any>;
@@ -26,7 +27,9 @@ export const AuthProvider = ({ children }: any) => {
 
     useEffect(() => {
         const loadUser = async () => {
+            // AsyncStorage.clear();
           const storedUser = await AsyncStorage.getItem('user');
+          console.log("User access token: ", storedUser);
           if (storedUser) {
             setUserToken(JSON.parse(storedUser));
           }
@@ -45,10 +48,12 @@ export const AuthProvider = ({ children }: any) => {
                 setUserToken({
                     accessToken: result.data.accessToken,
                     refreshToken: result.data.refreshToken,
+                    name: result.data.user.name,
                 });
                 await AsyncStorage.setItem("user", JSON.stringify({
                     accessToken: result.data.accessToken,
                     refreshToken: result.data.refreshToken,
+                    name: result.data.user.name,
                 }));
             }
         } catch (error: any) {
@@ -68,7 +73,11 @@ export const AuthProvider = ({ children }: any) => {
                 data: JSON.stringify(data),
             });
             if (result.status == 200) {
-                alert("Send OTP verify email successfully");
+                Toast.show({
+                    type: "success",
+                    text1: "Gửi mã OTP thành công",
+                    text2: "Hooray! Mã OTP đã được gửi đến email của bạn",
+                  });
             }
         } catch (error: any) {
             console.error("Error details:", error);
