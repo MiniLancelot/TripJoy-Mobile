@@ -95,6 +95,7 @@ const Layout = () => {
                 tabBarStyle: {
                   paddingBottom: 2,
                   height: 60,
+                  shadowColor: "blue",
                 },
               }}
               // tabBar={(props) => <TabBar {...props} />}

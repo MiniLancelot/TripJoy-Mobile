@@ -14,47 +14,61 @@
 
 import StarRailChar from "@/components/Others/StarRailChar";
 import StarRailChar2 from "@/components/Others/StarRailChar2";
+import TextCarousel from "@/components/Others/TextCarousel";
+import { Style } from "@rnmapbox/maps";
 import React, { useState, useEffect } from "react";
-import { FlatList, Text, View } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
-const DATA = Array.from({ length: 100 }, (_, i) => `Item ${i + 1}`); // Simulated data
+// const DATA = Array.from({ length: 100 }, (_, i) => `Item ${i + 1}`); // Simulated data
 
 const NewsfeedScreen = () => {
-  // const [data, setData] = useState<string[]>([]);
-  // const [page, setPage] = useState(1);
-  // const ITEMS_PER_PAGE = 5;
-
-  // useEffect(() => {
-  //   loadMoreItems(); // Load the initial data
-  // }, []);
-
-  // // Function to load more items
-  // const loadMoreItems = () => {
-  //   const newData = DATA.slice(
-  //     (page - 1) * ITEMS_PER_PAGE,
-  //     page * ITEMS_PER_PAGE
-  //   );
-  //   setData((prevData) => [...prevData, ...newData]);
-  //   setPage((prevPage) => prevPage + 1);
-  // };
-
+  const router = useRouter();
   return (
-    <View className="flex-1 bg-[#fff]">
-      {/* <FlatList
-      className="flex-1"
-        data={data}
-        renderItem={({ item }) => (
-          <View style={{ padding: 10 }}>
-            <Text>{item}</Text>
+    <View style={styles.container}>
+      <View style={styles.searchBoxContainer}>
+        <Pressable style={styles.searchBoxInnerContainer} onPress={() => router.push(`/(search)/search`)}>
+          <View style={{marginLeft: 20, marginTop: 2}}>
+            <Ionicons name="search" size={18} color="#c3c5c7" />
           </View>
-        )}
-        keyExtractor={(item, index) => index.toString()}
-        onEndReached={loadMoreItems}
-        onEndReachedThreshold={0.5} // Trigger load more when the list is halfway scrolled
-      /> */}
+          <TextCarousel />
+        </Pressable>
+      </View>
+
       <StarRailChar2 />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  searchBoxContainer: {
+    width: "100%",
+    paddingHorizontal: 15,
+    marginTop: 6,
+    paddingBottom: 1,
+    backgroundColor: "white",
+    height: 38,
+    // borderBottomColor: "#E0E2DB",
+    // borderBottomWidth: 0.3,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  searchBoxInnerContainer: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    borderRadius: 19,
+    padding: 2,
+    paddingTop: 7,
+    backgroundColor: "#f5f7fa",
+    flexDirection: "row",
+  },
+});
 
 export default NewsfeedScreen;

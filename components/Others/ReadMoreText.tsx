@@ -35,7 +35,7 @@ const ReadMoreText = ({ text, numberOfLines }: ReadMoreTextProps) => {
       {!isExpanded && (
         <TouchableOpacity onPress={() => setIsExpanded(true)}>
         <Text style={styles.readMoreText}>
-          {/* {isExpanded ? null : "Read More"} */}
+          {/* {isExpanded ? null : "Read More"} */} 
           Xem thêm
         </Text>
       </TouchableOpacity>
@@ -80,12 +80,12 @@ const ReadMoreText = ({ text, numberOfLines }: ReadMoreTextProps) => {
 
 const styles = StyleSheet.create({
   text: {
-    fontSize: 16,
-    lineHeight: 22, // Line height to make it more readable
+    fontSize: 14,
+    lineHeight: 22,
+    color:"#666" // Line height to make it more readable
   },
   readMoreText: {
     color: "gray",
-    marginTop: 5,
   },
 });
 

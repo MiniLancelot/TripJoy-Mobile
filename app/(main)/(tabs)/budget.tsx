@@ -5,7 +5,7 @@ import ColorList from "@/components/Others/ColorList";
 const budget = () => {
   return (
     <View style={styles.container}>
-      <ColorList color="#787169" />
+      {/* <ColorList color="#787169" /> */}
     </View>
   );
 };

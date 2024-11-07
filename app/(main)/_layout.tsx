@@ -94,6 +94,7 @@ const _layout = () => {
             <Stack.Screen name="details" options={{headerTitle: "Details"}} />
             <Stack.Screen name="(ids)" options={{headerShown: false}} />
             <Stack.Screen name="(create)" options={{headerShown: false}} />
+            <Stack.Screen name="(search)" options={{headerShown: false}} />
             
         </Stack>
     );

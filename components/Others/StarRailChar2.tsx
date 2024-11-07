@@ -15,7 +15,8 @@ import { useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ReadMoreText from "./ReadMoreText";
-
+import CharacterData from "@/assets/characters.json";
+// import { FontAwesome } from "@expo/vector-icons";
 type CharProps = {
   id: number;
   name: string;
@@ -26,6 +27,7 @@ type CharProps = {
   img: string;
   isLiked: boolean; //test like
   liked: number;
+  location: string;
 };
 
 const StarRailChar2 = () => {
@@ -45,10 +47,20 @@ const StarRailChar2 = () => {
   const fetchChars = async () => {
     try {
       setLoading(true);
+      // const testRes = CharacterData;
+      // console.log(`${testRes[0].name}:` , testRes[0] );
+
       const response = await axios.get(
         "https://hsr-api.vercel.app/api/v1/characters"
       );
-      const newData = response.data.map((item: CharProps) => ({...item, isLiked: false, liked: 99})); // Initialize liked property
+      const newData = response.data
+        .map((item: CharProps) => ({
+          ...item,
+          isLiked: false,
+          liked: 99, // Initialize liked property
+          location: "Đà Nẵng",
+        }))
+        .slice(2);
       // setChars(response.data);
       setChars(newData);
       // console.log(JSON.stringify(response.data, null, 2));
@@ -111,19 +123,31 @@ const StarRailChar2 = () => {
       // console.log("Like clicked");
     };
 
+    const getImageWidth = (numImages: number) => {
+      if (numImages === 1) return "100%";
+      if (numImages === 2) return "49.2%";
+      if (numImages === 3) return "32.5%";
+      return "32.5%";
+    };
+
+    const displayImages = chars.slice(0, 2);
+    // console.log(displayImages.map(char => char.name));
+
     return (
       <Pressable>
         <View style={styles.itemOuterContainer}>
-          
-          <Pressable style={styles.itemContainer} onPress={() => router.push(`/post/${item.id}`)}>
-            <Image source={{ uri: item.img }} style={styles.avatar} />
+          <View style={styles.itemContainer}>
+            <Pressable onPress={() => router.push(`/post/${item.id}`)}>
+              <Image source={{ uri: item.img }} style={styles.avatar} />
+            </Pressable>
+
             <View style={styles.infoContainer}>
               <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.path}>12 tiếng trước</Text>
+              <Text style={styles.path}>23h trước • {item.location}</Text>
             </View>
-          </Pressable>
+          </View>
           <View style={styles.textContainer}>
-          <Text style={[styles.title, {paddingBottom: 5}]}>{tempTitle}</Text>
+            <Text style={styles.title}>{tempTitle}</Text>
             <ReadMoreText text={tempTextContent} numberOfLines={3} />
             {/* <ReadMoreText
               text={tempTextContent}
@@ -133,34 +157,42 @@ const StarRailChar2 = () => {
             /> */}
           </View>
           <View style={styles.imageContainer}>
-            <Image
-              source={require("../../assets/images/tripfeed/da-nang.jpg")}
-              style={styles.postImage}
-            />
+            {displayImages.map((char, index) => (
+              <Image
+                key={index}
+                source={require("../../assets/images/tripfeed/da-nang.jpg")}
+                style={[
+                  styles.postImage,
+                  { width: getImageWidth(displayImages.length) },
+                ]}
+              />
+            ))}
           </View>
           <View style={styles.interactionBar}>
+            <TouchableOpacity
+              style={styles.likeContainer}
+              onPress={() => router.push(`/comment/${item.id}`)}
+            >
+              <Ionicons name="chatbubble-outline" size={22} color="#626262" />
+              <Text style={styles.like}>12</Text>
+            </TouchableOpacity>
             <View style={styles.likeContainer}>
               <TouchableOpacity onPress={toggleLike}>
                 <Ionicons
                   name={itemIsLiked ? "heart" : "heart-outline"}
                   size={24}
-                  color={itemIsLiked ? "#E85D75" : "#000"}
+                  color={itemIsLiked ? "#E85D75" : "#626262"}
                 />
               </TouchableOpacity>
 
               <Text style={styles.like}>{likeQuantity}</Text>
             </View>
-            <Pressable style={styles.likeContainer} onPress={() => router.push(`/comment/${item.id}`)}>
-              <Ionicons name="chatbubble-outline" size={24} color="black" />
-              <Text style={styles.like}>12</Text>
-            </Pressable>
           </View>
         </View>
       </Pressable>
     );
   };
 
-  
   const listFooter = () => {
     return (
       <View style={styles.footerContainer}>
@@ -199,12 +231,18 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  itemOuterContainer: {
+    padding: 15,
+    flex: 1,
+    flexDirection: "column",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e7e8ee",
+  },
   itemContainer: {
     flexDirection: "row",
-    padding: 10,
     // borderBottomWidth: 0.5,
     // borderBottomColor: "#ddd",
-    alignItems: "center",
+    // alignItems: "center",
   },
   itemContainer2: {
     padding: 10,
@@ -227,16 +265,18 @@ const styles = StyleSheet.create({
 
   infoContainer: {
     flex: 1,
+    justifyContent: "center",
+    gap: 1,
   },
 
   name: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
+    fontWeight: "700",
   },
 
   path: {
-    fontSize: 14,
-    color: "#666",
+    fontSize: 11,
+    color: "#8F91A2",
   },
 
   loadingText: {
@@ -257,46 +297,45 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
   },
-  itemOuterContainer: {
-    padding: 15,
-    flex: 1,
-    flexDirection: "column",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e7e8ee",
-  },
+
   title: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "500",
+    paddingVertical: 5,
     // paddingLeft: 10,
   },
   imageContainer: {
     alignItems: "center",
-    marginTop: 10,
-    width: "100%",
+    marginTop: 5,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   postImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
+    width: "32%",
+    height: 190,
+    borderRadius: 6,
   },
   textContainer: {
-    marginTop: 10,
-    width: "98%",
+    // marginTop: 10,
   },
   interactionBar: {
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 50,
+    justifyContent: "flex-end",
+    paddingHorizontal: 10,
     marginTop: 15,
+    gap: 40,
   },
   likeContainer: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 5
   },
   like: {
     marginLeft: 5,
-    fontSize: 16,
+    fontSize: 13,
+    color: "#626262",
   },
 });
 

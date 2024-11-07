@@ -28,6 +28,7 @@ import { useAuth } from "@/app/AuthContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
 
 const { width } = Dimensions.get("window");
 const IMG_HEIGHT = 200;
@@ -35,7 +36,7 @@ const IMG_HEIGHT = 200;
 const game = {
   name: "Rakkoon",
   banner: require("@/assets/images/others/hsr25.webp"),
-  avatar: require("@/assets/images/others/avatarTest.webp"),
+  avatar: require("@/assets/images/others/avatar.jpg"),
   description: "Honkai: Star Rail is a turn-based space fantasy RPG developed and published by HoYoverse for PC, PS5, and iOS/Android platforms. Come aboard with us on the Astral Express, TrailblazerssThis wiki is an English resource for information about the Global version of the game. There are unmarked spoilers on this wiki."
 };
 
@@ -143,6 +144,7 @@ const profile = () => {
 
   return (
     <View style={styles.profileContainer}>
+
       {session?.name && <Text style={styles.name}>Hello, {session.name}</Text>}
       <Stack.Screen
         options={{
@@ -233,10 +235,10 @@ const profile = () => {
               onPress={() => Alert.alert("Avatar")}
               style={{ width: 90 }}
             >
-              <Animated.View style={[avatarAnimatedStyle]}>
+              <Animated.View style={[avatarAnimatedStyle, {borderWidth: 10, borderColor: "#fff", width: 90, height: 90, borderRadius: 45,backgroundColor: "#fff", alignItems: "center", justifyContent: "center"}]}>
                 <Image
                   source={game.avatar}
-                  style={{ width: 80, height: 80, borderRadius: 45 }}
+                  style={{ width: 80, height: 80, borderRadius: 40, }}
                 />
               </Animated.View>
             </Pressable>
