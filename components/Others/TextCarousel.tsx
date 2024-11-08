@@ -23,7 +23,7 @@ export default function TextCarousel() {
 
       // Start the animation for both exiting and entering
       transition.value = withTiming(1, { duration: 500 }); // Duration for both exit and enter
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);

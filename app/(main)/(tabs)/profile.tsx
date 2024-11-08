@@ -29,6 +29,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
+import MyProfileModal from "@/components/Modals/MyProfileModal";
 
 const { width } = Dimensions.get("window");
 const IMG_HEIGHT = 200;
@@ -37,12 +38,14 @@ const game = {
   name: "Rakkoon",
   banner: require("@/assets/images/others/hsr25.webp"),
   avatar: require("@/assets/images/others/avatar.jpg"),
-  description: "Honkai: Star Rail is a turn-based space fantasy RPG developed and published by HoYoverse for PC, PS5, and iOS/Android platforms. Come aboard with us on the Astral Express, TrailblazerssThis wiki is an English resource for information about the Global version of the game. There are unmarked spoilers on this wiki."
+  description:
+    "Honkai: Star Rail is a turn-based space fantasy RPG developed and published by HoYoverse for PC, PS5, and iOS/Android platforms. Come aboard with us on the Astral Express, TrailblazerssThis wiki is an English resource for information about the Global version of the game. There are unmarked spoilers on this wiki.",
 };
 
 const profile = () => {
   const router = useRouter();
   const { session, logout } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
@@ -107,13 +110,16 @@ const profile = () => {
 
   const iconColorAnimatedStyle = useAnimatedStyle(() => {
     const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT);
-    const color = interpolateColor(clampedScroll, [0, IMG_HEIGHT], ["#fff", "#000"]);
+    const color = interpolateColor(
+      clampedScroll,
+      [0, IMG_HEIGHT],
+      ["#fff", "#000"]
+    );
     return {
       color,
     };
   });
 
-  
   const LogoutHandler = async () => {
     if (session.accessToken && session.refreshToken) {
       await logout!({
@@ -144,8 +150,7 @@ const profile = () => {
 
   return (
     <View style={styles.profileContainer}>
-
-      {session?.name && <Text style={styles.name}>Hello, {session.name}</Text>}
+      {/* {session?.name && <Text style={styles.name}>Hello, {session.name}</Text>} */}
       <Stack.Screen
         options={{
           headerTransparent: true,
@@ -186,13 +191,16 @@ const profile = () => {
           ),
           headerRight: () => {
             return (
-              <Pressable onPress={() => Alert.alert("Options")} style={{marginRight: 20}}>
+              <Pressable
+                onPress={() => setIsModalOpen(true)}
+                style={{ marginRight: 20 }}
+              >
                 <Animated.Text style={iconColorAnimatedStyle}>
                   <Ionicons name="settings-outline" size={20} />
                 </Animated.Text>
               </Pressable>
             );
-          }
+          },
         }}
       />
       <Animated.ScrollView
@@ -235,16 +243,40 @@ const profile = () => {
               onPress={() => Alert.alert("Avatar")}
               style={{ width: 90 }}
             >
-              <Animated.View style={[avatarAnimatedStyle, {borderWidth: 10, borderColor: "#fff", width: 90, height: 90, borderRadius: 45,backgroundColor: "#fff", alignItems: "center", justifyContent: "center"}]}>
+              <Animated.View
+                style={[
+                  avatarAnimatedStyle,
+                  {
+                    borderWidth: 10,
+                    borderColor: "#fff",
+                    width: 90,
+                    height: 90,
+                    borderRadius: 45,
+                    backgroundColor: "#fff",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                ]}
+              >
                 <Image
                   source={game.avatar}
-                  style={{ width: 80, height: 80, borderRadius: 40, }}
+                  style={{ width: 80, height: 80, borderRadius: 40 }}
                 />
               </Animated.View>
             </Pressable>
 
             <Text style={styles.text}>{game.name}</Text>
             <View>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
+              <Text style={{ marginVertical: 10 }}>{game.description}</Text>
               <Text style={{ marginVertical: 10 }}>{game.description}</Text>
               <Text style={{ marginVertical: 10 }}>{game.description}</Text>
               <Text style={{ marginVertical: 10 }}>{game.description}</Text>
@@ -260,6 +292,41 @@ const profile = () => {
       {/* <Pressable onPress={confirmLogout} style={styles.logoutButton}>
         <Text style={{ fontSize: 20, lineHeight: 28 }}>Logout</Text>
       </Pressable> */}
+
+      <MyProfileModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      >
+        <View
+          style={{ backgroundColor: "white", padding: 10, borderRadius: 16 }}
+        >
+          <Pressable
+            onPress={() => Alert.alert("Đổi mật khẩu")}
+            style={{
+              alignItems: "center",
+              justifyContent: "flex-start",
+              flexDirection: "row",
+              gap: 20,
+            }}
+          >
+            <Ionicons name="alert-circle-outline" size={20} style={{transform: [{ translateX: -3 }]}}/>
+            <Text style={{fontSize: 16, fontWeight: "500"}}>Quên mật khẩu?</Text>
+          </Pressable>
+          <Pressable
+            onPress={confirmLogout}
+            style={{
+              alignItems: "center",
+              justifyContent: "flex-start",
+              flexDirection: "row",
+              gap: 20,
+              marginTop: 20,
+            }}
+          >
+            <Ionicons name="log-out-outline" size={20} />
+            <Text style={{fontSize: 16, fontWeight: "500"}}>Đăng xuất</Text>
+          </Pressable>
+        </View>
+      </MyProfileModal>
     </View>
   );
 };
@@ -306,7 +373,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginLeft: 10,
   },
-  content:{
+  content: {
     marginTop: 20,
   },
   header: {
