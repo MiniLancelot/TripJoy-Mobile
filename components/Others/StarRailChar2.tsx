@@ -16,6 +16,7 @@ import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ReadMoreText from "./ReadMoreText";
 import CharacterData from "@/assets/characters.json";
+import AntDesign from '@expo/vector-icons/AntDesign';
 // import { FontAwesome } from "@expo/vector-icons";
 type CharProps = {
   id: number;
@@ -177,10 +178,15 @@ const StarRailChar2 = () => {
               <Text style={styles.like}>12</Text>
             </TouchableOpacity>
             <View style={styles.likeContainer}>
-              <TouchableOpacity onPress={toggleLike}>
-                <Ionicons
+              <TouchableOpacity onPress={toggleLike} style={{alignItems: "center", justifyContent: "center"}}>
+                {/* <Ionicons
                   name={itemIsLiked ? "heart" : "heart-outline"}
                   size={24}
+                  color={itemIsLiked ? "#E85D75" : "#626262"}
+                /> */}
+                <AntDesign
+                  name={itemIsLiked ? "like1" : "like2"}
+                  size={22}
                   color={itemIsLiked ? "#E85D75" : "#626262"}
                 />
               </TouchableOpacity>
@@ -330,6 +336,7 @@ const styles = StyleSheet.create({
   likeContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 5
   },
   like: {

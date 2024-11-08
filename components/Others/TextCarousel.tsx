@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate } from 'react-native-reanimated';
 
-const texts = ["Tìm kiếm", "Nhập tên để tìm kiếm", "Tìm kiếm bạn bè", "Kết nối với mọi người"];
+const texts = ["Tìm kiếm", "Nhập tên để tìm kiếm", "Tìm kiếm bạn bè", "Kết nối với mọi người", "Tìm kiếm ..."];
 
 type TextCarouselProps = {
     texts: string[];
