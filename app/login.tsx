@@ -498,7 +498,7 @@ const Login = () => {
         </View>
 
         <View style={styles.actionButtonsContainer}>
-          <Pressable onPress={() => alert("Forgot password")}>
+          <Pressable onPress={() => router.push("/forgot_password")}>
             <Text style={styles.actionText}>Quên mật khẩu?</Text>
           </Pressable>
           <Pressable onPress={() => router.push("/register")}>

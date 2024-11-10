@@ -51,6 +51,7 @@ const profile = () => {
   const router = useRouter();
   const { session, logout } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [user, setUser] = useState<any>({});
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
@@ -60,7 +61,7 @@ const profile = () => {
   //     AsyncStorage.getItem("info").then((value) => {
   //         if (value) {
   //             const infoObject = JSON.parse(value);
-  //             setUser(infoObject);
+  //             setUser(infoObject.name);
   //         }
   //     });
   // }, []);
@@ -172,7 +173,7 @@ const profile = () => {
                   <Animated.Text
                     style={[styles.headerName, headerAnimatedStyle]}
                   >
-                    {game.name}
+                    {session == null ? game.name : session.name}
                   </Animated.Text>
                 </Pressable>
               </>
