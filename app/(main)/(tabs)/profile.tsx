@@ -173,7 +173,7 @@ const profile = () => {
                   <Animated.Text
                     style={[styles.headerName, headerAnimatedStyle]}
                   >
-                    {session == null ? game.name : session.name}
+                    {game.name}
                   </Animated.Text>
                 </Pressable>
               </>
@@ -229,7 +229,7 @@ const profile = () => {
                   </Animated.View>
                 </Pressable>
 
-                <Text style={styles.text}>{game.name}</Text>
+                <Text style={styles.text}>{session == null ? game.name : session.name}</Text>
                 <View style={[styles.text, {flexDirection: "row", justifyContent:"flex-start", alignItems: "center", marginTop: 10, gap: 5}]}>
                 <Ionicons name="chatbox-ellipses" size={16} color="#bfbfbf" />
                 <Text style={{marginLeft: 5, color: "#bfbfbf"}}>Hola</Text>
