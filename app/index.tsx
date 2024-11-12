@@ -34,7 +34,7 @@ const Index = () => {
         if (session) {
             router.replace("/home");
         } else {
-            router.replace("/profile");
+            router.replace("/onboarding");
         }
     }
     return (
