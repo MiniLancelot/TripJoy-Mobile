@@ -2,7 +2,7 @@ import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
-import { AuthProvider } from "@/app/AuthContext";
+import { AuthProvider } from "@/app/(auth)/AuthContext";
 import "@/global.css";
 import Toast from 'react-native-toast-message';
 

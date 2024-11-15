@@ -1,10 +1,9 @@
 import { ActivityIndicator, View, Text, StyleSheet } from "react-native";
-import "@/global.css";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
-import { useAuth } from "@/app/AuthContext";
+import { useAuth } from "@/app/(auth)/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();

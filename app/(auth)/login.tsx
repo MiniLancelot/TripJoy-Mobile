@@ -25,7 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import "@/global.css";
 import SeparateLine from "@/components/Others/SeparateLine";
 import { user_login } from "@/utils/user_api";
-import { useAuth } from "@/app/AuthContext";
+import { useAuth } from "@/app/(auth)/AuthContext";
 import GoogleIcon from "@/components/Icons/GoogleIcon";
 import FacebookIcon from "@/components/Icons/FacebookIcon";
 import Toast from "react-native-toast-message";

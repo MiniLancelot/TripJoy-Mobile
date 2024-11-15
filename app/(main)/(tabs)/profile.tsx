@@ -24,7 +24,7 @@ import ColorList from "@/components/Others/ColorList";
 // import { user_logout } from '@/utils/user_api';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, useRouter } from "expo-router";
-import { useAuth } from "@/app/AuthContext";
+import { useAuth } from "@/app/(auth)/AuthContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";

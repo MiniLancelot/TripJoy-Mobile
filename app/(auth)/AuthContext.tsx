@@ -1,7 +1,7 @@
 import * as api from "@/utils/request";
 import { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import register from "@/app/register";
+import register from "@/app/(auth)/register";
 import Toast from "react-native-toast-message";
 
 interface AuthProps {
