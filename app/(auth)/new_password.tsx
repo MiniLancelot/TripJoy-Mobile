@@ -85,12 +85,16 @@ const new_password = () => {
       return;
     }
 
-    await change_password!({
-      password: enteredPassword.trim(),
-      confirmPassword: enteredValPassword.trim(),
-    }).then((res) => {
-      router.push("/login");
-    });
+    try {
+      await change_password!({
+        password: enteredPassword.trim(),
+        confirmPassword: enteredValPassword.trim(),
+      }).then(() => {
+        router.push("/login");
+      });
+    } catch (error) {
+      console.log(error); 
+    }
   };
 
   return (

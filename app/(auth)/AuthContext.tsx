@@ -54,7 +54,8 @@ export const AuthProvider = ({ children }: any) => {
     }, []);
 
     const user_login = async (data: any) => {
-        login(data).then((result) => {
+        try {
+            const result = await login(data);
             if (result && result.status == 200) {
                 setUserToken({
                     accessToken: result.data.accessToken,
@@ -74,27 +75,40 @@ export const AuthProvider = ({ children }: any) => {
                     }
                 });
             }
-        });
+        } catch (error: any) {
+            throw error;
+        }
     };
 
     const send_otp_verify_email = async (data: any) => {
-        _register.send_otp_verify_email(data).then((result) => {
+        try {
+            const result = await _register.send_otp_verify_email(data);
             if (result && result.status == 200) {
                 Toast.show({
                     type: "success",
                     text1: "Gửi mã OTP thành công",
-                    text2: "Hooray! Mã OTP đã được gửi đến email của bạn",
+                    text2: "Mã OTP đã được gửi đến email của bạn",
                 });
             }
-        });
+        } catch (error: any) {
+            throw error;
+        }
     };
 
     const user_register = async (data: any) => {
-        _register.register(data).then((result) => {
+        // _register.register(data).then((result) => {
+        //     if (result && result.status == 200) {
+        //         return;
+        //     } else throw "Register failed";
+        // });
+        try {
+            const result = await _register.register(data);
             if (result && result.status == 200) {
                 return;
-            } else throw "Register failed";
-        });
+            }
+        } catch (error: any) {
+            throw error;
+        }
     };
 
     const user_logout = async (data: any) => {
@@ -108,7 +122,25 @@ export const AuthProvider = ({ children }: any) => {
     };
 
     const send_otp_forget_password = async (data: any) => {
-        _forgotPassword.send_otp_forget_password(data).then((result) => {
+        // _forgotPassword.send_otp_forget_password(data).then((result) => {
+        //     if (result && result.status == 200) {
+        //         Toast.show({
+        //             type: "success",
+        //             text1: "Gửi mã OTP thành công",
+        //             text2: result.data.message,
+        //         });
+        //         setUrl(result.data.url);
+        //     }
+        //     else {
+                // Toast.show({
+                //     type: "error",
+                //     text1: "Gửi mã OTP thất bại",
+                //     text2: "Có lỗi xảy ra khi gửi mã OTP",
+                // });
+        //     }
+        // });
+        try {
+            const result = await _forgotPassword.send_otp_forget_password(data);
             if (result && result.status == 200) {
                 Toast.show({
                     type: "success",
@@ -117,18 +149,30 @@ export const AuthProvider = ({ children }: any) => {
                 });
                 setUrl(result.data.url);
             }
-            else {
-                Toast.show({
-                    type: "error",
-                    text1: "Gửi mã OTP thất bại",
-                    text2: "Có lỗi xảy ra khi gửi mã OTP",
-                });
-            }
-        });
+        } catch (error: any) {
+            Toast.show({
+                type: "error",
+                text1: "Gửi mã OTP thất bại",
+                text2: "Có lỗi xảy ra khi gửi mã OTP",
+            });
+            throw error;
+        }
     };
 
     const verify_otp_forget_password = async (data: any) => {
-        _forgotPassword.verify_otp_forget_password(url, data).then((result) => {
+        // _forgotPassword.verify_otp_forget_password(url, data).then((result) => {
+        //     if (result && result.status == 200) {
+        //         Toast.show({
+        //             type: "success",
+        //             text1: "Xác thực mã OTP thành công",
+        //             text2: result.data.message,
+        //         });
+        //         console.log("Result data: ", result.data);
+        //         setUrl(result.data.url);
+        //     }
+        // });
+        try {
+            const result = await _forgotPassword.verify_otp_forget_password(url, data);
             if (result && result.status == 200) {
                 Toast.show({
                     type: "success",
@@ -138,11 +182,19 @@ export const AuthProvider = ({ children }: any) => {
                 console.log("Result data: ", result.data);
                 setUrl(result.data.url);
             }
-        });
+        } catch (error: any) {
+            Toast.show({
+                type: "error",
+                text1: "Xác thực lỗi OTP thất bại",
+                text2: "Có lỗi xảy ra khi xác thực OTP",
+            });
+            throw error;
+        }
     };
 
     const change_password = async (data: any) => {
-        _forgotPassword.change_password(url, data).then((result) => {
+        try {
+            const result = await _forgotPassword.change_password(url, data);
             if (result && result.status == 200) {
                 Toast.show({
                     type: "success",
@@ -152,7 +204,14 @@ export const AuthProvider = ({ children }: any) => {
                 console.log("Result data: ", result.data);
                 setUrl("");
             }
-        });
+        } catch (error: any) {
+            Toast.show({
+                type: "error",
+                text1: "Thay đổi mật khẩu thất bại",
+                text2: "Có lỗi xảy ra khi thay đổi mật khẩu",
+            });
+            throw error;
+        }
     };
 
     // const get_user_info = async() => {

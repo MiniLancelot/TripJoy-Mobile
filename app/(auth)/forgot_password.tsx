@@ -122,11 +122,15 @@ const forgot_password = () => {
 
   const handleVerifyOtpEmail = async () => {
     const trimmedOtp = enteredOtp.trim();
-    await verify_otp_forget_password!({
-      otp: trimmedOtp.trim(),
-    }).then(() => {
-      router.push("/new_password");
-    });
+    try {
+      await verify_otp_forget_password!({
+        otp: trimmedOtp.trim(),
+      }).then(() => {
+        router.push("/new_password");
+      });
+    } catch (error: any) {
+
+    }
   };
   var isOtpDisabled = !enteredEmail || !emailValidate.test(enteredEmail);
 
