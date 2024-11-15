@@ -10,6 +10,7 @@ const login = async (data: any) => {
         return result;
     } catch (error: any) {
         showError(error);
+        throw error;
     }
 };
 

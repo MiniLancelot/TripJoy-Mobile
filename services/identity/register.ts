@@ -13,6 +13,7 @@ const send_otp_verify_email = async (data: any) => {
         return result;
     } catch (error: any) {
         showError(error);
+        throw error;
     }
 };
 
@@ -28,6 +29,7 @@ const register = async (data: any) => {
         return result;
     } catch (error: any) {
         showError(error);
+        throw error;
     }
 };
 

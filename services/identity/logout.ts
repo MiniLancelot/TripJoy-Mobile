@@ -13,6 +13,7 @@ const logout = async (token: any, data: any) => {
         return result;
     } catch (error: any) {
         showError(error);
+        throw error;
     }
 }
 

@@ -13,6 +13,7 @@ const send_otp_forget_password = async (data: any) => {
         return result;
     } catch (error: any) {
         showError(error);
+        throw error;
     }
 }
 
@@ -28,6 +29,7 @@ const verify_otp_forget_password = async (url:any, data: any) => {
         return result;
     } catch (error: any) {
         showError(error);
+        throw error;
     }
 }
 
@@ -43,6 +45,7 @@ const change_password = async (url: any, data: any) => {
         return result;
     } catch (error: any) {
         showError(error);
+        throw error;
     }
 }
 
