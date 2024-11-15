@@ -51,7 +51,6 @@ const profile = () => {
   const router = useRouter();
   const { session, logout } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [user, setUser] = useState<any>({});
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
@@ -127,10 +126,10 @@ const profile = () => {
   });
 
   const LogoutHandler = async () => {
-    if (session.accessToken && session.refreshToken) {
+    if (session.userToken.accessToken && session.userToken.refreshToken) {
       await logout!({
-        refreshToken: session.refreshToken.trim(),
-        accessToken: session.accessToken.trim(),
+        refreshToken: session.userToken.refreshToken.trim(),
+        accessToken: session.userToken.accessToken.trim(),
       });
       router.replace("/login");
     }
@@ -229,10 +228,10 @@ const profile = () => {
                   </Animated.View>
                 </Pressable>
 
-                <Text style={styles.text}>{session == null ? game.name : session.name}</Text>
+                <Text style={styles.text}>{session.userInfo == null ? game.name : session.userInfo.user.profile.userName}</Text>
                 <View style={[styles.text, {flexDirection: "row", justifyContent:"flex-start", alignItems: "center", marginTop: 10, gap: 5}]}>
                 <Ionicons name="chatbox-ellipses" size={16} color="#bfbfbf" />
-                <Text style={{marginLeft: 5, color: "#bfbfbf"}}>Hola</Text>
+                <Text style={{marginLeft: 5, color: "#bfbfbf"}}>{session.userInfo == null ? game.name : session.userInfo.user.profile.phoneNumber}</Text>
                 </View>
               </View>
               <View style={styles.outerEditContainer}>
@@ -257,7 +256,7 @@ const profile = () => {
                 <Text>Bài Viết</Text>
               </View>
               <View style={styles.dataSingleContainer}>
-                <Text style={styles.dataNumber}>{game.friends}</Text>
+                <Text style={styles.dataNumber}>{session.userInfo == null ? 100 : session.userInfo.user.friends.length}</Text>
                 <Text>Bạn Bè</Text>
               </View>
               <View style={styles.dataSingleContainer}>

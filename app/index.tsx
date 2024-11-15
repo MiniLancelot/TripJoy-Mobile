@@ -30,7 +30,7 @@ const Index = () => {
     }
 
     const handleToken = async () => {
-        if (session) {
+        if (session.userInfo && session.userToken) {
             router.replace("/home");
         } else {
             router.replace("/login");

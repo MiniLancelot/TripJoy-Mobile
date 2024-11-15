@@ -1,12 +1,20 @@
-import * as api from "@/utils/request";
+// import identity from "@/utils/request";
 import { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import register from "@/app/(auth)/register";
+import login from "@/services/identity/login";
+import logout from "@/services/identity/logout";
+import _register from "@/services/identity/register";
+import _forgotPassword from "@/services/identity/forgotPassword";
 import Toast from "react-native-toast-message";
+import get_user_profile from "@/services/user/userProfile";
 
 interface AuthProps {
-    session: { accessToken: string | null; refreshToken: string | null; name: string | null };
-    // forget_password_url?: string;  
+    session: {
+        userToken: any | null;
+        userInfo: any | null;
+    };
+    // forget_password_url?: string;
     login?: (data: any) => Promise<any>;
     logout?: (data: any) => Promise<any>;
     register?: (data: any) => Promise<any>;
@@ -28,144 +36,80 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: any) => {
     const [userToken, setUserToken] = useState<any>(null);
+    const [userInfo, setUserInfo] = useState<any>(null);
     const [url, setUrl] = useState<string>("");
 
     useEffect(() => {
         const loadUser = async () => {
             // AsyncStorage.clear();
-          const storedUser = await AsyncStorage.getItem('user');
-          console.log("User access token: ", storedUser);
-          if (storedUser) {
-            setUserToken(JSON.parse(storedUser));
-          }
-          else setUserToken(null);
+            const storedUser = await AsyncStorage.getItem("user");
+            const storedUserInfo = await AsyncStorage.getItem("user_info");
+            console.log("User access token: ", storedUser);
+            if (storedUser && storedUserInfo) {
+                setUserToken(JSON.parse(storedUser));
+                setUserInfo(JSON.parse(storedUserInfo));
+            } else {setUserToken(null); setUserInfo(null);}
         };
         loadUser();
-      }, []);
+    }, []);
 
     const user_login = async (data: any) => {
-        try {
-            const result = await api.identity("/login", {
-                method: "POST",
-                data: JSON.stringify(data),
-            });
-            if (result.status == 200) {
+        login(data).then((result) => {
+            if (result && result.status == 200) {
                 setUserToken({
                     accessToken: result.data.accessToken,
                     refreshToken: result.data.refreshToken,
-                    name: result.data.user.name,
                 });
-                await AsyncStorage.setItem("user", JSON.stringify({
-                    accessToken: result.data.accessToken,
-                    refreshToken: result.data.refreshToken,
-                    name: result.data.user.name,
-                }));
+                AsyncStorage.setItem(
+                    "user",
+                    JSON.stringify({
+                        accessToken: result.data.accessToken,
+                        refreshToken: result.data.refreshToken,
+                    })
+                );
+                get_user_profile(result.data.accessToken).then((result) => {
+                    if (result && result.status == 200) {
+                        setUserInfo(result.data);
+                        AsyncStorage.setItem("user_info", JSON.stringify(result.data));
+                    }
+                });
             }
-        } catch (error: any) {
-            console.info(error);
-            // return error.response.data;
-            throw error;
-        }
+        });
     };
 
     const send_otp_verify_email = async (data: any) => {
-        try {
-            const result = await api.identity("/send-otp-verify-email", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                data: JSON.stringify(data),
-            });
-            if (result.status == 200) {
+        _register.send_otp_verify_email(data).then((result) => {
+            if (result && result.status == 200) {
                 Toast.show({
                     type: "success",
                     text1: "Gửi mã OTP thành công",
                     text2: "Hooray! Mã OTP đã được gửi đến email của bạn",
-                  });
+                });
             }
-        } catch (error: any) {
-            console.error("Error details:", error);
-            if (error.response) {
-                console.error("Response data:", error.response.data);
-                console.error("Response status:", error.response.status);
-                console.error("Response headers:", error.response.headers);
-            } else if (error.request) {
-                console.error("Request data:", error.request);
-            } else {
-                console.error("Error message:", error.message);
-            }
-            throw error.message;
-        }
+        });
     };
 
-    // const user_register = async (data: any) => {
-    //     try {
-    //         const result = await api.identity("/register-with-otp", {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             data: JSON.stringify(data),  // Chuyển đổi data thành chuỗi JSON
-    //         });
-    //         if (result.status == 200) {
-    //             setUserToken({
-    //                 accessToken: result.data.accessToken,
-    //                 refreshToken: result.data.refreshToken,
-    //             });
-    //             await AsyncStorage.setItem("user", JSON.stringify({
-    //                 accessToken: result.data.accessToken,
-    //                 refreshToken: result.data.refreshToken,
-    //             }));
-    //         }
-    //     } catch (error: any) {
-    //         return error.response.data;
-    //     }
-    // };
-
     const user_register = async (data: any) => {
-        try {
-            const result = await api.identity("/register-with-otp", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                data: JSON.stringify(data),  // Chuyển đổi data thành chuỗi JSON
-            });
-            if (result.status == 200) {
+        _register.register(data).then((result) => {
+            if (result && result.status == 200) {
                 return;
-            }
-            else throw "Register failed";
-        } catch (error: any) {
-            return error.response.data;
-        }
+            } else throw "Register failed";
+        });
     };
 
     const user_logout = async (data: any) => {
-        try {
-            const result = await api.identity("/logout",{
-                method: "POST",
-                data: JSON.stringify(data),
-            });
-            if (result.status == 200) {
+        logout(userToken.accessToken, data).then((result) => {
+            if (result && result.status == 200) {
                 setUserToken(null);
-                await AsyncStorage.removeItem("user");
+                setUserInfo(null);
+                AsyncStorage.removeItem("user");
             }
-        } catch (error: any) {
-            throw error;
-        }
-    }
+        });
+    };
 
     const send_otp_forget_password = async (data: any) => {
-        try {
-            const result = await api.identity("/forget-password", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                data: JSON.stringify(data),
-            });
-            if (result.status == 200) {
+        _forgotPassword.send_otp_forget_password(data).then((result) => {
+            if (result && result.status == 200) {
                 Toast.show({
                     type: "success",
                     text1: "Gửi mã OTP thành công",
@@ -173,31 +117,19 @@ export const AuthProvider = ({ children }: any) => {
                 });
                 setUrl(result.data.url);
             }
-        } catch (error: any) {
-            console.error("Error details:", error);
-            if (error.response) {
-                console.error("Response data:", error.response.data);
-                console.error("Response status:", error.response.status);
-                console.error("Response headers:", error.response.headers);
-            } else if (error.request) {
-                console.error("Request data:", error.request);
-            } else {
-                console.error("Error message:", error.message);
+            else {
+                Toast.show({
+                    type: "error",
+                    text1: "Gửi mã OTP thất bại",
+                    text2: "Có lỗi xảy ra khi gửi mã OTP",
+                });
             }
-            throw error.message;
-        }
-    }
+        });
+    };
 
     const verify_otp_forget_password = async (data: any) => {
-        try {
-            const result = await api.identity(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                data: JSON.stringify(data),
-            });
-            if (result.status == 200) {
+        _forgotPassword.verify_otp_forget_password(url, data).then((result) => {
+            if (result && result.status == 200) {
                 Toast.show({
                     type: "success",
                     text1: "Xác thực mã OTP thành công",
@@ -206,31 +138,12 @@ export const AuthProvider = ({ children }: any) => {
                 console.log("Result data: ", result.data);
                 setUrl(result.data.url);
             }
-        } catch (error: any) {
-            console.error("Error details:", error);
-            if (error.response) {
-                console.error("Response data:", error.response.data);
-                console.error("Response status:", error.response.status);
-                console.error("Response headers:", error.response.headers);
-            } else if (error.request) {
-                console.error("Request data:", error.request);
-            } else {
-                console.error("Error message:", error.message);
-            }
-            throw error.message;
-        }
-    }
+        });
+    };
 
     const change_password = async (data: any) => {
-        try {
-            const result = await api.identity(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                data: JSON.stringify(data),
-            });
-            if (result.status == 200) {
+        _forgotPassword.change_password(url, data).then((result) => {
+            if (result && result.status == 200) {
                 Toast.show({
                     type: "success",
                     text1: "Thay đổi mật khẩu thành công",
@@ -239,20 +152,15 @@ export const AuthProvider = ({ children }: any) => {
                 console.log("Result data: ", result.data);
                 setUrl("");
             }
-        } catch (error: any) {
-            console.error("Error details:", error);
-            if (error.response) {
-                console.error("Response data:", error.response.data);
-                console.error("Response status:", error.response.status);
-                console.error("Response headers:", error.response.headers);
-            } else if (error.request) {
-                console.error("Request data:", error.request);
-            } else {
-                console.error("Error message:", error.message);
-            }
-            throw error.message;
-        }
-    }
+        });
+    };
+
+    // const get_user_info = async() => {
+    //     const user_info = await get_user_profile(userToken.accessToken);
+    //     if (user_info && user_info.status == 200) {
+    //         setUserInfo(user_info.data);
+    //     }
+    // }
 
     const value = {
         login: user_login,
@@ -262,11 +170,10 @@ export const AuthProvider = ({ children }: any) => {
         send_otp_forget_password: send_otp_forget_password,
         verify_otp_forget_password: verify_otp_forget_password,
         change_password: change_password,
-        session: userToken,
+        session: {userToken, userInfo},
     };
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
     );
 };
-

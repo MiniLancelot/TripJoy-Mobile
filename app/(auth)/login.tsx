@@ -232,9 +232,8 @@ const Login = () => {
       Toast.show({
         type: "success",
         text1: "Đăng nhập thành công",
-        text2: "Welcome back!",
+        text2: "Welcome!",
       });
-      // router.replace("/home");
       setTimeout(() => {
         router.replace("/home");
       }, 500);
