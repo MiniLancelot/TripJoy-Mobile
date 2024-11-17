@@ -41,6 +41,7 @@ const Trip = () => {
       setLoading(true);
       const response = await axios.get(
         "https://hsr-api.vercel.app/api/v1/characters"
+        // "https://hsr-api.vercel.app/api/v1/characters"
       );
       setUsers(response.data);
     } catch (err: any) {

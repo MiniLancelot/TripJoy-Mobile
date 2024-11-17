@@ -37,14 +37,14 @@ const Index = () => {
     if (session.userToken !== null) {
       const health = await get_health(session.userToken.accessToken);
       if (health) {
-        console.log(health.data.status);
+        console.log("Health: ",health.data.status);
       } else {
         try {
           const result = await refreshingToken({
             refreshToken: session.userToken.refreshToken,
           });
           if (result) {
-            console.log(result);
+            console.log("RefeshToken result: ",result);
             setCurrentToken({
                 accessToken: result.data.accessToken,
                 refreshToken: result.data.refreshToken,
