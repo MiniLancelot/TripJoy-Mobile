@@ -9,7 +9,7 @@ import {
 import React from "react";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/app/AuthContext";
+import { useAuth } from "@/app/(auth)/AuthContext";
 import "@/global.css";
 import { SafeAreaView } from 'react-native-safe-area-context';
 

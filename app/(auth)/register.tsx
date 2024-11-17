@@ -52,7 +52,7 @@ const register = () => {
     enteredName,
     enteredEmail,
     enteredOtp,
-    enteredPhoneNumber,
+    // enteredPhoneNumber,
     enteredPassword,
     enteredValPassword,
   } = registerData;
@@ -84,7 +84,7 @@ const register = () => {
     !enteredName ||
     !enteredEmail ||
     !enteredOtp ||
-    !enteredPhoneNumber ||
+    // !enteredPhoneNumber ||
     !enteredPassword ||
     !enteredValPassword;
 
@@ -187,7 +187,7 @@ const register = () => {
     const trimmedName = enteredName.trim();
     const trimmedEmail = enteredEmail.trim();
     const trimmedOtp = enteredOtp.trim();
-    const trimmedPhoneNumber = enteredPhoneNumber.trim();
+    // const trimmedPhoneNumber = enteredPhoneNumber.trim();
     const trimmedPassword = enteredPassword.trim();
     const trimmedValPassword = enteredValPassword.trim();
 
@@ -195,7 +195,7 @@ const register = () => {
       !trimmedName ||
       !trimmedEmail ||
       !trimmedOtp ||
-      !trimmedPhoneNumber ||
+      // !trimmedPhoneNumber ||
       !trimmedPassword ||
       !trimmedValPassword
     ) {
@@ -221,7 +221,7 @@ const register = () => {
         name: enteredName.trim(),
         email: enteredEmail.trim(),
         otp: enteredOtp.trim(),
-        phoneNumber: enteredPhoneNumber.trim(),
+        // phoneNumber: enteredPhoneNumber.trim(),
         password: enteredPassword.trim(),
         confirmPassword: enteredValPassword.trim(),
       });
@@ -365,7 +365,7 @@ const register = () => {
             </View> */}
           </View>
 
-          <View style={styles.outerInput}>
+          {/* <View style={styles.outerInput}>
             <AnimatedTextInput
               style={[
                 animatedBorderStyle(phoneNumberBorderColor),
@@ -401,7 +401,7 @@ const register = () => {
                 />
               </Pressable>
             )}
-          </View>
+          </View> */}
 
           <View style={styles.outerInput}>
             <AnimatedTextInput

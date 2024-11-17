@@ -24,8 +24,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 import "@/global.css";
 import SeparateLine from "@/components/Others/SeparateLine";
-import { user_login } from "@/utils/user_api";
-import { useAuth } from "@/app/AuthContext";
+import { useAuth } from "@/app/(auth)/AuthContext";
 import GoogleIcon from "@/components/Icons/GoogleIcon";
 import FacebookIcon from "@/components/Icons/FacebookIcon";
 import Toast from "react-native-toast-message";
@@ -232,9 +231,8 @@ const Login = () => {
       Toast.show({
         type: "success",
         text1: "Đăng nhập thành công",
-        text2: "Welcome back!",
+        text2: "Welcome!",
       });
-      // router.replace("/home");
       setTimeout(() => {
         router.replace("/home");
       }, 500);
@@ -498,7 +496,7 @@ const Login = () => {
         </View>
 
         <View style={styles.actionButtonsContainer}>
-          <Pressable onPress={() => alert("Forgot password")}>
+          <Pressable onPress={() => router.push("/forgot_password")}>
             <Text style={styles.actionText}>Quên mật khẩu?</Text>
           </Pressable>
           <Pressable onPress={() => router.push("/register")}>

@@ -159,14 +159,15 @@ const Map = () => {
       const start = coordinates[0];
       const end = coordinates[coordinates.length - 1];
       let url;
+      let urlTest;
 
       if (coordinates.length > 2) {
-        const waypoints = coordinates.slice(1,-1).map(coord => coord.join(',')).join(';');
-        url = `https://api.mapbox.com/directions/v5/mapbox/walking/${start.join(',')};${waypoints};${end.join(',')}?geometries=geojson&access_token=${accessToken}`;
-      } else {
-        url = `https://api.mapbox.com/directions/v5/mapbox/walking/${start.join(',')};${end.join(',')}?geometries=geojson&access_token=${accessToken}`;
+        const waypoints = coordinates.slice(1,-1).map(coord => coord.join('%2C')).join('%3B');
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join('%2C')}%3B${waypoints}%3B${end.join('%2C')}?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${accessToken}`;      } else {
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(',')};${end.join(',')}?geometries=geojson&access_token=${accessToken}`;
       }
 
+      console.log(url);
       try {
         const response = await axios.get(url);
         const routeGeoJSON = response.data.routes[0].geometry;
@@ -181,7 +182,14 @@ const Map = () => {
     fetchRoute();
   }, []);
 
-  const locationPoints = Locations.map((location) => point([location.longtitude, location.latitude]));
+  // const locationPoints = Locations.map((location) => point([location.longtitude, location.latitude]));
+  const locationPoints = Locations.map((location, index) => ({
+    ...point([location.longtitude, location.latitude]),
+    // properties: { ordinal: (index + 1).toString(), name: location.name }
+    properties: {
+      label: `${index + 1}. ${location.name}`,
+    }
+  }));  
   const myLocationFeature = featureCollection(locationPoints);
 
   return (
@@ -194,10 +202,26 @@ const Map = () => {
           <Camera followUserLocation followZoomLevel={15} zoomLevel={15} />
           <LocationPuck pulsing={{ isEnabled: true }} puckBearingEnabled />
 
-          <ShapeSource id="myLocations" shape={myLocationFeature}>
+          {/* <ShapeSource id="myLocations" shape={myLocationFeature}>
             <SymbolLayer
               id="my-location-icons"
               style={{ iconImage: "pin", iconSize: 0.5 }}
+            />
+            <Images images={{ pin }} />
+          </ShapeSource> */}
+
+
+          <ShapeSource id="myLocations" shape={myLocationFeature}>
+            <SymbolLayer
+              id="my-location-icons"
+              style={{
+                iconImage: "pin",
+                iconSize: 0.5,
+                textField: ['get', 'label'],
+                textSize: 14,
+                textOffset: [0, 2.5],
+                textColor: "#000",
+              }}
             />
             <Images images={{ pin }} />
           </ShapeSource>
