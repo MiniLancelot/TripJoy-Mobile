@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: any) => {
             // AsyncStorage.clear();
             const storedUser = await AsyncStorage.getItem("user");
             const storedUserInfo = await AsyncStorage.getItem("user_info");
-            console.log("User access token: ", storedUser);
+            // console.log("User access token: ", storedUser);
             if (storedUser && storedUserInfo) {
                 setUserToken(JSON.parse(storedUser));
                 setUserInfo(JSON.parse(storedUserInfo));

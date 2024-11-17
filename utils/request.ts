@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "http://192.168.1.9:7000";
+const baseURL = "http://192.168.1.10:7000";
 
 const identity = axios.create({
     baseURL: `${baseURL}/identity-service`,
