@@ -7,8 +7,8 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import TextCarousel from "@/components/Others/TextCarousel";
+import React, { useEffect, useState, useRef } from "react";
+// import TextCarousel from "@/components/Others/TextCarousel";
 import get_user_search from "@/services/user/getUserBySearch";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { FlashList } from "@shopify/flash-list";
@@ -34,16 +34,20 @@ const search = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
+  const searchInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     fetchName();
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
   }, []);
 
   const fetchName = async () => {
     try {
       const result = await get_user_search(session.userToken.accessToken, "");
       if (result) {
-        console.log(result.data.users.data);
+        // console.log(result.data.users.data);
         setUsers(result.data.users.data);
       }
     } catch (err: any) {
@@ -96,7 +100,9 @@ const search = () => {
         </View>
         <View style={styles.searchBoxContainer}>
           <TextInput
+            autoFocus
             style={styles.searchBar}
+            ref={searchInputRef}
             placeholder="Tìm kiếm"
             value={searchQuery}
             onChangeText={(text) => setSearchQuery(text)}

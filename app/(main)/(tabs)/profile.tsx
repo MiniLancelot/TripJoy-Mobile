@@ -47,6 +47,7 @@ const game = {
     "Honkai: Star Rail is a turn-based space fantasy RPG developed and published by HoYoverse for PC, PS5, and iOS/Android platforms. Come aboard with us on the Astral Express, TrailblazerssThis wiki is an English resource for information about the Global version of the game. There are unmarked spoilers on this wiki.",
 };
 
+
 const profile = () => {
   const router = useRouter();
   const { session, logout } = useAuth();
@@ -64,6 +65,9 @@ const profile = () => {
   //         }
   //     });
   // }, []);
+  const tempAvatar =
+    "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
+  const avatarUri = session.userInfo.user.profile.avatar == null ? tempAvatar : session.userInfo.user.profile.avatar;
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT); // Clamp scrollOffset value
@@ -91,6 +95,7 @@ const profile = () => {
     const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT);
     return {
       opacity: interpolate(clampedScroll, [0, IMG_HEIGHT / 1.5], [0, 1]),
+      // backgroundColor: interpolateColor(clampedScroll, [0, IMG_HEIGHT / 1.5], ['transparent', 'white']),
     };
   });
 
@@ -166,13 +171,13 @@ const profile = () => {
               <>
                 <Pressable style={styles.headerAvatarNameConatainer} onLongPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}>
                   <Animated.Image
-                    source={game.avatar}
+                    source={{uri: avatarUri}}
                     style={[styles.headerAvatar, headerAvatarAnimatedStyle]}
                   />
                   <Animated.Text
                     style={[styles.headerName, headerAnimatedStyle]}
                   >
-                    {game.name}
+                    {session.userInfo == null ? game.name : session.userInfo.user.profile.userName}
                   </Animated.Text>
                 </Pressable>
               </>
@@ -224,7 +229,7 @@ const profile = () => {
                   <Animated.View
                     style={[avatarAnimatedStyle, styles.mainAvatarContainer]}
                   >
-                    <Image source={game.avatar} style={styles.mainAvatar} />
+                    <Image source={{uri: avatarUri}} style={styles.mainAvatar} />
                   </Animated.View>
                 </Pressable>
 
@@ -350,7 +355,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   header: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     height: 80,
   },
   headerAvatarNameConatainer: {
