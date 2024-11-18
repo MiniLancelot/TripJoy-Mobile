@@ -211,7 +211,6 @@ const User = () => {
   return (
 
     <View style={styles.profileContainer}>
-      {/* {session?.name && <Text style={styles.name}>Hello, {session.name}</Text>} */}
       <Stack.Screen
         options={{
           headerTransparent: true,
