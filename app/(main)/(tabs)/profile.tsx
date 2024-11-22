@@ -261,7 +261,7 @@ const profile = () => {
                 <Text>Bài Viết</Text>
               </View>
               <View style={styles.dataSingleContainer}>
-                <Text style={styles.dataNumber}>{session.userInfo == null ? 100 : session.userInfo.user.friends.length}</Text>
+                <Text style={styles.dataNumber}>{session.userInfo == null ? 0 : session.userInfo.user.friends.length}</Text>
                 <Text>Bạn Bè</Text>
               </View>
               <View style={styles.dataSingleContainer}>
