@@ -1,5 +1,5 @@
 import { View, Text, Alert } from "react-native";
-import React from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import {
   accept_friend_request,
@@ -8,11 +8,14 @@ import {
 } from "@/services/user/friend_request";
 import { FlatList } from "react-native-gesture-handler";
 import FriendItem from "@/components/Friend/AddFriendItem";
+import { FlashList } from "@shopify/flash-list";
 
 const FriendInvitation = () => {
   const { session } = useAuth();
-  const [users, setUsers] = React.useState<any>(null);
-  const [isSuccess, setIsSuccess] = React.useState<boolean>(false);
+  const [users, setUsers] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const handleFriendRequest = async (id: string, accept: boolean) => {
     try {
@@ -70,6 +73,7 @@ const FriendInvitation = () => {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const res = await get_friends_request(session.userToken.accessToken);
       if (res && res.status == 200) {
         setUsers(res.data.users == null ? [] : res.data.users);
@@ -80,15 +84,22 @@ const FriendInvitation = () => {
       }
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoading(false);
     }
   };
 
-  React.useEffect(() => {
+  const refreshHandler = () => {
+    setUsers([]);
+    fetchData();
+  };
+
+  useEffect(() => {
     // fetch
     fetchData();
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isSuccess) {
       fetchData();
       setIsSuccess(false);
@@ -97,15 +108,18 @@ const FriendInvitation = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Text>FriendInvitation</Text>
+      {/* <Text>FriendInvitation</Text> */}
       {users != null && users.data != null ? (
-        <FlatList
+        <FlashList
           data={users.data}
-          onRefresh={fetchData}
-          renderItem={({ item }) => (
+          refreshing={loading}
+          onRefresh={refreshHandler}
+          estimatedItemSize={65}
+          renderItem={({ item }: { item: { id: string; userName: string; avatar: string } }) => (
             <FriendItem
               id={item.id}
               name={item.userName}
+              avatar = {item.avatar}
               _onClick={handleFriendRequest}
             />
           )}

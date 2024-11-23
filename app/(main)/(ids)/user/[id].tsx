@@ -7,6 +7,7 @@ import {
   Dimensions,
   Pressable,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { useState, useEffect, useLayoutEffect } from "react";
 import {
@@ -465,10 +466,12 @@ const User = () => {
                     />
                   </Animated.View>
                 </Pressable>
+                <TouchableOpacity onLongPress={fetchUser}>
+                  <Text style={styles.text}>
+                    {session.userInfo == null ? game.name : user.userName}
+                  </Text>
+                </TouchableOpacity>
 
-                <Text style={styles.text}>
-                  {session.userInfo == null ? game.name : user.userName}
-                </Text>
                 <View
                   style={[
                     styles.text,
@@ -507,12 +510,18 @@ const User = () => {
                             size={13}
                             color={"#13c892"}
                           /> */}
-                            <Ionicons
-                              name="person-add-outline"
-                              size={15}
+                            {/* <Ionicons
+                              name="add-outline"
+                              size={20}
+                              color={"#13c892"}
+                            /> */}
+                            <FontAwesome6
+                              name="plus"
+                              solid
+                              size={16}
                               color={"#13c892"}
                             />
-                            <Text style={styles.editText}>Thêm bạn bè</Text>
+                            <Text style={styles.editText}>Kết Bạn</Text>
                           </Pressable>
                         </View>
                       </View>
@@ -530,12 +539,18 @@ const User = () => {
                       size={13}
                       color={"#13c892"}
                     /> */}
-                            <Ionicons
+                            {/* <Ionicons
                               name="person-add-outline"
                               size={15}
                               color={"#13c892"}
+                            /> */}
+                            <FontAwesome6
+                              name="check"
+                              solid
+                              size={16}
+                              color={"#13c892"}
                             />
-                            <Text style={styles.editText}>Hủy kết bạn</Text>
+                            <Text style={styles.editText}>Bạn bè</Text>
                           </Pressable>
                         </View>
                       </View>
@@ -548,16 +563,11 @@ const User = () => {
                             onPress={handleRevokeFriendRequest}
                             style={styles.innerEditContainer}
                           >
-                            {/* <FontAwesome6
-                      name="pen-to-square"
-                      size={13}
-                      color={"#13c892"}
-                    /> */}
-                            <Ionicons
+                            {/* <Ionicons
                               name="person-add-outline"
                               size={15}
                               color={"#13c892"}
-                            />
+                            /> */}
                             <Text style={styles.editText}>Thu hồi lời mời</Text>
                           </Pressable>
                         </View>
@@ -565,47 +575,37 @@ const User = () => {
                     );
                   case FriendStatus.REQUESTED:
                     return (
-                      <View>
-                        <View style={styles.outerEditContainer}>
+                      <View style={styles.invitationContainer}>
+                        <View style={styles.invitationOuterEditContainer}>
                           <View style={styles.editContainer}>
                             <Pressable
                               onPress={handleAcceptFriendRequest}
                               style={styles.innerEditContainer}
                             >
-                              {/* <FontAwesome6
-                      name="pen-to-square"
-                      size={13}
-                      color={"#13c892"}
-                    /> */}
-                              <Ionicons
+                              {/* <Ionicons
                                 name="person-add-outline"
                                 size={15}
                                 color={"#13c892"}
-                              />
+                              /> */}
                               <Text style={styles.editText}>
-                                Chấp nhận lời mời
+                                Xác nhận
                               </Text>
                             </Pressable>
                           </View>
                         </View>
-                        <View style={styles.outerEditContainer}>
+                        <View style={styles.invitationOuterEditContainer}>
                           <View style={styles.editContainer}>
                             <Pressable
                               onPress={handleDeclineFriendRequest}
                               style={styles.innerEditContainer}
                             >
-                              {/* <FontAwesome6
-                      name="pen-to-square"
-                      size={13}
-                      color={"#13c892"}
-                    /> */}
-                              <Ionicons
+                              {/* <Ionicons
                                 name="person-add-outline"
                                 size={15}
                                 color={"#13c892"}
-                              />
+                              /> */}
                               <Text style={styles.editText}>
-                                Từ chối lời mời
+                                Từ chối
                               </Text>
                             </Pressable>
                           </View>
@@ -626,11 +626,6 @@ const User = () => {
                       size={13}
                       color={"#13c892"}
                     /> */}
-                            <Ionicons
-                              name="person-add-outline"
-                              size={15}
-                              color={"#13c892"}
-                            />
                             <Text style={styles.editText}>Bản thân</Text>
                           </Pressable>
                         </View>
@@ -639,7 +634,7 @@ const User = () => {
                 }
               })()}
             </View>
-            <View style={styles.dataContainer}>
+            {/* <View style={styles.dataContainer}>
               <View style={styles.dataSingleContainer}>
                 <Text style={styles.dataNumber}>{game.posts}</Text>
                 <Text>Bài Viết</Text>
@@ -654,7 +649,7 @@ const User = () => {
                 <Text style={styles.dataNumber}>{game.trips}</Text>
                 <Text>Chuyến Đi</Text>
               </View>
-            </View>
+            </View> */}
             <View>
               <Text
                 style={{
@@ -850,11 +845,23 @@ const styles = StyleSheet.create({
     padding: 7,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
+    // paddingHorizontal: 12,
+  },
+  invitationOuterEditContainer: {
+    // alignItems: "flex-end",
+    // justifyContent: "center",
+    // flex: 1,
+    marginRight: 15,
+    marginTop: 50,
+  },
+  invitationContainer: {
+    flexDirection: "row",
+    marginLeft: 70,
   },
   editText: {
     fontSize: 13,
-    fontWeight: "500",
+    fontWeight: "700",
     color: "#13c892",
   },
   modalContainer: {
@@ -898,6 +905,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingRight: 0,
   },
+  
 });
 
 export default User;
