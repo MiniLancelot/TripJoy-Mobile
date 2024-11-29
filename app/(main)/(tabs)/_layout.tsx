@@ -206,17 +206,17 @@ const Layout = () => {
               
             >
               <BottomSheetView style={styles.contentContainer}>
-                <Text style={{fontSize: 20, fontWeight: "500"}}>Awesome Bottom Sheet 🎉</Text>
+                <Text style={{fontSize: 20, fontWeight: "500"}}>Tạo chuyến đi của bạn 🎉</Text>
                 <View style={{ flexDirection: "row", gap: 35, marginTop: 35 }}>
                   <Pressable
                     onPress={() => router.push("/Trip1")}
                   >
-                    <Text>Go to Trip1</Text>
+                    <Text>Tạo chuyến đi thủ công</Text>
                   </Pressable>
                   <Pressable
                     onPress={() => router.push("/Trip2")}
                   >
-                    <Text>Go to Trip2</Text>
+                    <Text>Tạo chuyến đi bằng AI</Text>
                   </Pressable>
                 </View>
               </BottomSheetView>

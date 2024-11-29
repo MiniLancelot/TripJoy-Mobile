@@ -95,6 +95,7 @@ const _layout = () => {
             <Stack.Screen name="(ids)" options={{headerShown: false}} />
             <Stack.Screen name="(create)" options={{headerShown: false}} />
             <Stack.Screen name="(search)" options={{headerShown: false}} />
+            <Stack.Screen name="(friends)" options={{headerTitle: "Bạn Bè"}} />
             
         </Stack>
     );

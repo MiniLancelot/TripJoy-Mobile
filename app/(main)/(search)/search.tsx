@@ -20,7 +20,7 @@ type UserProps = {
   userName: string;
   email: string;
   phoneNumber: string | null;
-  avatar: string | null;
+  avatar: any | null;
   dateOfBirth: string | null;
   address: string | null;
   gender: boolean | null;
@@ -69,7 +69,7 @@ const search = () => {
       .toLowerCase()
       .indexOf(searchQuery.toLowerCase());
     const endIndex = startIndex + searchQuery.length;
-    const avatarUri = item.avatar ? item.avatar : tempAvatar;
+    const avatarUri = item.avatar ? item.avatar.url : tempAvatar;
 
     return (
       <Pressable style={styles.itemContainer} onPress={() => router.push(`/user/${item.id}`)}>

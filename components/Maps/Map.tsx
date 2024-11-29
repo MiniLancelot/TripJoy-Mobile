@@ -277,6 +277,3 @@ const styles = StyleSheet.create({
 });
 
 export default Map;
-
-
-

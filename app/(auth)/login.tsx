@@ -233,6 +233,7 @@ const Login = () => {
         text1: "Đăng nhập thành công",
         text2: "Welcome!",
       });
+      // router.replace("/home");
       setTimeout(() => {
         router.replace("/home");
       }, 500);
@@ -317,7 +318,7 @@ const Login = () => {
         </View> */}
         <View style={styles.inputsContainer}>
           <View style={styles.inputContainer}>
-            <Pressable style={styles.inputLabel} onPress={handleUsernameFocus}>
+            {/* <Pressable style={styles.inputLabel} onPress={handleUsernameFocus}>
               <Animated.Text
                 style={[
                   styles.inputLabelText,
@@ -327,7 +328,7 @@ const Login = () => {
               >
                 Email
               </Animated.Text>
-            </Pressable>
+            </Pressable> */}
             <View style={styles.outerUsernameInput}>
               <AnimatedTextInput
                 autoCapitalize={"none"}
@@ -335,38 +336,38 @@ const Login = () => {
                   animatedBorderStyle(userNameBorderColor),
                   styles.usernameInput,
                 ]}
-                // placeholder={"Tên đăng nhập"}
+                placeholder={"Tên đăng nhập"}
                 ref={usernameRef}
                 maxLength={30}
                 value={enteredUserName}
                 onChangeText={(text) => setEnteredUserName(text)}
-                onFocus={() => {
-                  handleFocus(userNameBorderColor);
-                  animateInput(
-                    "username",
-                    usernameHeight * 0.21,
-                    "#657ef8",
-                    -22
-                  );
-                }}
-                onBlur={() => {
-                  handleBlur(userNameBorderColor);
-                  if (enteredUserName.trim() === "") {
-                    animateInput(
-                      "username",
-                      usernameHeight * 0.32,
-                      "#6b707b",
-                      0
-                    );
-                  } else {
-                    animateInput(
-                      "username",
-                      usernameHeight * 0.21,
-                      "#6b707b",
-                      -22
-                    );
-                  }
-                }}
+                // onFocus={() => {
+                //   handleFocus(userNameBorderColor);
+                //   animateInput(
+                //     "username",
+                //     usernameHeight * 0.21,
+                //     "#657ef8",
+                //     -22
+                //   );
+                // }}
+                // onBlur={() => {
+                //   handleBlur(userNameBorderColor);
+                //   if (enteredUserName.trim() === "") {
+                //     animateInput(
+                //       "username",
+                //       usernameHeight * 0.32,
+                //       "#6b707b",
+                //       0
+                //     );
+                //   } else {
+                //     animateInput(
+                //       "username",
+                //       usernameHeight * 0.21,
+                //       "#6b707b",
+                //       -22
+                //     );
+                //   }
+                // }}
                 onLayout={onLayoutUsername}
                 selectionColor="#657ef8"
               />
@@ -385,7 +386,7 @@ const Login = () => {
             </View>
           </View>
           <View style={styles.inputContainer}>
-            <Pressable style={styles.inputLabel} onPress={handlePasswordFocus}>
+            {/* <Pressable style={styles.inputLabel} onPress={handlePasswordFocus}>
               <Animated.Text
                 style={[
                   styles.inputLabelText,
@@ -395,45 +396,46 @@ const Login = () => {
               >
                 Mật khẩu
               </Animated.Text>
-            </Pressable>
+            </Pressable> */}
             <View style={styles.outerPasswordInput}>
               <AnimatedTextInput
                 style={[
                   animatedBorderStyle(passwordBorderColor),
                   styles.passwordInput,
                 ]}
+                placeholder={"Mật khẩu"}
                 ref={passwordRef}
                 maxLength={30}
                 secureTextEntry={!isPasswordVisible}
                 value={enteredPassword}
                 onChangeText={(text) => setEnteredPassword(text)}
-                onFocus={() => {
-                  handleFocus(passwordBorderColor);
-                  animateInput(
-                    "password",
-                    passwordHeight * 0.21,
-                    "#657ef8",
-                    -22
-                  );
-                }}
-                onBlur={() => {
-                  handleBlur(passwordBorderColor);
-                  if (enteredPassword.trim() === "") {
-                    animateInput(
-                      "password",
-                      passwordHeight * 0.32,
-                      "#6b707b",
-                      0
-                    );
-                  } else {
-                    animateInput(
-                      "password",
-                      passwordHeight * 0.21,
-                      "#6b707b",
-                      -22
-                    );
-                  }
-                }}
+                // onFocus={() => {
+                //   handleFocus(passwordBorderColor);
+                //   animateInput(
+                //     "password",
+                //     passwordHeight * 0.21,
+                //     "#657ef8",
+                //     -22
+                //   );
+                // }}
+                // onBlur={() => {
+                //   handleBlur(passwordBorderColor);
+                //   if (enteredPassword.trim() === "") {
+                //     animateInput(
+                //       "password",
+                //       passwordHeight * 0.32,
+                //       "#6b707b",
+                //       0
+                //     );
+                //   } else {
+                //     animateInput(
+                //       "password",
+                //       passwordHeight * 0.21,
+                //       "#6b707b",
+                //       -22
+                //     );
+                //   }
+                // }}
                 onLayout={onLayoutPassword}
                 selectionColor="#657ef8"
               />

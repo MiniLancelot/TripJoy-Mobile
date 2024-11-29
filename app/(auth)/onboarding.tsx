@@ -1,3 +1,4 @@
+
 import React from "react";
 import { FlatList, useWindowDimensions, View, Text } from "react-native";
 import Animated, {

@@ -32,9 +32,40 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import MyProfileModal from "@/components/Modals/MyProfileModal";
 import StarRailChar2 from "@/components/Others/StarRailChar2";
+import get_user_profile from "@/services/user/userProfile";
 
 const { width } = Dimensions.get("window");
 const IMG_HEIGHT = 200;
+
+// type UserProps = {
+//   id: string;
+//   userName: string;
+//   email: string;
+//   phoneNumber: string | null;
+//   avatar: string | null;
+//   dateOfBirth: string | null;
+//   address: string | null;
+//   gender: boolean | null;
+//   status: number;
+// };
+
+type UserProfileProps = {
+  id: string;
+  userName: string;
+  email: string;
+  phoneNumber: string | null;
+  avatar: any | null;
+  dateOfBirth: string | null;
+  address: string | null;
+  gender: boolean | null;
+};
+
+type UserProps = {
+  profile: UserProfileProps;
+  friends: any[];
+  friendRequests: any[];
+  sentFriendRequests: any[];
+};
 
 const game = {
   name: "Mean Nhat",
@@ -47,11 +78,40 @@ const game = {
     "Honkai: Star Rail is a turn-based space fantasy RPG developed and published by HoYoverse for PC, PS5, and iOS/Android platforms. Come aboard with us on the Astral Express, TrailblazerssThis wiki is an English resource for information about the Global version of the game. There are unmarked spoilers on this wiki.",
 };
 
-
 const profile = () => {
   const router = useRouter();
   const { session, logout } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // const [user, setUser] = useState<UserProps>({
+  //   id: "",
+  //   userName: "",
+  //   email: "",
+  //   phoneNumber: null,
+  //   avatar: null,
+  //   dateOfBirth: null,
+  //   address: null,
+  //   gender: null,
+  //   status: 0,
+  // });
+
+  const [user, setUser] = useState<UserProps>({
+    profile: {
+      id: "",
+      userName: "",
+      email: "",
+      phoneNumber: null,
+      avatar: null,
+      dateOfBirth: null,
+      address: null,
+      gender: null,
+    },
+    friends: [],
+    friendRequests: [],
+    sentFriendRequests: [],
+  });
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
@@ -67,7 +127,8 @@ const profile = () => {
   // }, []);
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
-  const avatarUri = session.userInfo.user.profile.avatar == null ? tempAvatar : session.userInfo.user.profile.avatar;
+  const avatarUri =
+    user.profile.avatar == null ? tempAvatar : user.profile.avatar.url;
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT); // Clamp scrollOffset value
@@ -140,6 +201,25 @@ const profile = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    try {
+      setLoading(true);
+      const response = await get_user_profile(session.userToken.accessToken);
+      if (response) {
+        console.log(response.data.user);
+        setUser(response.data.user);
+        // console.log(session.userInfo);
+        setLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   const confirmLogout = () => {
     Alert.alert(
       "Xác nhận đăng xuất",
@@ -169,15 +249,22 @@ const profile = () => {
           headerLeft: () => {
             return (
               <>
-                <Pressable style={styles.headerAvatarNameConatainer} onLongPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}>
+                <Pressable
+                  style={styles.headerAvatarNameConatainer}
+                  onLongPress={() =>
+                    scrollRef.current?.scrollTo({ y: 0, animated: true })
+                  }
+                >
                   <Animated.Image
-                    source={{uri: avatarUri}}
+                    source={{ uri: avatarUri }}
                     style={[styles.headerAvatar, headerAvatarAnimatedStyle]}
                   />
                   <Animated.Text
                     style={[styles.headerName, headerAnimatedStyle]}
                   >
-                    {session.userInfo == null ? game.name : session.userInfo.user.profile.userName}
+                    {session.userInfo == null
+                      ? game.name
+                      : user.profile.userName}
                   </Animated.Text>
                 </Pressable>
               </>
@@ -229,20 +316,44 @@ const profile = () => {
                   <Animated.View
                     style={[avatarAnimatedStyle, styles.mainAvatarContainer]}
                   >
-                    <Image source={{uri: avatarUri}} style={styles.mainAvatar} />
+                    <Image
+                      source={{ uri: avatarUri }}
+                      style={styles.mainAvatar}
+                    />
                   </Animated.View>
                 </Pressable>
+                <TouchableOpacity onLongPress={fetchUser}>
+                  <Text style={styles.text}>
+                    {session.userInfo == null
+                      ? game.name
+                      : user.profile.userName}
+                  </Text>
+                </TouchableOpacity>
 
-                <Text style={styles.text}>{session.userInfo == null ? game.name : session.userInfo.user.profile.userName}</Text>
-                <View style={[styles.text, {flexDirection: "row", justifyContent:"flex-start", alignItems: "center", marginTop: 10, gap: 5}]}>
-                <Ionicons name="chatbox-ellipses" size={16} color="#bfbfbf" />
-                <Text style={{marginLeft: 5, color: "#bfbfbf"}}>{session.userInfo == null ? game.name : session.userInfo.user.profile.phoneNumber}</Text>
+                <View
+                  style={[
+                    styles.text,
+                    {
+                      flexDirection: "row",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      marginTop: 10,
+                      gap: 5,
+                    },
+                  ]}
+                >
+                  <Ionicons name="chatbox-ellipses" size={16} color="#bfbfbf" />
+                  <Text style={{ marginLeft: 5, color: "#bfbfbf" }}>
+                    {session.userInfo == null
+                      ? game.name
+                      : user.profile.phoneNumber}
+                  </Text>
                 </View>
               </View>
               <View style={styles.outerEditContainer}>
                 <View style={styles.editContainer}>
                   <Pressable
-                    onPress={() => router.push("/(update)/update-profile")}
+                    onPress={() => router.push("/update-profile")}
                     style={styles.innerEditContainer}
                   >
                     <FontAwesome6
@@ -260,18 +371,24 @@ const profile = () => {
                 <Text style={styles.dataNumber}>{game.posts}</Text>
                 <Text>Bài Viết</Text>
               </View>
-              <View style={styles.dataSingleContainer}>
-                <Text style={styles.dataNumber}>{session.userInfo == null ? 100 : session.userInfo.user.friends.length}</Text>
+              <Pressable style={styles.dataSingleContainer} onPress={() => router.push("/(friends)/friend-list")}>
+                <Text style={styles.dataNumber}>
+                  {session.userInfo == null ? 0 : user.friends.length}
+                </Text>
                 <Text>Bạn Bè</Text>
-              </View>
+              </Pressable>
               <View style={styles.dataSingleContainer}>
                 <Text style={styles.dataNumber}>{game.trips}</Text>
                 <Text>Chuyến Đi</Text>
               </View>
             </View>
             <View>
-              <Text style={{ marginVertical: 10, fontSize: 18, fontWeight:"700" }}>Bài Viết</Text>
-              <StarRailChar2 />              
+              <Text
+                style={{ marginVertical: 10, fontSize: 18, fontWeight: "700" }}
+              >
+                Bài Viết
+              </Text>
+              <StarRailChar2 />
             </View>
           </View>
         </View>
@@ -463,15 +580,14 @@ const styles = StyleSheet.create({
     borderBottomColor: "#bfbfbf",
     borderBottomWidth: 0.2,
   },
-  dataSingleContainer:{
+  dataSingleContainer: {
     alignItems: "center",
     justifyContent: "center",
     gap: 7,
   },
-  dataNumber:{
+  dataNumber: {
     fontSize: 17,
     fontWeight: "bold",
-  }
-  
+  },
 });
 export default profile;

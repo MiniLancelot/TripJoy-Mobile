@@ -7,6 +7,7 @@ import {
   Dimensions,
   Pressable,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { useState, useEffect, useLayoutEffect } from "react";
 import {
@@ -32,6 +33,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import StarRailChar2 from "@/components/Others/StarRailChar2";
+import {
+  accept_friend_request,
+  decline_friend_request,
+  remove_friend,
+  revoke_friend_request,
+  send_friend_request,
+} from "@/services/user/friend_request";
 
 type UserProps = {
   id: string;
@@ -42,10 +50,19 @@ type UserProps = {
   dateOfBirth: string | null;
   address: string | null;
   gender: boolean | null;
+  status: number;
 };
 
 const { width } = Dimensions.get("window");
 const IMG_HEIGHT = 200;
+
+enum FriendStatus {
+  STRANGER = 0,
+  FRIEND = 1,
+  PENDING = 2,
+  REQUESTED = 3,
+  MYSELF = 4,
+}
 
 const game = {
   name: "Mean Nhat",
@@ -72,9 +89,11 @@ const User = () => {
     dateOfBirth: null,
     address: null,
     gender: null,
+    status: 0,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
@@ -106,7 +125,6 @@ const User = () => {
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
 
-
   const imageAnimatedStyle = useAnimatedStyle(() => {
     const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT); // Clamp scrollOffset value
     return {
@@ -133,7 +151,6 @@ const User = () => {
     const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT);
     return {
       opacity: interpolate(clampedScroll, [0, IMG_HEIGHT / 1.5], [0, 1]),
-      
     };
   });
 
@@ -172,6 +189,12 @@ const User = () => {
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    if (isSuccess) {
+      fetchUser();
+    }
+  }, [isSuccess]);
+
   const fetchUser = async () => {
     try {
       setLoading(true);
@@ -183,6 +206,7 @@ const User = () => {
         console.log(response.data.user);
         setUser(response.data.user);
         setLoading(false);
+        setIsSuccess(false);
       }
     } catch (err: any) {
       setError(err.message);
@@ -208,10 +232,150 @@ const User = () => {
   //   );
   // }
 
-  return (
+  const handleSendFriendRequest = async () => {
+    try {
+      const response = await send_friend_request(
+        session.userToken.accessToken,
+        user.id
+      );
+      if (response) {
+        console.log(response.data);
+        setIsSuccess(response.data.isSuccess);
+      }
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  };
 
+  const handleRevokeFriendRequest = async () => {
+    try {
+      Alert.alert(
+        "Thông báo", // Tiêu đề của alert
+        "Bạn có muốn tiếp tục không?", // Nội dung của alert
+        [
+          {
+            text: "Cancel", // Nút hủy
+            onPress: () => {},
+            style: "cancel", // Style cho nút hủy
+          },
+          {
+            text: "OK", // Nút đồng ý
+            onPress: async () => {
+              const response = await revoke_friend_request(
+                session.userToken.accessToken,
+                user.id
+              );
+              if (response) {
+                console.log(response.data);
+                setIsSuccess(response.data.isSuccess);
+              }
+            }, // In ra "Hello" khi nhấn OK
+          },
+        ],
+        { cancelable: true } // Có thể đóng alert bằng cách nhấn ngoài không
+      );
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const handleAcceptFriendRequest = async () => {
+    try {
+      const response = await accept_friend_request(
+        session.userToken.accessToken,
+        user.id
+      );
+      if (response) {
+        console.log(response.data);
+        setIsSuccess(response.data.isSuccess);
+      }
+    } catch (err: any) {
+      setError(err.message);
+      Alert.alert("Thông báo", "Lời mời kết bạn đã bị thu hồi.", [
+        {
+          text: "OK",
+          onPress: () => {
+            setIsSuccess(true);
+          },
+        },
+      ]);
+    }
+  };
+
+  const handleDeclineFriendRequest = async () => {
+    try {
+      Alert.alert(
+        "Thông báo", // Tiêu đề của alert
+        "Bạn có muốn tiếp tục không?", // Nội dung của alert
+        [
+          {
+            text: "Cancel", // Nút hủy
+            onPress: () => {},
+            style: "cancel", // Style cho nút hủy
+          },
+          {
+            text: "OK", // Nút đồng ý
+            onPress: async () => {
+              const response = await decline_friend_request(
+                session.userToken.accessToken,
+                user.id
+              );
+              if (response) {
+                console.log(response.data);
+                setIsSuccess(response.data.isSuccess);
+              }
+            }, // In ra "Hello" khi nhấn OK
+          },
+        ],
+        { cancelable: true } // Có thể đóng alert bằng cách nhấn ngoài không
+      );
+    } catch (err: any) {
+      setError(err.message);
+      Alert.alert("Thông báo", "Lời mời kết bạn đã bị thu hồi.", [
+        {
+          text: "OK",
+          onPress: () => {
+            setIsSuccess(true);
+          },
+        },
+      ]);
+    }
+  };
+
+  const handleRemoveFriend = async () => {
+    try {
+      Alert.alert(
+        "Thông báo", // Tiêu đề của alert
+        "Bạn có muốn tiếp tục không?", // Nội dung của alert
+        [
+          {
+            text: "Cancel", // Nút hủy
+            onPress: () => {},
+            style: "cancel", // Style cho nút hủy
+          },
+          {
+            text: "OK", // Nút đồng ý
+            onPress: async () => {
+              const response = await remove_friend(
+                session.userToken.accessToken,
+                user.id
+              );
+              if (response) {
+                console.log(response.data);
+                setIsSuccess(response.data.isSuccess);
+              }
+            }, // In ra "Hello" khi nhấn OK
+          },
+        ],
+        { cancelable: true } // Có thể đóng alert bằng cách nhấn ngoài không
+      );
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  return (
     <View style={styles.profileContainer}>
-      {/* {session?.name && <Text style={styles.name}>Hello, {session.name}</Text>} */}
       <Stack.Screen
         options={{
           headerTransparent: true,
@@ -223,19 +387,18 @@ const User = () => {
               <>
                 <View style={styles.backBtnWrapper}>
                   <Pressable onPress={() => router.back()}>
-                         <Animated.Text style={iconColorAnimatedStyle}>
-
-                    <Ionicons
-                      name="arrow-back-outline"
-                      size={25}
-                    />
+                    <Animated.Text style={iconColorAnimatedStyle}>
+                      <Ionicons name="arrow-back-outline" size={25} />
                     </Animated.Text>
                   </Pressable>
                 </View>
                 <Pressable
                   style={styles.headerAvatarNameConatainer}
                   onLongPress={() =>
-                    scrollRef.current?.scrollTo({ y: 0, animated: true })
+                    scrollRef.current?.scrollTo({
+                      y: 0,
+                      animated: true,
+                    })
                   }
                 >
                   <Animated.Image
@@ -297,13 +460,18 @@ const User = () => {
                   <Animated.View
                     style={[avatarAnimatedStyle, styles.mainAvatarContainer]}
                   >
-                    <Image source={{uri:tempAvatar}} style={styles.mainAvatar} />
+                    <Image
+                      source={{ uri: tempAvatar }}
+                      style={styles.mainAvatar}
+                    />
                   </Animated.View>
                 </Pressable>
+                <TouchableOpacity onLongPress={fetchUser}>
+                  <Text style={styles.text}>
+                    {session.userInfo == null ? game.name : user.userName}
+                  </Text>
+                </TouchableOpacity>
 
-                <Text style={styles.text}>
-                  {session.userInfo == null ? game.name : user.userName}
-                </Text>
                 <View
                   style={[
                     styles.text,
@@ -317,40 +485,163 @@ const User = () => {
                   ]}
                 >
                   <Ionicons name="chatbox-ellipses" size={16} color="#bfbfbf" />
-                  <Text style={{ marginLeft: 5, color: "#bfbfbf" }}>
+                  <Text
+                    style={{
+                      marginLeft: 5,
+                      color: "#bfbfbf",
+                    }}
+                  >
                     {session.userInfo == null ? game.name : user.phoneNumber}
                   </Text>
                 </View>
               </View>
-              <View style={styles.outerEditContainer}>
-                <View style={styles.editContainer}>
-                  <Pressable
-                    // onPress={() => router.push("/(update)/update-profile")}
-                    style={styles.innerEditContainer}
-                  >
-                    {/* <FontAwesome6
+              {(() => {
+                switch (user.status) {
+                  case FriendStatus.STRANGER:
+                    return (
+                      <View style={styles.outerEditContainer}>
+                        <View style={styles.editContainer}>
+                          <Pressable
+                            onPress={handleSendFriendRequest}
+                            style={styles.innerEditContainer}
+                          >
+                            {/* <FontAwesome6
+                            name="pen-to-square"
+                            size={13}
+                            color={"#13c892"}
+                          /> */}
+                            {/* <Ionicons
+                              name="add-outline"
+                              size={20}
+                              color={"#13c892"}
+                            /> */}
+                            <FontAwesome6
+                              name="plus"
+                              solid
+                              size={16}
+                              color={"#13c892"}
+                            />
+                            <Text style={styles.editText}>Kết Bạn</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    );
+                  case FriendStatus.FRIEND:
+                    return (
+                      <View style={styles.outerEditContainer}>
+                        <View style={styles.editContainer}>
+                          <Pressable
+                            onPress={handleRemoveFriend}
+                            style={styles.innerEditContainer}
+                          >
+                            {/* <FontAwesome6
                       name="pen-to-square"
                       size={13}
                       color={"#13c892"}
                     /> */}
-                    <Ionicons
-                      name="person-add-outline"
-                      size={15}
+                            {/* <Ionicons
+                              name="person-add-outline"
+                              size={15}
+                              color={"#13c892"}
+                            /> */}
+                            <FontAwesome6
+                              name="check"
+                              solid
+                              size={16}
+                              color={"#13c892"}
+                            />
+                            <Text style={styles.editText}>Bạn bè</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    );
+                  case FriendStatus.PENDING:
+                    return (
+                      <View style={styles.outerEditContainer}>
+                        <View style={styles.editContainer}>
+                          <Pressable
+                            onPress={handleRevokeFriendRequest}
+                            style={styles.innerEditContainer}
+                          >
+                            {/* <Ionicons
+                              name="person-add-outline"
+                              size={15}
+                              color={"#13c892"}
+                            /> */}
+                            <Text style={styles.editText}>Thu hồi lời mời</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    );
+                  case FriendStatus.REQUESTED:
+                    return (
+                      <View style={styles.invitationContainer}>
+                        <View style={styles.invitationOuterEditContainer}>
+                          <View style={styles.editContainer}>
+                            <Pressable
+                              onPress={handleAcceptFriendRequest}
+                              style={styles.innerEditContainer}
+                            >
+                              {/* <Ionicons
+                                name="person-add-outline"
+                                size={15}
+                                color={"#13c892"}
+                              /> */}
+                              <Text style={styles.editText}>
+                                Xác nhận
+                              </Text>
+                            </Pressable>
+                          </View>
+                        </View>
+                        <View style={styles.invitationOuterEditContainer}>
+                          <View style={styles.editContainer}>
+                            <Pressable
+                              onPress={handleDeclineFriendRequest}
+                              style={styles.innerEditContainer}
+                            >
+                              {/* <Ionicons
+                                name="person-add-outline"
+                                size={15}
+                                color={"#13c892"}
+                              /> */}
+                              <Text style={styles.editText}>
+                                Từ chối
+                              </Text>
+                            </Pressable>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  case FriendStatus.MYSELF:
+                    return (
+                      <View style={styles.outerEditContainer}>
+                        <View style={styles.editContainer}>
+                          <Pressable
+                            // onPress={() => router.push("/(update)/update-profile")}
+                            disabled={true}
+                            style={styles.innerEditContainer}
+                          >
+                            {/* <FontAwesome6
+                      name="pen-to-square"
+                      size={13}
                       color={"#13c892"}
-                    />
-                    <Text style={styles.editText}>Thêm bạn bè</Text>
-                  </Pressable>
-                </View>
-              </View>
+                    /> */}
+                            <Text style={styles.editText}>Bản thân</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    );
+                }
+              })()}
             </View>
-            <View style={styles.dataContainer}>
+            {/* <View style={styles.dataContainer}>
               <View style={styles.dataSingleContainer}>
                 <Text style={styles.dataNumber}>{game.posts}</Text>
                 <Text>Bài Viết</Text>
               </View>
               <View style={styles.dataSingleContainer}>
                 <Text style={styles.dataNumber}>
-                  {session.userInfo == null ? 100 : 200}
+                  {session.userInfo == null ? 0 : session.userInfo.user.friends.length}
                 </Text>
                 <Text>Bạn Bè</Text>
               </View>
@@ -358,10 +649,14 @@ const User = () => {
                 <Text style={styles.dataNumber}>{game.trips}</Text>
                 <Text>Chuyến Đi</Text>
               </View>
-            </View>
+            </View> */}
             <View>
               <Text
-                style={{ marginVertical: 10, fontSize: 18, fontWeight: "700" }}
+                style={{
+                  marginVertical: 10,
+                  fontSize: 18,
+                  fontWeight: "700",
+                }}
               >
                 Bài Viết
               </Text>
@@ -550,11 +845,23 @@ const styles = StyleSheet.create({
     padding: 7,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
+    // paddingHorizontal: 12,
+  },
+  invitationOuterEditContainer: {
+    // alignItems: "flex-end",
+    // justifyContent: "center",
+    // flex: 1,
+    marginRight: 15,
+    marginTop: 50,
+  },
+  invitationContainer: {
+    flexDirection: "row",
+    marginLeft: 70,
   },
   editText: {
     fontSize: 13,
-    fontWeight: "500",
+    fontWeight: "700",
     color: "#13c892",
   },
   modalContainer: {
@@ -598,6 +905,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingRight: 0,
   },
+  
 });
 
 export default User;
