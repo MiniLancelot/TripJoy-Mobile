@@ -193,11 +193,11 @@ const UpdateProfile = () => {
             onValueChange={(newValue) => handleChangeProfileState("gender", newValue)}
             style={styles.checkbox}
           />
-          <Text style={styles.label}>Do you like React Native?</Text>
+          <Text style={styles.label}>Nhấn vào checkbox nếu bạn là nam</Text>
         </View>
         <Text>Nhấn vào để xác nhận bạn là nam</Text>
       </View>
-      <Text>{profile.address.country ?? " "}</Text>
+      <Text>{profile.address ? profile.address.country : " "}</Text>
       <Pressable onPress={updateProfile}>
         <Text>Update</Text>
       </Pressable>
