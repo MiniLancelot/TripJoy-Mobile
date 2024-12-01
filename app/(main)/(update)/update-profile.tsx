@@ -22,7 +22,7 @@ type UserProfileProps = {
   avatar: string | null;
   dateOfBirth: string | null;
   address: any;
-  gender: boolean | null;
+  gender: number | null;
 };
 
 const UpdateProfile = () => {
@@ -189,17 +189,16 @@ const UpdateProfile = () => {
       <View style={styles.container}>
         <View style={styles.checkboxContainer}>
           <CheckBox
-            value={profile.gender ?? false}
+            value={(profile.gender == 1)}
             onValueChange={(newValue) => handleChangeProfileState("gender", newValue)}
             style={styles.checkbox}
           />
           <Text style={styles.label}>Nhấn vào checkbox nếu bạn là nam</Text>
         </View>
-        <Text>Nhấn vào để xác nhận bạn là nam</Text>
       </View>
       <Text>{profile.address ? profile.address.country : " "}</Text>
       <Pressable onPress={updateProfile}>
-        <Text>Update</Text>
+      <Text>Nhấn vào để cập nhật</Text>
       </Pressable>
     </View>
   );

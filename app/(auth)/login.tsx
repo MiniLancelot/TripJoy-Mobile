@@ -28,6 +28,7 @@ import { useAuth } from "@/app/(auth)/AuthContext";
 import GoogleIcon from "@/components/Icons/GoogleIcon";
 import FacebookIcon from "@/components/Icons/FacebookIcon";
 import Toast from "react-native-toast-message";
+import { InputOutline } from "react-native-input-outline";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
