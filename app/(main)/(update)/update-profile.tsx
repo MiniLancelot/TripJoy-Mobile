@@ -20,6 +20,7 @@ import { useAuth } from "@/app/(auth)/AuthContext";
 import get_user_profile from "@/services/user/userProfile";
 import { Calendar } from "react-native-calendars";
 import update_user from "@/services/user/update_user";
+import GenderDropdown from "@/components/Dropdowns/GenderDropdown";
 
 type UserProfileProps = {
   id: string;
@@ -79,7 +80,7 @@ const UpdateProfile = () => {
 
   useEffect(() => {
     fetchUser();
-    setDate(profile.dateOfBirth ?? "2024-06-01");
+    setDate(profile.dateOfBirth?.split(" ")[0] ?? "2003-06-01");
   }, []);
 
   useEffect(() => {
@@ -124,10 +125,10 @@ const UpdateProfile = () => {
           ward: profile.address.ward,
           province: profile.address.province,
         },
-        Gender: profile.gender ? 1 : 0,
+        Gender: profile.gender,
       });
       if (response) {
-        console.log(response);
+        console.log(response.data);
         setIsSuccess(true);
         setLoading(false);
       }
@@ -140,6 +141,9 @@ const UpdateProfile = () => {
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
   }, []);
+  const handleSetGender = (val: number) => {
+    handleChangeProfileState('gender', val);
+  }
 
   const renderBackDrop = useCallback(
     (props: any) => (
@@ -170,6 +174,8 @@ const UpdateProfile = () => {
           />
           <TextInput
             value={profile.phoneNumber == null ? "none" : profile.phoneNumber}
+            maxLength={6}
+            keyboardType={"phone-pad"}
             onChangeText={(text) =>
               handleChangeProfileState("phoneNumber", text)
             }
@@ -179,7 +185,7 @@ const UpdateProfile = () => {
             <Text>
               {profile.dateOfBirth === null
                 ? "Chưa có thông tin ngày sinh"
-                : profile.dateOfBirth}
+                : profile.dateOfBirth.split(" ")[0]}
             </Text>
           </Pressable>
           <TextInput
@@ -203,7 +209,7 @@ const UpdateProfile = () => {
               handleChangeProfileState("address.province", text)
             }
           />
-          <View style={styles.container}>
+          {/* <View style={styles.container}>
             <View style={styles.checkboxContainer}>
               <CheckBox
                 value={profile.gender == 1}
@@ -214,8 +220,9 @@ const UpdateProfile = () => {
               />
               <Text style={styles.label}>Nhấn vào checkbox nếu bạn là nam</Text>
             </View>
-          </View>
-          <Text>{profile.address ? profile.address.country : " "}</Text>
+          </View> */}
+          <GenderDropdown value={profile.gender ?? -1} setValue={handleSetGender}/>
+          {/* <Text>{profile.address ? profile.address.country : " "}</Text> */}
           <Pressable onPress={updateProfile}>
             <Text>Nhấn vào để cập nhật</Text>
           </Pressable>
@@ -235,7 +242,7 @@ const UpdateProfile = () => {
               </View>
               <View style={{ marginBottom: 10 }}>
                 <Calendar
-                  current={profile.dateOfBirth ?? "2024-06-01"}
+                  current={profile.dateOfBirth?.split(" ")[0] ?? "2024-06-01"}
                   onDayPress={(day: any) => {
                     handleChangeProfileState("dateOfBirth", day.dateString);
                     console.log(day.dateString);
@@ -247,7 +254,7 @@ const UpdateProfile = () => {
                       disableTouchEvent: true,
                       selectedColor: "#46e835",
                     },
-                    [date]: { marked: true, activeOpacity: 0 },
+                    [date]: { marked: true },
                   }}
                   theme={{
                     todayTextColor: "#46e835",

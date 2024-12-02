@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import Dropdown from '@/components/Others/Dropdown'
+import Dropdown from '@/components/Dropdowns/Dropdown'
 import AnimationTextInput from '@/components/TextInput/MyTextInput'
 
 const DropdownTest = () => {
