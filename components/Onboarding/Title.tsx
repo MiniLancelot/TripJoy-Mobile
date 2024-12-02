@@ -1,5 +1,4 @@
 import { Text, View, StyleSheet } from "react-native";
-import "@/global.css";
 
 const Title = () => {
     const blackCharacter = "⠀";

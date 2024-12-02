@@ -2,20 +2,19 @@ import {
   View,
   Text,
   FlatList,
-  Image,
   StyleSheet,
   Pressable,
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
+import { Image } from 'expo-image';
 import { useState, useEffect, memo } from "react";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ReadMoreText from "./ReadMoreText";
-import CharacterData from "@/assets/characters.json";
 import AntDesign from '@expo/vector-icons/AntDesign';
 // import { FontAwesome } from "@expo/vector-icons";
 type CharProps = {
@@ -139,7 +138,8 @@ const StarRailChar2 = () => {
         <View style={styles.itemOuterContainer}>
           <View style={styles.itemContainer}>
             <Pressable onPress={() => router.push(`/post/${item.id}`)}>
-              <Image source={{ uri: item.img }} style={styles.avatar} />
+              {/* <Image source={{ uri: item.img }} style={styles.avatar} /> */}
+              <Image source={item.img} style = {styles.avatar} />
             </Pressable>
 
             <View style={styles.infoContainer}>

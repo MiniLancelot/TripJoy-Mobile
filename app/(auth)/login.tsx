@@ -21,8 +21,6 @@ import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import FontAwesome from "@expo/vector-icons/FontAwesome";
-import "@/global.css";
 import SeparateLine from "@/components/Others/SeparateLine";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import GoogleIcon from "@/components/Icons/GoogleIcon";
@@ -32,12 +30,8 @@ import Toast from "react-native-toast-message";
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const Login = () => {
-  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = useWindowDimensions();
   const router = useRouter();
   const { login } = useAuth();
-  const facebookIcon = require("@/assets/icons/facebook.png");
-  //   const googleIcon = require("@/assets/icons/google.svg");
-
   const [enteredUserName, setEnteredUserName] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -170,57 +164,6 @@ const Login = () => {
     }
   };
 
-  // const handleLogin = async () => {
-  //     await request
-  //         .post("/Account/login", {
-  //             email: enteredUserName,
-  //             password: enteredPassword,
-  //         })
-  //         .then((response) => {
-  //             console.log(response.data.user.name);
-  //             AsyncStorage.setItem("info", JSON.stringify(response.data));
-  //             router.push("/home");
-  //         })
-  //         .catch((error) => {
-  //             if (error.response && error.response.data) {
-  //                 const values = Object.values(error.response.data.errors);
-  //                 if (Array.isArray(values[0])) {
-  //                     console.error(values[0][0]);
-  //                 }
-  //             } else if (error.request) {
-  //                 console.error("No response received from the server.");
-  //             } else {
-  //                 console.error(error.message);
-  //             }
-  //         });
-  // };
-
-  // const handleLoginTest = () => {
-  //     user_login({
-  //         email: enteredUserName,
-  //         password: enteredPassword,
-  //     })
-  //         .then((response) => {
-  //             console.log(response.data);
-  //             if (response.status == 200) {
-  //                 AsyncStorage.setItem(
-  //                     "info",
-  //                     JSON.stringify({
-  //                         accessToken: response.data.accessToken,
-  //                         refreshToken: response.data.refreshToken,
-  //                     })
-  //                 );
-  //                 router.replace("/home");
-  //             }
-  //         })
-  //         .catch((err) => {
-  //             console.error(err);
-  //             // console.info(err.message);
-  //         });
-  // };
-
-  // useEffect(() => {console.info(authState)}, [authState]);
-
   const handleLoginTest = async () => {
     setIsLoading(true);
     try {
@@ -258,67 +201,12 @@ const Login = () => {
       <View style={styles.mainContainer}>
         <View style={styles.titleContainer}>
           <Title />
+          
           <Text style={styles.loginTitle}>Đăng Nhập Tài Khoản</Text>
         </View>
-        {/* <View className="p-[10px] w-full items-center">
-          <View
-            className="rounded-2xl overflow-hidden m-[10px] w-[90%]"
-            // style={styles.shadow}
-          >
-            <Pressable
-              className="flex-row bg-[#fafafc] p-[10px] items-center"
-              onPress={handleGoogleLogin}
-              android_ripple={{ color: "gray" }}
-            >
-              <View style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 15,
-                  backgroundColor: 'white',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderColor: '#000',
-                  borderWidth: 0.1,
-                }}>
-
-                <GoogleIcon width={20} height={20} />
-              </View>
-
-              <Text className="ml-[20px] text-[#242629] text-lg font-medium">
-                Đăng nhập với Google
-              </Text>
-            </Pressable>
-          </View>
-          <View className="rounded-2xl overflow-hidden m-[10px] w-[90%]">
-            <Pressable
-              className="flex-row bg-[#fafafc] p-[10px] items-center"
-              onPress={() => alert("Facebook")}
-              android_ripple={{ color: "gray" }}
-            >
-             
-
-              <View style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 15,
-                  backgroundColor: '#1877f2',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  // borderColor: '#000',
-                  // borderWidth: 0.1,
-                }}>
-                
-                <FacebookIcon width={30} height={30} />
-              </View>
-              <Text className="ml-[20px] text-[#242629] text-lg font-medium">
-                Đăng nhập với Facebook
-              </Text>
-            </Pressable>
-          </View>
-        </View> */}
         <View style={styles.inputsContainer}>
           <View style={styles.inputContainer}>
-            {/* <Pressable style={styles.inputLabel} onPress={handleUsernameFocus}>
+            <Pressable style={styles.inputLabel} onPress={handleUsernameFocus}>
               <Animated.Text
                 style={[
                   styles.inputLabelText,
@@ -328,7 +216,7 @@ const Login = () => {
               >
                 Email
               </Animated.Text>
-            </Pressable> */}
+            </Pressable>
             <View style={styles.outerUsernameInput}>
               <AnimatedTextInput
                 autoCapitalize={"none"}
@@ -336,41 +224,42 @@ const Login = () => {
                   animatedBorderStyle(userNameBorderColor),
                   styles.usernameInput,
                 ]}
-                placeholder={"Tên đăng nhập"}
+                // placeholder={"Tên đăng nhập"}
                 ref={usernameRef}
                 maxLength={30}
                 value={enteredUserName}
                 onChangeText={(text) => setEnteredUserName(text)}
-                // onFocus={() => {
-                //   handleFocus(userNameBorderColor);
-                //   animateInput(
-                //     "username",
-                //     usernameHeight * 0.21,
-                //     "#657ef8",
-                //     -22
-                //   );
-                // }}
-                // onBlur={() => {
-                //   handleBlur(userNameBorderColor);
-                //   if (enteredUserName.trim() === "") {
-                //     animateInput(
-                //       "username",
-                //       usernameHeight * 0.32,
-                //       "#6b707b",
-                //       0
-                //     );
-                //   } else {
-                //     animateInput(
-                //       "username",
-                //       usernameHeight * 0.21,
-                //       "#6b707b",
-                //       -22
-                //     );
-                //   }
-                // }}
+                onFocus={() => {
+                  handleFocus(userNameBorderColor);
+                  animateInput(
+                    "username",
+                    usernameHeight * 0.21,
+                    "#657ef8",
+                    -22
+                  );
+                }}
+                onBlur={() => {
+                  handleBlur(userNameBorderColor);
+                  if (enteredUserName.trim() === "") {
+                    animateInput(
+                      "username",
+                      usernameHeight * 0.32,
+                      "#6b707b",
+                      0
+                    );
+                  } else {
+                    animateInput(
+                      "username",
+                      usernameHeight * 0.21,
+                      "#6b707b",
+                      -22
+                    );
+                  }
+                }}
                 onLayout={onLayoutUsername}
                 selectionColor="#657ef8"
               />
+              
               {enteredUserName.length > 0 && (
                 <Pressable
                   style={styles.clearUserNameButton}
@@ -386,7 +275,7 @@ const Login = () => {
             </View>
           </View>
           <View style={styles.inputContainer}>
-            {/* <Pressable style={styles.inputLabel} onPress={handlePasswordFocus}>
+            <Pressable style={styles.inputLabel} onPress={handlePasswordFocus}>
               <Animated.Text
                 style={[
                   styles.inputLabelText,
@@ -396,46 +285,46 @@ const Login = () => {
               >
                 Mật khẩu
               </Animated.Text>
-            </Pressable> */}
+            </Pressable>
             <View style={styles.outerPasswordInput}>
               <AnimatedTextInput
                 style={[
                   animatedBorderStyle(passwordBorderColor),
                   styles.passwordInput,
                 ]}
-                placeholder={"Mật khẩu"}
+                // placeholder={"Mật khẩu"}
                 ref={passwordRef}
                 maxLength={30}
                 secureTextEntry={!isPasswordVisible}
                 value={enteredPassword}
                 onChangeText={(text) => setEnteredPassword(text)}
-                // onFocus={() => {
-                //   handleFocus(passwordBorderColor);
-                //   animateInput(
-                //     "password",
-                //     passwordHeight * 0.21,
-                //     "#657ef8",
-                //     -22
-                //   );
-                // }}
-                // onBlur={() => {
-                //   handleBlur(passwordBorderColor);
-                //   if (enteredPassword.trim() === "") {
-                //     animateInput(
-                //       "password",
-                //       passwordHeight * 0.32,
-                //       "#6b707b",
-                //       0
-                //     );
-                //   } else {
-                //     animateInput(
-                //       "password",
-                //       passwordHeight * 0.21,
-                //       "#6b707b",
-                //       -22
-                //     );
-                //   }
-                // }}
+                onFocus={() => {
+                  handleFocus(passwordBorderColor);
+                  animateInput(
+                    "password",
+                    passwordHeight * 0.21,
+                    "#657ef8",
+                    -22
+                  );
+                }}
+                onBlur={() => {
+                  handleBlur(passwordBorderColor);
+                  if (enteredPassword.trim() === "") {
+                    animateInput(
+                      "password",
+                      passwordHeight * 0.32,
+                      "#6b707b",
+                      0
+                    );
+                  } else {
+                    animateInput(
+                      "password",
+                      passwordHeight * 0.21,
+                      "#6b707b",
+                      -22
+                    );
+                  }
+                }}
                 onLayout={onLayoutPassword}
                 selectionColor="#657ef8"
               />
@@ -467,9 +356,6 @@ const Login = () => {
 
         <View style={styles.loginButtonContainer}>
           <Pressable
-            // onPress={() => {
-            //     console.log(enteredUserName, enteredPassword);
-            // }}
             onPress={handleLoginTest}
             disabled={isLoginDisabled || isLoading}
             android_ripple={isLoginDisabled ? null : { color: "#b9bcc6" }}
@@ -550,7 +436,7 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 30,
     alignItems: "center",
     // minHeight: 100,
   },

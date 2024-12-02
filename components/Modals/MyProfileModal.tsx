@@ -49,12 +49,12 @@ const MyProfileModal = ({ isOpen, withInput, onClose, children, ...rest }: PROPS
 
 const styles = StyleSheet.create({
   modalContainer: {
-    // flex: 1,
-    // justifyContent: "flex-start",
-    // alignItems: "flex-end",
-    // backgroundColor: "rgba(24, 24, 27, 0.9)",
-    // paddingHorizontal: 15,
-    // paddingTop: 75
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+    backgroundColor: "rgba(24, 24, 27, 0.9)",
+    paddingHorizontal: 15,
+    paddingTop: 75
   },
   backdrop: {
       ...StyleSheet.absoluteFillObject,

@@ -24,7 +24,7 @@ const register = async (data: any) => {
             headers: {
                 "Content-Type": "application/json",
             },
-            data: JSON.stringify(data),  // Chuyển đổi data thành chuỗi JSON
+            data: JSON.stringify(data),
         });
         return result;
     } catch (error: any) {

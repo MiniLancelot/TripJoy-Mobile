@@ -16,7 +16,7 @@ const MaterialTopTabs = createMaterialTopTabNavigator();
 
 const Home = () => {
   return (
-    <View style={{ flex: 1, backgroundColor: "white", paddingTop:25}}>
+    <View style={{ flex: 1, backgroundColor: "white"}}>
       {/* <Text>Search Bar Coming Soon</Text> */}
       <MaterialTopTabs.Navigator
         screenOptions={{
