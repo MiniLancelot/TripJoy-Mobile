@@ -140,7 +140,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
-} from 'react';
+} from "react";
 import {
   Platform,
   StyleSheet,
@@ -149,7 +149,7 @@ import {
   View,
   Text,
   ViewStyle,
-} from 'react-native';
+} from "react-native";
 import Animated, {
   useSharedValue,
   withTiming,
@@ -157,14 +157,14 @@ import Animated, {
   interpolate,
   Extrapolation,
   interpolateColor,
-} from 'react-native-reanimated';
-import {textScale} from './utils';
-import {colors} from './theme';
+} from "react-native-reanimated";
+import { textScale } from "./utils";
+import { colors } from "./theme";
 import {
   AnimationTextInputMethods,
   AnimationTextInputProps,
   variantEnum,
-} from './types';
+} from "./types";
 
 const AnimationTextInput = forwardRef<
   AnimationTextInputMethods,
@@ -172,30 +172,31 @@ const AnimationTextInput = forwardRef<
 >((props, ref) => {
   const {
     inactiveColor = colors.grey,
-    activeColor = colors.primary,
+    activeColor = colors.blue,
     errorColor = colors.red,
     backgroundColor = colors.transparent,
-    fontSize = textScale(10),
+    fontSize = textScale(12),
     fontColor = colors.black,
     fontFamily,
     error,
-    errorFontSize = textScale(10),
+    errorFontSize = textScale(12),
     errorStyle,
     assistiveText,
-    assistiveTextFontSize = textScale(10),
+    assistiveTextFontSize = textScale(12),
     assistiveTextColor = inactiveColor,
     assistiveTextStyle,
     characterCount,
     characterCountColor = inactiveColor,
-    characterCountFontSize = textScale(10),
+    characterCountFontSize = textScale(12),
     counterTextStyle,
     paddingHorizontal = 12,
     paddingVertical = 12,
     style,
-    placeholder = 'Input',
+    placeholder = "Input",
     trailingIcon,
-    value: providedValue = '',
+    value: providedValue = "",
     variant = variantEnum.outlined,
+    
     onChangeText,
     ...inputProps
   } = props;
@@ -211,12 +212,12 @@ const AnimationTextInput = forwardRef<
   const isFocused = () => Boolean(inputRef.current?.isFocused());
   const clear = () => {
     Boolean(inputRef.current?.clear());
-    setValue('');
+    setValue("");
   };
 
   const errorState = useCallback(
     () => error !== null && error !== undefined,
-    [error],
+    [error]
   );
 
   const handleFocus = () => {
@@ -237,11 +238,11 @@ const AnimationTextInput = forwardRef<
   };
 
   const handlePlaceholderLayout = useCallback(
-    ({nativeEvent}: {nativeEvent: {layout: {width: number}}}) => {
-      const {width} = nativeEvent.layout;
+    ({ nativeEvent }: { nativeEvent: { layout: { width: number } } }) => {
+      const { width } = nativeEvent.layout;
       placeholderSize.value = width;
     },
-    [placeholderSize],
+    [placeholderSize]
   );
 
   const renderTrailingIcon = () => {
@@ -268,7 +269,7 @@ const AnimationTextInput = forwardRef<
         translateY: interpolate(
           placeholderAnimated.value,
           [0, 1],
-          [0, -(paddingVertical + fontSize * 1.25)],
+          [0, -(paddingVertical + fontSize * 1)]
         ),
       },
       {
@@ -278,7 +279,7 @@ const AnimationTextInput = forwardRef<
         translateX: interpolate(
           placeholderAnimated.value,
           [0, 1],
-          [0, -placeholderSize.value * 0.2],
+          [0, -placeholderSize.value * 0.2]
         ),
       },
     ],
@@ -288,7 +289,7 @@ const AnimationTextInput = forwardRef<
     color: interpolateColor(
       colorAnimated.value,
       [0, 1, 2],
-      [inactiveColor, activeColor, errorColor],
+      [colors.secondGrey, activeColor, errorColor]
     ),
   }));
 
@@ -297,7 +298,7 @@ const AnimationTextInput = forwardRef<
       placeholderAnimated.value,
       [0, 1],
       [0, placeholderSize.value * 0.7 + 7],
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     ),
   }));
 
@@ -307,7 +308,7 @@ const AnimationTextInput = forwardRef<
         ? interpolateColor(
             colorAnimated.value,
             [0, 1, 2],
-            [inactiveColor, activeColor, errorColor],
+            [inactiveColor, activeColor, errorColor]
           )
         : inactiveColor,
   }));
@@ -322,71 +323,74 @@ const AnimationTextInput = forwardRef<
   const styles = StyleSheet.create({
     container: {
       ...(variant === variantEnum.standard
-        ? {borderBottomWidth: 1}
-        : {borderWidth: 1, borderRadius: 5}),
-      alignSelf: 'stretch',
-      flexDirection: 'row',
+        ? { borderBottomWidth: 1 }
+        : { borderWidth: 1, borderRadius: 5 }),
+      alignSelf: "stretch",
+      flexDirection: "row",
       backgroundColor,
     },
     inputContainer: {
       flex: 1,
       ...(variant === variantEnum.standard
-        ? {paddingRight: paddingHorizontal}
-        : {paddingHorizontal}),
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+        ? { paddingRight: paddingHorizontal }
+        : { paddingHorizontal }),
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
       paddingVertical:
-        Platform.OS !== 'android' ? paddingVertical : paddingVertical - 8,
+        Platform.OS !== "android" ? paddingVertical : paddingVertical - 8,
     },
     input: {
       flex: 1,
       fontSize: textScale(fontSize),
       fontFamily,
       color: fontColor,
+      fontWeight: "700",
     },
     placeholder: {
-      position: 'absolute',
+      marginTop: 3,
+      position: "absolute",
       top: paddingVertical,
       ...(variant === variantEnum.standard
-        ? {left: 0}
-        : {left: paddingHorizontal}),
+        ? { left: 0 }
+        : { left: paddingHorizontal }),
     },
     placeholderText: {
       fontSize: textScale(fontSize),
       fontFamily,
       borderRadius: 8,
+      color: colors.secondGrey,
     },
     placeholderSpacer: {
-      position: 'absolute',
+      position: "absolute",
       top: -1,
       left: paddingHorizontal - 3,
       backgroundColor: colors.white,
       height: 1,
     },
     errorText: {
-      position: 'absolute',
+      position: "absolute",
       color: errorColor,
       fontSize: textScale(errorFontSize),
       bottom: -textScale(errorFontSize) - 7,
       ...(variant === variantEnum.standard
-        ? {left: 0}
-        : {left: paddingHorizontal}),
+        ? { left: 0 }
+        : { left: paddingHorizontal }),
     },
     trailingIcon: {
-      position: 'absolute',
+      position: "absolute",
       right: paddingHorizontal,
-      alignSelf: 'center',
+      alignSelf: "center",
     },
     counterText: {
-      position: 'absolute',
+      position: "absolute",
       color: errorState() ? errorColor : characterCountColor,
       fontSize: textScale(characterCountFontSize),
       bottom: -textScale(characterCountFontSize) - 7,
       right: paddingHorizontal,
     },
     assistiveText: {
-      position: 'absolute',
+      position: "absolute",
       color: assistiveTextColor,
       fontSize: textScale(assistiveTextFontSize),
       bottom: -textScale(assistiveTextFontSize) - 7,
@@ -399,18 +403,20 @@ const AnimationTextInput = forwardRef<
   }, [styles.placeholder, animatedPlaceholderStyles]);
 
   return (
-    <Animated.View style={[styles.container, animatedContainerStyle, style as ViewStyle]}>
+    <Animated.View
+      style={[styles.container, animatedContainerStyle, style as ViewStyle]}
+    >
       <TouchableWithoutFeedback onPress={handleFocus}>
         <View style={styles.inputContainer}>
           <TextInput
             {...inputProps}
             ref={inputRef}
             style={styles.input}
-            pointerEvents={isFocused() ? 'auto' : 'none'}
+            pointerEvents={isFocused() ? "auto" : "none"}
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChangeText={handleChangeText}
-            maxLength={characterCount ? characterCount : undefined}
+            
             selectionColor={errorState() ? errorColor : activeColor}
             placeholder=""
             value={value}
@@ -426,18 +432,18 @@ const AnimationTextInput = forwardRef<
       <Animated.View
         style={placeholderStyle}
         onLayout={handlePlaceholderLayout}
-        pointerEvents="none">
+        pointerEvents="none"
+      >
         <Animated.Text
-          style={[styles.placeholderText, animatedPlaceholderTextStyles]}>
+          style={[styles.placeholderText, animatedPlaceholderTextStyles]}
+        >
           {placeholder}
         </Animated.Text>
       </Animated.View>
       {characterCount && (
         <Text
-          style={[
-            styles.counterText,
-            counterTextStyle,
-          ]}>{`${value.length} / ${characterCount}`}</Text>
+          style={[styles.counterText, counterTextStyle]}
+        >{`${value.length} / ${characterCount}`}</Text>
       )}
       {errorState() ? (
         <Text style={[styles.errorText, errorStyle]}>{error}</Text>
@@ -453,4 +459,4 @@ const AnimationTextInput = forwardRef<
 });
 
 export default AnimationTextInput;
-AnimationTextInput.displayName = 'AnimationTextInput';
+AnimationTextInput.displayName = "AnimationTextInput";

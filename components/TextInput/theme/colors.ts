@@ -3,7 +3,9 @@ const colors = {
   black: '#000000',
   red: '#E40303',
   white: '#FFFFFF',
-  grey: '#8A8A8A',
+  grey: '#e7e8ee',
+  blue: "#657ef8",
+  secondGrey: "#6b707b",
   transparent: 'transparent',
 };
 

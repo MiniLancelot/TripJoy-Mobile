@@ -37,6 +37,7 @@ interface AnimationTextInputProps extends TextInputProps {
   assistiveTextStyle?: TextStyle;
   errorStyle?: TextStyle;
   counterTextStyle?: TextStyle;
+  maxLength? : number;
   variant?: 'outlined' | 'standard';
 }
 
