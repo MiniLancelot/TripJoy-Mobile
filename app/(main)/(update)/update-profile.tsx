@@ -6,8 +6,15 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+  BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CheckBox from "@react-native-community/checkbox";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Stack } from "expo-router";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import get_user_profile from "@/services/user/userProfile";
@@ -40,6 +47,7 @@ const UpdateProfile = () => {
     gender: null,
   });
   const [date, setDate] = useState("");
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -128,78 +136,131 @@ const UpdateProfile = () => {
     }
   };
 
+  const handleOpen = () => bottomSheetRef.current?.expand();
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+
+  const renderBackDrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      ></BottomSheetBackdrop>
+    ),
+    []
+  );
+
   return (
     <View style={styles.container}>
-      <Stack.Screen
-        options={{
-          title: "Thông tin cá nhân",
-        }}
-      />
-      <View style={styles.avatarContainer}>
-        <Image source={{ uri: tempAvatar }} style={styles.image} />
-      </View>
-      <TextInput
-        value={profile.userName}
-        onChangeText={(text) => handleChangeProfileState("userName", text)}
-      />
-      <TextInput
-        value={profile.phoneNumber == null ? "none" : profile.phoneNumber}
-        onChangeText={(text) => handleChangeProfileState("phoneNumber", text)}
-      />
-      <Calendar
-        current={profile.dateOfBirth ?? "2024-06-01"}
-        onDayPress={(day: any) => {
-          handleChangeProfileState("dateOfBirth", day.dateString);
-          console.log(day.dateString);
-        }}
-        markedDates={{
-          [profile.dateOfBirth ?? ""]: {
-            selected: true,
-            disableTouchEvent: true,
-            selectedColor: "#46e835",
-          },
-          [date]: { marked: true, activeOpacity: 0 },
-        }}
-        theme={{
-          todayTextColor: "#46e835",
-          arrowColor: "#46e835",
-          selectedDayBackgroundColor: "#blue",
-          dotColor: "#46e835",
-        }}
-      />
-      <TextInput
-        value={profile.address != null ? profile.address.district : "none"}
-        placeholder="District"
-        onChangeText={(text) =>
-          handleChangeProfileState("address.district", text)
-        }
-      />
-      <TextInput
-        value={profile.address != null ? profile.address.ward : "none"}
-        placeholder="Ward"
-        onChangeText={(text) => handleChangeProfileState("address.ward", text)}
-      />
-      <TextInput
-        value={profile.address != null ? profile.address.province : "none"}
-        placeholder="Province"
-        onChangeText={(text) =>
-          handleChangeProfileState("address.province", text)
-        }
-      />
-      <View style={styles.container}>
-        <View style={styles.checkboxContainer}>
-          <CheckBox
-            value={(profile.gender == 1)}
-            onValueChange={(newValue) => handleChangeProfileState("gender", newValue)}
-            style={styles.checkbox}
+      <GestureHandlerRootView>
+        <BottomSheetModalProvider>
+          <Stack.Screen
+            options={{
+              title: "Thông tin cá nhân",
+            }}
           />
-          <Text style={styles.label}>Nhấn vào checkbox nếu bạn là nam</Text>
-        </View>
-      </View>
-      <Text>{profile.address ? profile.address.country : " "}</Text>
-      <Pressable onPress={updateProfile}>
-      <Text>Nhấn vào để cập nhật</Text>
-      </Pressable>
+          <View style={styles.avatarContainer}>
+            <Image source={{ uri: tempAvatar }} style={styles.image} />
+          </View>
+          <TextInput
+            value={profile.userName}
+            onChangeText={(text) => handleChangeProfileState("userName", text)}
+          />
+          <TextInput
+            value={profile.phoneNumber == null ? "none" : profile.phoneNumber}
+            onChangeText={(text) =>
+              handleChangeProfileState("phoneNumber", text)
+            }
+          />
+
+          <Pressable onPress={handleOpen}>
+            <Text>
+              {profile.dateOfBirth === null
+                ? "Chưa có thông tin ngày sinh"
+                : profile.dateOfBirth}
+            </Text>
+          </Pressable>
+          <TextInput
+            value={profile.address != null ? profile.address.district : "none"}
+            placeholder="District"
+            onChangeText={(text) =>
+              handleChangeProfileState("address.district", text)
+            }
+          />
+          <TextInput
+            value={profile.address != null ? profile.address.ward : "none"}
+            placeholder="Ward"
+            onChangeText={(text) =>
+              handleChangeProfileState("address.ward", text)
+            }
+          />
+          <TextInput
+            value={profile.address != null ? profile.address.province : "none"}
+            placeholder="Province"
+            onChangeText={(text) =>
+              handleChangeProfileState("address.province", text)
+            }
+          />
+          <View style={styles.container}>
+            <View style={styles.checkboxContainer}>
+              <CheckBox
+                value={profile.gender == 1}
+                onValueChange={(newValue) =>
+                  handleChangeProfileState("gender", newValue)
+                }
+                style={styles.checkbox}
+              />
+              <Text style={styles.label}>Nhấn vào checkbox nếu bạn là nam</Text>
+            </View>
+          </View>
+          <Text>{profile.address ? profile.address.country : " "}</Text>
+          <Pressable onPress={updateProfile}>
+            <Text>Nhấn vào để cập nhật</Text>
+          </Pressable>
+          <BottomSheet
+            ref={bottomSheetRef}
+            onChange={handleSheetChanges}
+            snapPoints={["50%"]}
+            index={-1}
+            backdropComponent={renderBackDrop}
+            enablePanDownToClose={true}
+          >
+            <BottomSheetView style={styles.contentContainer}>
+              <View style={{flex: 1, alignItems: "center"}}>
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>
+                  Tạo chuyến đi của bạn 🎉
+                </Text>
+              </View>
+              <View style={{ marginBottom: 10 }}>
+                <Calendar
+                  current={profile.dateOfBirth ?? "2024-06-01"}
+                  onDayPress={(day: any) => {
+                    handleChangeProfileState("dateOfBirth", day.dateString);
+                    console.log(day.dateString);
+                    console.log();
+                  }}
+                  markedDates={{
+                    [profile.dateOfBirth ?? ""]: {
+                      selected: true,
+                      disableTouchEvent: true,
+                      selectedColor: "#46e835",
+                    },
+                    [date]: { marked: true, activeOpacity: 0 },
+                  }}
+                  theme={{
+                    todayTextColor: "#46e835",
+                    arrowColor: "#46e835",
+                    selectedDayBackgroundColor: "#blue",
+                    dotColor: "#46e835",
+                  }}
+                />
+              </View>
+            </BottomSheetView>
+          </BottomSheet>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </View>
   );
 };
@@ -219,14 +280,17 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   checkboxContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 20,
   },
   checkbox: {
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   label: {
     margin: 8,
+  },
+  contentContainer: {
+    flex: 1,
   },
 });
 
