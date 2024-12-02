@@ -42,7 +42,7 @@ const GenderDropdown = ({value, setValue}: GenderDropdownProps) => {
     <View style={styles.container}>
       {renderLabel()}
       <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+        style={[styles.dropdown, isFocus && { borderColor: '#657ef8' }]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
@@ -63,7 +63,7 @@ const GenderDropdown = ({value, setValue}: GenderDropdownProps) => {
         renderLeftIcon={() => (
           <AntDesign
             style={styles.icon}
-            color={isFocus ? 'blue' : 'black'}
+            color={isFocus ? '#657ef8' : 'black'}
             name="Safety"
             size={20}
           />
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     padding: 16,
+    paddingHorizontal: 0,
   },
   dropdown: {
     height: 50,
