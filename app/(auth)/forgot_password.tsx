@@ -9,7 +9,6 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import "@/global.css";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import Title from "@/components/Onboarding/Title";
@@ -26,7 +25,7 @@ const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const forgot_password = () => {
   const router = useRouter();
-  const { send_otp_forget_password, verify_otp_forget_password, register } =
+  const { send_otp_forget_password, verify_otp_forget_password } =
     useAuth();
 
   // const [enteredName, setEnteredName] = useState("");

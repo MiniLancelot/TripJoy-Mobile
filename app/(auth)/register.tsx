@@ -9,7 +9,6 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import "@/global.css";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import Title from "@/components/Onboarding/Title";
@@ -33,18 +32,10 @@ const register = () => {
   const router = useRouter();
   const { send_otp_verify_email, register } = useAuth();
 
-  // const [enteredName, setEnteredName] = useState("");
-  // const [enteredEmail, setEnteredEmail] = useState("");
-  // const [enteredOtp, setEnteredOtp] = useState("");
-  // const [enteredPhoneNumber, setEnteredPhoneNumber] = useState("");
-  // const [enteredPassword, setEnteredPassword] = useState("");
-  // const [enteredValPassword, setEnteredValPassword] = useState("");
-
   const [registerData, setRegisterData] = useState({
     enteredName: "",
     enteredEmail: "",
     enteredOtp: "",
-    enteredPhoneNumber: "",
     enteredPassword: "",
     enteredValPassword: "",
   });
@@ -52,7 +43,6 @@ const register = () => {
     enteredName,
     enteredEmail,
     enteredOtp,
-    // enteredPhoneNumber,
     enteredPassword,
     enteredValPassword,
   } = registerData;
@@ -75,7 +65,6 @@ const register = () => {
   const nameBorderColor = useSharedValue("#e7e8ee");
   const passwordBorderColor = useSharedValue("#e7e8ee");
   const otpBorderColor = useSharedValue("#e7e8ee");
-  const phoneNumberBorderColor = useSharedValue("#e7e8ee");
   const emailBorderColor = useSharedValue("#e7e8ee");
   const valPasswordBorderColor = useSharedValue("#e7e8ee");
   const emailValidate = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -84,7 +73,6 @@ const register = () => {
     !enteredName ||
     !enteredEmail ||
     !enteredOtp ||
-    // !enteredPhoneNumber ||
     !enteredPassword ||
     !enteredValPassword;
 
@@ -187,7 +175,6 @@ const register = () => {
     const trimmedName = enteredName.trim();
     const trimmedEmail = enteredEmail.trim();
     const trimmedOtp = enteredOtp.trim();
-    // const trimmedPhoneNumber = enteredPhoneNumber.trim();
     const trimmedPassword = enteredPassword.trim();
     const trimmedValPassword = enteredValPassword.trim();
 
@@ -195,7 +182,6 @@ const register = () => {
       !trimmedName ||
       !trimmedEmail ||
       !trimmedOtp ||
-      // !trimmedPhoneNumber ||
       !trimmedPassword ||
       !trimmedValPassword
     ) {
@@ -221,7 +207,6 @@ const register = () => {
         name: enteredName.trim(),
         email: enteredEmail.trim(),
         otp: enteredOtp.trim(),
-        // phoneNumber: enteredPhoneNumber.trim(),
         password: enteredPassword.trim(),
         confirmPassword: enteredValPassword.trim(),
       });

@@ -8,7 +8,6 @@ import {
   Image,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-// import TextCarousel from "@/components/Others/TextCarousel";
 import get_user_search from "@/services/user/getUserBySearch";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { FlashList } from "@shopify/flash-list";
@@ -135,7 +134,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 15,
+    paddingHorizontal: 15,
   },
   text: {
     fontSize: 32,

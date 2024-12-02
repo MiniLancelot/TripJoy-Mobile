@@ -131,19 +131,19 @@ const profile = () => {
     user.profile.avatar == null ? tempAvatar : user.profile.avatar.url;
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
-    const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT); // Clamp scrollOffset value
+    
     return {
       transform: [
         {
           translateY: interpolate(
-            clampedScroll,
+            scrollOffset.value,
             [-IMG_HEIGHT, 0, IMG_HEIGHT],
             [-IMG_HEIGHT / 2, 0, IMG_HEIGHT * 0.75]
           ),
         },
         {
           scale: interpolate(
-            clampedScroll,
+            scrollOffset.value,
             [-IMG_HEIGHT, 0, IMG_HEIGHT],
             [2, 1, 1]
           ),
@@ -153,36 +153,34 @@ const profile = () => {
   });
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
-    const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT);
+    
     return {
-      opacity: interpolate(clampedScroll, [0, IMG_HEIGHT / 1.5], [0, 1]),
+      opacity: interpolate(scrollOffset.value, [0, IMG_HEIGHT / 1.5], [0, 1]),
       // backgroundColor: interpolateColor(clampedScroll, [0, IMG_HEIGHT / 1.5], ['transparent', 'white']),
     };
   });
 
   const avatarAnimatedStyle = useAnimatedStyle(() => {
-    const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT);
+    
     return {
-      opacity: interpolate(clampedScroll, [0, IMG_HEIGHT / 2], [1, 0]),
+      opacity: interpolate(scrollOffset.value, [0, IMG_HEIGHT / 2], [1, 0]),
       transform: [
         {
-          translateY: interpolate(clampedScroll, [0, IMG_HEIGHT / 2], [0, -50]),
+          translateY: interpolate(scrollOffset.value, [0, IMG_HEIGHT / 2], [0, -50]),
         },
       ],
     };
   });
 
   const headerAvatarAnimatedStyle = useAnimatedStyle(() => {
-    const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT);
     return {
-      opacity: interpolate(clampedScroll, [0, IMG_HEIGHT / 2], [0, 1]),
+      opacity: interpolate(scrollOffset.value, [0, IMG_HEIGHT / 2], [0, 1]),
     };
   });
 
   const iconColorAnimatedStyle = useAnimatedStyle(() => {
-    const clampedScroll = clamp(scrollOffset.value, 0, IMG_HEIGHT);
     const color = interpolateColor(
-      clampedScroll,
+      scrollOffset.value,
       [0, IMG_HEIGHT],
       ["#fff", "#000"]
     );
@@ -371,7 +369,7 @@ const profile = () => {
                 <Text style={styles.dataNumber}>{game.posts}</Text>
                 <Text>Bài Viết</Text>
               </View>
-              <Pressable style={styles.dataSingleContainer} onPress={() => router.push("/(friends)/friend-list")}>
+              <Pressable style={styles.dataSingleContainer} onPress={() => router.push("/(main)/(friends)/friend-list")}>
                 <Text style={styles.dataNumber}>
                   {session.userInfo == null ? 0 : user.friends.length}
                 </Text>
@@ -473,7 +471,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#fff",
-    height: 80,
+    height: 60,
   },
   headerAvatarNameConatainer: {
     flexDirection: "row",

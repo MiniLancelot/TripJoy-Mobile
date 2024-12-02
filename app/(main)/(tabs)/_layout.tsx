@@ -5,7 +5,6 @@ import { Tabs, Link, useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 // import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
-import "@/global.css";
 import BottomSheet, {
   BottomSheetModal,
   BottomSheetView,
@@ -94,7 +93,7 @@ const Layout = () => {
                 tabBarInactiveTintColor: "#737373",
                 tabBarStyle: {
                   paddingBottom: 2,
-                  height: 60,
+                  height: 50,
                   shadowColor: "blue",
                 },
               }}
@@ -231,10 +230,13 @@ const Layout = () => {
 const styles = StyleSheet.create({
   createIconContainer: {
     backgroundColor: "#dad9d9",
-    padding: 6,
+    
+    
     borderRadius: 8,
     borderWidth: 2,
     borderColor: "white",
+    textAlign: "center",
+    justifyContent: "center"
   },
   contentContainer: {
     flex: 1,
