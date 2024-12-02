@@ -84,6 +84,7 @@ const profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // const [user, setUser] = useState<UserProps>({
   //   id: "",
@@ -131,7 +132,6 @@ const profile = () => {
     user.profile.avatar == null ? tempAvatar : user.profile.avatar.url;
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
-    
     return {
       transform: [
         {
@@ -153,7 +153,6 @@ const profile = () => {
   });
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
-    
     return {
       opacity: interpolate(scrollOffset.value, [0, IMG_HEIGHT / 1.5], [0, 1]),
       // backgroundColor: interpolateColor(clampedScroll, [0, IMG_HEIGHT / 1.5], ['transparent', 'white']),
@@ -161,12 +160,15 @@ const profile = () => {
   });
 
   const avatarAnimatedStyle = useAnimatedStyle(() => {
-    
     return {
       opacity: interpolate(scrollOffset.value, [0, IMG_HEIGHT / 2], [1, 0]),
       transform: [
         {
-          translateY: interpolate(scrollOffset.value, [0, IMG_HEIGHT / 2], [0, -50]),
+          translateY: interpolate(
+            scrollOffset.value,
+            [0, IMG_HEIGHT / 2],
+            [0, -50]
+          ),
         },
       ],
     };
@@ -234,6 +236,10 @@ const profile = () => {
       ],
       { cancelable: false }
     );
+  };
+
+  const refreshPage = () => {
+    setRefreshKey((prev) => prev + 1);
   };
 
   return (
@@ -369,7 +375,10 @@ const profile = () => {
                 <Text style={styles.dataNumber}>{game.posts}</Text>
                 <Text>Bài Viết</Text>
               </View>
-              <Pressable style={styles.dataSingleContainer} onPress={() => router.push("/(main)/(friends)/friend-list")}>
+              <Pressable
+                style={styles.dataSingleContainer}
+                onPress={() => router.push("/(main)/(friends)/friend-list")}
+              >
                 <Text style={styles.dataNumber}>
                   {session.userInfo == null ? 0 : user.friends.length}
                 </Text>
@@ -381,12 +390,20 @@ const profile = () => {
               </View>
             </View>
             <View>
-              <Text
-                style={{ marginVertical: 10, fontSize: 18, fontWeight: "700" }}
-              >
-                Bài Viết
-              </Text>
-              <StarRailChar2 />
+              <Pressable onLongPress={refreshPage}>
+                <Text
+                  style={{
+                    marginVertical: 10,
+                    fontSize: 18,
+                    fontWeight: "700",
+                  }}
+                >
+                  Bài Viết
+                </Text>
+              </Pressable>
+              <View key={refreshKey}>
+                <StarRailChar2 />
+              </View>
             </View>
           </View>
         </View>

@@ -5,6 +5,8 @@ import {
   Image,
   TextInput,
   Pressable,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import BottomSheet, {
   BottomSheetModal,
@@ -12,14 +14,18 @@ import BottomSheet, {
   BottomSheetModalProvider,
   BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CheckBox from "@react-native-community/checkbox";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import get_user_profile from "@/services/user/userProfile";
 import { Calendar } from "react-native-calendars";
 import update_user from "@/services/user/update_user";
+import GenderDropdown from "@/components/Dropdowns/GenderDropdown";
+import AnimationTextInput from "@/components/TextInput/MyTextInput";
+import Toast from "react-native-toast-message";
 
 type UserProfileProps = {
   id: string;
@@ -34,7 +40,7 @@ type UserProfileProps = {
 
 const UpdateProfile = () => {
   const { session, logout } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfileProps>({
     id: "",
@@ -73,13 +79,21 @@ const UpdateProfile = () => {
           })
       );
   };
+  const isLoginDisabled =
+  !profile.userName || // Username is required
+  (profile.address && // Address is partially filled but incomplete
+    (!profile.address.province ||
+      !profile.address.ward ||
+      !profile.address.district)) || 
+  (!profile.address?.province && !profile.address?.ward && !profile.address?.district);
+  
 
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=large";
 
   useEffect(() => {
     fetchUser();
-    setDate(profile.dateOfBirth ?? "2024-06-01");
+    setDate(profile.dateOfBirth?.split(" ")[0] ?? "2003-06-01");
   }, []);
 
   useEffect(() => {
@@ -95,13 +109,13 @@ const UpdateProfile = () => {
 
   const fetchUser = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await get_user_profile(session.userToken.accessToken);
       if (response) {
         console.log(response.data.user);
         setProfile(response.data.user.profile);
         // console.log(session.userInfo);
-        setLoading(false);
+        setIsLoading(false);
       }
     } catch (err: any) {
       setError(err.message);
@@ -110,7 +124,7 @@ const UpdateProfile = () => {
 
   const updateProfile = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await update_user(session.userToken.accessToken, {
         UserName: profile.userName,
         PhoneNumber: profile.phoneNumber,
@@ -124,12 +138,20 @@ const UpdateProfile = () => {
           ward: profile.address.ward,
           province: profile.address.province,
         },
-        Gender: profile.gender ? 1 : 0,
+        Gender: profile.gender,
       });
       if (response) {
-        console.log(response);
+        console.log(response.data);
         setIsSuccess(true);
-        setLoading(false);
+        setIsLoading(false);
+        Toast.show({
+          type: "success",
+          text1: "Cập nhật thành công",
+          // text2: "Welcome!",
+        });
+        setTimeout(() => {
+          router.replace("/profile");
+        }, 500);
       }
     } catch (err: any) {
       setError(err.message);
@@ -140,6 +162,9 @@ const UpdateProfile = () => {
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
   }, []);
+  const handleSetGender = (val: number) => {
+    handleChangeProfileState("gender", val);
+  };
 
   const renderBackDrop = useCallback(
     (props: any) => (
@@ -161,64 +186,233 @@ const UpdateProfile = () => {
               title: "Thông tin cá nhân",
             }}
           />
-          <View style={styles.avatarContainer}>
-            <Image source={{ uri: tempAvatar }} style={styles.image} />
-          </View>
-          <TextInput
-            value={profile.userName}
-            onChangeText={(text) => handleChangeProfileState("userName", text)}
-          />
-          <TextInput
-            value={profile.phoneNumber == null ? "none" : profile.phoneNumber}
-            onChangeText={(text) =>
-              handleChangeProfileState("phoneNumber", text)
-            }
-          />
-
-          <Pressable onPress={handleOpen}>
-            <Text>
-              {profile.dateOfBirth === null
-                ? "Chưa có thông tin ngày sinh"
-                : profile.dateOfBirth}
-            </Text>
-          </Pressable>
-          <TextInput
-            value={profile.address != null ? profile.address.district : "none"}
-            placeholder="District"
-            onChangeText={(text) =>
-              handleChangeProfileState("address.district", text)
-            }
-          />
-          <TextInput
-            value={profile.address != null ? profile.address.ward : "none"}
-            placeholder="Ward"
-            onChangeText={(text) =>
-              handleChangeProfileState("address.ward", text)
-            }
-          />
-          <TextInput
+          <ScrollView>
+            <View style={styles.avatarContainer}>
+              <Image source={{ uri: tempAvatar }} style={styles.image} />
+            </View>
+            <View style={styles.inputsContainer}>
+              <View style={styles.outerUsernameInput}>
+                <AnimationTextInput
+                  placeholder="Tên đăng nhập"
+                  style={styles.usernameInput}
+                  autoCapitalize={"none"}
+                  maxLength={30}
+                  value={profile.userName}
+                  onChangeText={(text) =>
+                    handleChangeProfileState("userName", text)
+                  }
+                />
+                {profile.userName.length > 0 && (
+                  <Pressable
+                    style={styles.clearUserNameButton}
+                    onPress={() => handleChangeProfileState("userName", "")}
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={21}
+                      color="#9FB7B9"
+                    />
+                  </Pressable>
+                )}
+              </View>
+              <View style={styles.outerUsernameInput}>
+                <AnimationTextInput
+                  placeholder="Số điện thoại"
+                  style={styles.otherInput}
+                  autoCapitalize={"none"}
+                  maxLength={10}
+                  keyboardType={"phone-pad"}
+                  value={profile.phoneNumber == null ? "" : profile.phoneNumber}
+                  onChangeText={(text) =>
+                    handleChangeProfileState("phoneNumber", text)
+                  }
+                />
+                {profile.phoneNumber && profile.phoneNumber.length > 0 && (
+                  <Pressable
+                    style={styles.clearUserNameButton}
+                    onPress={() => handleChangeProfileState("phoneNumber", "")}
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={21}
+                      color="#9FB7B9"
+                    />
+                  </Pressable>
+                )}
+              </View>
+              <Pressable
+                onPress={handleOpen}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 7,
+                  gap: 20,
+                  paddingHorizontal: 5,
+                }}
+              >
+                <Ionicons
+                  name={"calendar-outline"}
+                  size={30}
+                  color={"#6b707b"}
+                />
+                <View style={[styles.birthdayInput, { borderWidth: 1.2 }]}>
+                  <Text style={{ fontSize: 16, fontWeight: "700" }}>
+                    {profile.dateOfBirth === null
+                      ? "Chưa có thông tin ngày sinh"
+                      : profile.dateOfBirth.split(" ")[0]}
+                  </Text>
+                </View>
+              </Pressable>
+              <View style={{ marginTop: 3 }}>
+                <GenderDropdown
+                  value={profile.gender ?? -1}
+                  setValue={handleSetGender}
+                />
+              </View>
+              <View>
+                {/* <TextInput
             value={profile.address != null ? profile.address.province : "none"}
             placeholder="Province"
             onChangeText={(text) =>
               handleChangeProfileState("address.province", text)
             }
-          />
-          <View style={styles.container}>
-            <View style={styles.checkboxContainer}>
-              <CheckBox
-                value={profile.gender == 1}
-                onValueChange={(newValue) =>
-                  handleChangeProfileState("gender", newValue)
-                }
-                style={styles.checkbox}
-              />
-              <Text style={styles.label}>Nhấn vào checkbox nếu bạn là nam</Text>
+          /> */}
+                <View style={styles.outerUsernameInput}>
+                  <AnimationTextInput
+                    placeholder="Tỉnh / Thành phố"
+                    style={styles.addressInput}
+                    maxLength={40}
+                    value={
+                      profile.address != null ? profile.address.province : ""
+                    }
+                    onChangeText={(text) =>
+                      handleChangeProfileState("address.province", text)
+                    }
+                  />
+                  {profile.address && (
+                    <Pressable
+                      style={styles.clearUserNameButton}
+                      onPress={() =>
+                        handleChangeProfileState("address.province", "")
+                      }
+                    >
+                      <Ionicons
+                        name="close-circle-outline"
+                        size={21}
+                        color="#9FB7B9"
+                      />
+                    </Pressable>
+                  )}
+                </View>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={styles.outerUsernameInput}>
+                    <AnimationTextInput
+                      placeholder="Phường"
+                      style={styles.wardInput}
+                      maxLength={40}
+                      value={
+                        profile.address != null ? profile.address.ward : ""
+                      }
+                      onChangeText={(text) =>
+                        handleChangeProfileState("address.ward", text)
+                      }
+                    />
+
+                    {/* {profile.address && (
+                <Pressable
+                  style={styles.clearUserNameButton}
+                  onPress={() => handleChangeProfileState("address.province", "")}
+                >
+                  <Ionicons
+                    name="close-circle-outline"
+                    size={21}
+                    color="#9FB7B9"
+                  />
+                </Pressable>
+              )} */}
+                  </View>
+                  <View style={styles.outerUsernameInput}>
+                    <AnimationTextInput
+                      placeholder="Quận"
+                      style={styles.districtInput}
+                      maxLength={40}
+                      value={
+                        profile.address != null ? profile.address.district : ""
+                      }
+                      onChangeText={(text) =>
+                        handleChangeProfileState("address.district", text)
+                      }
+                    />
+                  </View>
+                </View>
+                {/* <TextInput
+            value={profile.address != null ? profile.address.district : "none"}
+            placeholder="District"
+            onChangeText={(text) =>
+              handleChangeProfileState("address.district", text)
+            }
+          /> */}
+                {/* <TextInput
+            value={profile.address != null ? profile.address.ward : "none"}
+            placeholder="Ward"
+            onChangeText={(text) =>
+              handleChangeProfileState("address.ward", text)
+            }
+          /> */}
+          
+              </View>
+              <View style={{marginTop: 10}}>
+              <Text style={{color: "#6b707b"}}>Bạn có thể hoặc không nhập địa chỉ hoặc phải nhập đủ cả 3 trường: Phường, Quận, Thành phố</Text>
+
+              </View>
+              
             </View>
-          </View>
-          <Text>{profile.address ? profile.address.country : " "}</Text>
-          <Pressable onPress={updateProfile}>
-            <Text>Nhấn vào để cập nhật</Text>
+            {/* <Pressable onPress={updateProfile}>
+                <Text>Nhấn vào để cập nhật</Text>
+              </Pressable> */}
+              <View style={styles.loginButtonContainer}>
+          <Pressable
+            onPress={updateProfile}
+            disabled={isLoginDisabled || isLoading}
+            android_ripple={isLoginDisabled ? null : { color: "#b9bcc6" }}
+            // android_ripple={{ color: "gray" }}
+          >
+            <View
+              style={[
+                styles.innerLoginButtonContainer,
+                isLoginDisabled && styles.loginButtonDisabled,
+              ]}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" size={28} />
+              ) : (
+                <Text
+                  style={[
+                    styles.loginButtonText,
+                    { color: isLoginDisabled ? "#b9bcc6" : "#fff" },
+                  ]}
+                >
+                  Đăng Nhập
+                </Text>
+              )}
+            </View>
           </Pressable>
+        </View>
+          </ScrollView>
+
+          {/* <TextInput
+            value={profile.userName}
+            onChangeText={(text) => handleChangeProfileState("userName", text)}
+          /> */}
+          {/* <TextInput
+            value={profile.phoneNumber == null ? "none" : profile.phoneNumber}
+            maxLength={10}
+            keyboardType={"phone-pad"}
+            onChangeText={(text) =>
+              handleChangeProfileState("phoneNumber", text)
+            }
+          /> */}
+
           <BottomSheet
             ref={bottomSheetRef}
             onChange={handleSheetChanges}
@@ -228,14 +422,14 @@ const UpdateProfile = () => {
             enablePanDownToClose={true}
           >
             <BottomSheetView style={styles.contentContainer}>
-              <View style={{flex: 1, alignItems: "center"}}>
+              <View style={{ flex: 1, alignItems: "center" }}>
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>
                   Tạo chuyến đi của bạn 🎉
                 </Text>
               </View>
               <View style={{ marginBottom: 10 }}>
                 <Calendar
-                  current={profile.dateOfBirth ?? "2024-06-01"}
+                  current={profile.dateOfBirth?.split(" ")[0] ?? "2003-06-01"}
                   onDayPress={(day: any) => {
                     handleChangeProfileState("dateOfBirth", day.dateString);
                     console.log(day.dateString);
@@ -247,7 +441,7 @@ const UpdateProfile = () => {
                       disableTouchEvent: true,
                       selectedColor: "#46e835",
                     },
-                    [date]: { marked: true, activeOpacity: 0 },
+                    [date]: { marked: true },
                   }}
                   theme={{
                     todayTextColor: "#46e835",
@@ -272,7 +466,7 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 40,
   },
   image: {
     width: 100,
@@ -291,6 +485,131 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+  },
+  inputsContainer: {
+    marginTop: 40,
+    width: "90%",
+    flex: 1,
+    marginLeft: 20,
+  },
+  outerUsernameInput: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  usernameInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+
+    padding: 10,
+
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    fontSize: 18,
+    lineHeight: 28,
+    paddingRight: 90,
+    fontWeight: "500",
+  },
+  otherInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+
+    padding: 10,
+    marginVertical: 10,
+    marginTop: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    fontSize: 18,
+    lineHeight: 28,
+    paddingRight: 90,
+    fontWeight: "500",
+  },
+  birthdayInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderColor: "#e7e8ee",
+    padding: 10,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "87%",
+    fontSize: 18,
+    lineHeight: 28,
+    fontWeight: "500",
+  },
+  addressInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+
+    padding: 10,
+    marginVertical: 0,
+    // marginTop: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    fontSize: 18,
+    lineHeight: 28,
+    paddingRight: 90,
+    fontWeight: "500",
+  },
+  clearUserNameButton: {
+    position: "absolute",
+    paddingRight: 10,
+    right: 7,
+  },
+  wardInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+
+    padding: 10,
+    marginVertical: 0,
+    marginTop: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "70%",
+    fontSize: 18,
+    lineHeight: 28,
+    paddingRight: 10,
+    fontWeight: "500",
+  },
+  districtInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    marginLeft: -60,
+    padding: 10,
+    marginVertical: 0,
+    marginTop: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "77%",
+    fontSize: 18,
+    lineHeight: 28,
+    paddingRight: 10,
+    fontWeight: "500",
+  },
+  loginButtonContainer: {
+    backgroundColor: "#13c892",
+    borderRadius: 12,
+    overflow: "hidden",
+    margin: 10,
+    width: "95%",
+    marginTop: 90,
+  },
+  innerLoginButtonContainer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginButtonText: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: "semibold",
+    lineHeight: 28,
+  },
+  loginButtonDisabled: {
+    backgroundColor: "#e7e8ee",
+    color: "#b9bcc6",
   },
 });
 
