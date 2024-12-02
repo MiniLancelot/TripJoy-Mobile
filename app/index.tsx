@@ -69,11 +69,11 @@ const Index = () => {
     if (session.userInfo && session.userToken) {
     //   console.log("Có userToken: ", session.userToken.accessToken);
       console.log("Có userInfo: ", session.userInfo.user.profile.userName);
-      router.replace("/home");
+      router.replace("/(main)/(create)/(temp)/DropdownTest");
     } else {
       console.log("No userToken: ", session.userToken);
       console.log("No userInfo: ", session.userInfo);
-      router.replace("/login");
+      router.replace("/(main)/(create)/(temp)/DropdownTest");
     }
   };
   return (
