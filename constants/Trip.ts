@@ -1,0 +1,38 @@
+export const Trips = [
+    
+    {
+      title: 'Gia Lai',
+      subtitle: 'Lorem ipsum dolor sit amet',
+      startTime: "20/12",
+      endTime: "20/12",
+      illustration: 'https://quynhongrouptour.com.vn/wp-content/uploads/2024/04/ivivu-nha-tho-go-kon-tum.jpg',
+    },
+    {
+      title: 'Sơn Trà',
+      subtitle: 'Lorem ipsum dolor sit amet et nuncat ',
+      startTime: "20/12",
+      endTime: "20/12",
+      illustration: 'https://ik.imagekit.io/tvlk/blog/2022/09/ban-dao-son-tra-4.jpg?tr=dpr-2,w-675',
+    },
+    {
+      title: 'Quảng Ngãi',
+      subtitle: 'Lorem ipsum dolor sit amet et nuncat mergitur',
+      startTime: "20/12",
+      endTime: "20/12",
+      illustration: 'https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/shutterstock1469180783-1648119213801.png',
+    },
+    {
+      title: 'Hà Nội',
+      subtitle: 'Lorem ipsum dolor sit amet',
+      startTime: "20/12",
+      endTime: "20/12",
+      illustration: 'https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg',
+    },
+    {
+      title: 'Quảng Nam',
+      subtitle: 'Lorem ipsum dolor sit amet et nuncat mergitur',
+      startTime: "20/12",
+      endTime: "20/12",
+      illustration: 'https://static.vinwonders.com/2022/12/du-lich-bien-quang-nam-1.jpg',
+    },
+  ];

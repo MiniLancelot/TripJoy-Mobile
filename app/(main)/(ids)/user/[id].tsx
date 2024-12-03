@@ -91,13 +91,16 @@ const User = () => {
     gender: null,
     status: 0,
   });
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
-
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
-  const avatarUri = user.avatar == null ? tempAvatar : user.avatar;
+  const [avatarUrl, setAvatarUrl] = useState(tempAvatar);
+
+  // const avatarUri = user.avatar == null ? tempAvatar : user.avatar.url;
+
   //   useEffect(() => {
 
   //     const fetchChar = async () => {
@@ -204,6 +207,10 @@ const User = () => {
       );
       if (response) {
         console.log(response.data.user);
+        console.log(response.data.user.avatar.url);
+        if(response.data.user.avatar.url){
+          setAvatarUrl(response.data.user.avatar.url);
+        }
         setUser(response.data.user);
         setLoading(false);
         setIsSuccess(false);
@@ -402,7 +409,7 @@ const User = () => {
                   }
                 >
                   <Animated.Image
-                    source={{ uri: avatarUri }}
+                    source={{ uri: avatarUrl }}
                     style={[styles.headerAvatar, headerAvatarAnimatedStyle]}
                   />
                   <Animated.Text
@@ -461,7 +468,7 @@ const User = () => {
                     style={[avatarAnimatedStyle, styles.mainAvatarContainer]}
                   >
                     <Image
-                      source={{ uri: tempAvatar }}
+                      source={{ uri: avatarUrl }}
                       style={styles.mainAvatar}
                     />
                   </Animated.View>
@@ -587,9 +594,7 @@ const User = () => {
                                 size={15}
                                 color={"#13c892"}
                               /> */}
-                              <Text style={styles.editText}>
-                                Xác nhận
-                              </Text>
+                              <Text style={styles.editText}>Xác nhận</Text>
                             </Pressable>
                           </View>
                         </View>
@@ -604,9 +609,7 @@ const User = () => {
                                 size={15}
                                 color={"#13c892"}
                               /> */}
-                              <Text style={styles.editText}>
-                                Từ chối
-                              </Text>
+                              <Text style={styles.editText}>Từ chối</Text>
                             </Pressable>
                           </View>
                         </View>
@@ -905,7 +908,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingRight: 0,
   },
-  
 });
 
 export default User;
