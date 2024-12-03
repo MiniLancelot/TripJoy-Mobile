@@ -217,6 +217,11 @@ const Layout = () => {
                   >
                     <Text>Tạo chuyến đi bằng AI</Text>
                   </Pressable>
+                  <Pressable
+                    onPress={() => router.push("/Trip3")}
+                  >
+                    <Text>Test</Text>
+                  </Pressable>
                 </View>
               </BottomSheetView>
             </BottomSheet>
