@@ -75,8 +75,8 @@ const Trip2 = () => {
       </View>
       <View>
         <TextField value={value}
-        label="Cardholder name"
-        errorText={error}
+        // label="Cardholder name"
+        // errorText={error}
         onChangeText={(text) => setValue(text)}/>
       </View>
       <Button

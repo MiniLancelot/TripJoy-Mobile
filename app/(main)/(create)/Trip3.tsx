@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, TextInput, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet, Text, Pressable } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { format, set } from "date-fns";
 import ProvinceDropdown from "@/components/Dropdowns/ProvinceDropdown";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import VehicleDropdown from "@/components/Dropdowns/VehicleDropdown";
+import CustomImagePicker from "@/components/ImagePicker/CustomImagePicker";
+import addPlan from "@/services/plan/plan";
 
 type PlanProfileProps = {
   title: string | null;
@@ -61,6 +63,39 @@ const Trip3 = () => {
     }
   };
 
+  const createBlobFromUri = async (uri: string, fileName: string, mimeType: string): Promise<File> => {
+    const response = await fetch(uri); // Fetch the local file
+    const blob = await response.blob(); // Convert the response to Blob
+    return new File([blob], fileName, { type: mimeType }); // Convert Blob to File
+  };
+
+  const _addPlan = async () => {
+    try{
+      const form = new FormData();
+      form.append("Plan.Title", data.title!);
+      form.append("Plan.StartDate", data.startDate);
+      form.append("Plan.EndDate", data.endDate);
+      form.append("Plan.EstimatedBudget", data.estimatedBudget.toString());
+      form.append("Plan.ProvinceStartId", data.provinceStartId);
+      form.append("Plan.ProvinceEndId", data.provinceEndId);
+      form.append("Plan.Method", data.method.toString());
+      form.append("Plan.Vehicle", data.vehicle.toString());
+      if(data.avatar){
+        const parts = data.avatar.split('/'); // Chia đường dẫn theo dấu '/'
+        const fileName = parts[parts.length - 1]; // Lấy phần tử cuối cùng trong mảng (tên tệp)
+        const file = await createBlobFromUri(data.avatar, fileName, "image/jpeg");
+        form.append("Plan.Avatar", file);
+      }
+      const response = await addPlan(form, session.userToken.accessToken);
+      if(response){
+        console.log(response.data);
+      }
+    }
+    catch(err: any){
+      console.error(err);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -86,6 +121,7 @@ const Trip3 = () => {
       />
       <TextInput
         placeholder="Nhập kinh phí dự kiến"
+        keyboardType="phone-pad"
         value={data.estimatedBudget.toString()}
         onChangeText={(text) =>
           handleChangeProfileState("estimatedBudget", parseInt(text))
@@ -109,6 +145,15 @@ const Trip3 = () => {
         setValue={(value) => handleChangeProfileState("vehicle", value)}
         placeholder="Chọn phương tiện"
       />
+      <Text>Vui lòng nhập hết các trường trước khi thêm avatar</Text>
+      <CustomImagePicker image={data.avatar} setImage={(value: string) => handleChangeProfileState("avatar", value)} />
+
+      <Pressable
+        style={{ backgroundColor: "blue", padding: 16, alignItems: "center" }}
+        onPress={_addPlan}
+      >
+        <Text>Thêm chuyến đi</Text>
+      </Pressable>
     </View>
   );
 };
@@ -119,11 +164,12 @@ const getMarkedDatesBetween = (startDate: string, endDate: string) => {
   const end = new Date(endDate);
 
   while (currentDate <= end) {
+    currentDate.setDate(currentDate.getDate() + 1);
     const dateString = format(currentDate, "yyyy-MM-dd");
     if (dateString !== startDate && dateString !== endDate) {
       dates[dateString] = { color: "green", textColor: "white" };
     }
-    currentDate.setDate(currentDate.getDate() + 1);
+    
   }
 
   return dates;

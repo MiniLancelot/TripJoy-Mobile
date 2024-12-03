@@ -5,6 +5,9 @@ const login = async (data: any) => {
     try {
         const result = await identity("/login", {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
             data: JSON.stringify(data),
         });
         return result;
