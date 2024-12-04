@@ -222,6 +222,11 @@ const Layout = () => {
                   >
                     <Text>Test</Text>
                   </Pressable>
+                  <Pressable
+                    onPress={() => router.push("/Trip4")}
+                  >
+                    <Text>Test2</Text>
+                  </Pressable>
                 </View>
               </BottomSheetView>
             </BottomSheet>

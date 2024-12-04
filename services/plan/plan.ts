@@ -1,13 +1,14 @@
 import { plan } from "@/utils/request";
 import showError from "@/utils/showError";
 
-const addPlan = async (data: FormData, accessToken: any) => {
+const addPlan = async (data: any, accessToken: any) => {
   try {
     const result = await plan("/plans", {
       method: "POST",
       data: data,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${accessToken}`
       },
 
     });
@@ -18,4 +19,19 @@ const addPlan = async (data: FormData, accessToken: any) => {
   }
 };
 
-export default addPlan;
+const getAllPlan = async (accessToken: any) => {
+  try {
+    const result = await plan("/plans", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { addPlan, getAllPlan };

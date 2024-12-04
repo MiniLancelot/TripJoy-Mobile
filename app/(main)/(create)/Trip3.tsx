@@ -6,7 +6,8 @@ import ProvinceDropdown from "@/components/Dropdowns/ProvinceDropdown";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import VehicleDropdown from "@/components/Dropdowns/VehicleDropdown";
 import CustomImagePicker from "@/components/ImagePicker/CustomImagePicker";
-import addPlan from "@/services/plan/plan";
+import { addPlan } from "@/services/plan/plan";
+import { router } from "expo-router";
 
 type PlanProfileProps = {
   title: string | null;
@@ -17,7 +18,7 @@ type PlanProfileProps = {
   provinceEndId: string;
   method: number;
   vehicle: number;
-  avatar: string | null;
+  avatar: any | null;
 };
 
 const Trip3 = () => {
@@ -63,35 +64,48 @@ const Trip3 = () => {
     }
   };
 
-  const createBlobFromUri = async (uri: string, fileName: string, mimeType: string): Promise<File> => {
-    const response = await fetch(uri); // Fetch the local file
-    const blob = await response.blob(); // Convert the response to Blob
-    return new File([blob], fileName, { type: mimeType }); // Convert Blob to File
+  const createBlobFromUri = async (
+    uri: string,
+    fileName: string,
+    mimeType: string
+  ): Promise<any> => {
+    // const response = await fetch(uri); // Fetch the local file
+    // const blob = await response.blob(); // Convert the response to Blob
+    // return new File([blob], fileName, { type: mimeType }); // Convert Blob to File
+    const result = {
+      uri: uri,
+      name: fileName,
+      type: mimeType,
+    };
+    return result;
   };
 
   const _addPlan = async () => {
-    try{
-      const form = new FormData();
-      form.append("Plan.Title", data.title!);
-      form.append("Plan.StartDate", data.startDate);
-      form.append("Plan.EndDate", data.endDate);
-      form.append("Plan.EstimatedBudget", data.estimatedBudget.toString());
-      form.append("Plan.ProvinceStartId", data.provinceStartId);
-      form.append("Plan.ProvinceEndId", data.provinceEndId);
-      form.append("Plan.Method", data.method.toString());
-      form.append("Plan.Vehicle", data.vehicle.toString());
-      if(data.avatar){
-        const parts = data.avatar.split('/'); // Chia đường dẫn theo dấu '/'
+    try {
+      const _form = new FormData();
+      _form.append("Plan.Title", data.title ?? "");
+      _form.append("Plan.StartDate", data.startDate);
+      _form.append("Plan.EndDate", data.endDate);
+      _form.append("Plan.EstimatedBudget", data.estimatedBudget.toString());
+      _form.append("Plan.ProvinceStartId", data.provinceStartId);
+      _form.append("Plan.ProvinceEndId", data.provinceEndId);
+      _form.append("Plan.Method", data.method.toString());
+      _form.append("Plan.Vehicle", data.vehicle.toString());
+      if (data.avatar) {
+        const parts = data.avatar.split("/"); // Chia đường dẫn theo dấu '/'
         const fileName = parts[parts.length - 1]; // Lấy phần tử cuối cùng trong mảng (tên tệp)
-        const file = await createBlobFromUri(data.avatar, fileName, "image/jpeg");
-        form.append("Plan.Avatar", file);
+        const file: any = {
+          uri: data.avatar,
+          type: "image/jpeg",
+          name: fileName,
+        };
+        _form.append("Plan.Avatar", file);
       }
-      const response = await addPlan(form, session.userToken.accessToken);
-      if(response){
+      const response = await addPlan(_form, session.userToken.accessToken);
+      if (response) {
         console.log(response.data);
       }
-    }
-    catch(err: any){
+    } catch (err: any) {
       console.error(err);
     }
   };
@@ -146,7 +160,10 @@ const Trip3 = () => {
         placeholder="Chọn phương tiện"
       />
       <Text>Vui lòng nhập hết các trường trước khi thêm avatar</Text>
-      <CustomImagePicker image={data.avatar} setImage={(value: string) => handleChangeProfileState("avatar", value)} />
+      <CustomImagePicker
+        image={data.avatar}
+        setImage={(value: string) => handleChangeProfileState("avatar", value)}
+      />
 
       <Pressable
         style={{ backgroundColor: "blue", padding: 16, alignItems: "center" }}
@@ -169,7 +186,6 @@ const getMarkedDatesBetween = (startDate: string, endDate: string) => {
     if (dateString !== startDate && dateString !== endDate) {
       dates[dateString] = { color: "green", textColor: "white" };
     }
-    
   }
 
   return dates;
