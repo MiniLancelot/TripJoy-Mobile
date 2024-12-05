@@ -141,10 +141,10 @@ const UpdateProfile = () => {
         type: "image/jpg",
       };
       _form.append("Avatar", file);
-      _form.append("Address.District", JSON.stringify(profile.address.district));
-      _form.append("Address.Ward", JSON.stringify(profile.address.ward));
-      _form.append("Address.Province", JSON.stringify(profile.address.province));
-      _form.append("Address.Country", JSON.stringify(profile.address.country));
+      _form.append("Address.District", profile.address.district);
+      _form.append("Address.Ward", profile.address.ward);
+      _form.append("Address.Province", profile.address.province);
+      _form.append("Address.Country", profile.address.country);
       _form.append("Gender", JSON.stringify(profile.gender));
 
       const response = await update_user(session.userToken.accessToken, _form);
