@@ -6,6 +6,7 @@ const logout = async (token: any, data: any) => {
         const result = await identity("/logout",{
             method: "POST",
             headers: {
+                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
             data: JSON.stringify(data),

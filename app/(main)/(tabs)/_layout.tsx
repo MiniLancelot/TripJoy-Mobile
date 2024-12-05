@@ -93,7 +93,7 @@ const Layout = () => {
                 tabBarInactiveTintColor: "#737373",
                 tabBarStyle: {
                   paddingBottom: 2,
-                  height: 50,
+                  height: 60,
                   shadowColor: "blue",
                 },
               }}
@@ -217,7 +217,20 @@ const Layout = () => {
                   >
                     <Text>Tạo chuyến đi bằng AI</Text>
                   </Pressable>
+                  
                 </View>
+                <View style={{ flexDirection: "row", gap: 35, marginTop: 35 }}>
+                  <Pressable
+                    onPress={() => router.push("/Trip3")}
+                  >
+                    <Text>Test</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => router.push("/Trip4")}
+                  >
+                    <Text>Test2</Text>
+                  </Pressable>
+                  </View>
               </BottomSheetView>
             </BottomSheet>
           </BottomSheetModalProvider>
@@ -230,13 +243,12 @@ const Layout = () => {
 const styles = StyleSheet.create({
   createIconContainer: {
     backgroundColor: "#dad9d9",
-    
-    
+    padding: 6,
     borderRadius: 8,
     borderWidth: 2,
     borderColor: "white",
-    textAlign: "center",
-    justifyContent: "center"
+
+    
   },
   contentContainer: {
     flex: 1,

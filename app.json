@@ -7,7 +7,11 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/images/splash1.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -26,15 +30,6 @@
     "plugins": [
       "expo-router",
       [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      [
         "@rnmapbox/maps",
         {
           "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiZGlseXMyMyIsImEiOiJjbTI5MHJ2ZGUwMGxnMmpxcDhla2E2dWE2In0.1Uv0G24aZ9sUA6KlEx5g1w",
@@ -46,7 +41,8 @@
         {
           "locationWhenInUsePermission": "Show current location on map."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

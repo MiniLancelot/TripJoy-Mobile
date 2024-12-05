@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   ActivityIndicator,
+  Button,
 } from "react-native";
 import BottomSheet, {
   BottomSheetModal,
@@ -26,6 +27,7 @@ import update_user from "@/services/user/update_user";
 import GenderDropdown from "@/components/Dropdowns/GenderDropdown";
 import AnimationTextInput from "@/components/TextInput/MyTextInput";
 import Toast from "react-native-toast-message";
+import * as ImagePicker from 'expo-image-picker';
 
 type UserProfileProps = {
   id: string;
@@ -176,6 +178,24 @@ const UpdateProfile = () => {
     ),
     []
   );
+
+  const [image, setImage] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -398,6 +418,8 @@ const UpdateProfile = () => {
             </View>
           </Pressable>
         </View>
+        <Button title="Pick an image from camera roll" onPress={pickImage} />
+        {image && <Image source={{ uri: image }} style={{width: 200, height: 200}} />}
           </ScrollView>
 
           {/* <TextInput

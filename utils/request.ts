@@ -1,16 +1,12 @@
-import axios from "axios";
+import axios from 'axios';
 import { baseURL } from "@/utils/baseUrl";
 
 const createAxiosInstance = (servicePath: string) => {
-    return axios.create({
-        baseURL: `${baseURL}/${servicePath}`,
-        headers: {
-            "Content-Type": "application/json",
-            "Allow-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-        },
-        responseType: "json",
-        withCredentials: true,
-    });
+  return axios.create({
+    baseURL: `${baseURL}/${servicePath}`,
+    responseType: "json",
+    withCredentials: true,
+  });
 };
 
 const identity = createAxiosInstance('identity-service'); 

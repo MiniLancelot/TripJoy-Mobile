@@ -1,4 +1,3 @@
-
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
