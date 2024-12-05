@@ -41,9 +41,10 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
     const translate = interpolate(
       scrollX.value,
       inputRange,
-      [0.97, 0.97, 0.97]
+      [0.97, 0.97, 0.97],
+      Extrapolation.CLAMP,
     );
-    const opacity = interpolate(scrollX.value, inputRange, [0.6, 1, 0.6]);
+    const opacity = interpolate(scrollX.value, inputRange, [0.6, 1, 0.6],Extrapolation.CLAMP,);
     return { transform: [{ scale: translate }], opacity };
   });
   const translateImageStyle = useAnimatedStyle(() => {
@@ -55,7 +56,7 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
     return { transform: [{ translateX: translate }] };
   });
   const translateTextStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(scrollX.value, inputRange, [0, 1, 0]);
+    const opacity = interpolate(scrollX.value, inputRange, [0, 1, 0],Extrapolation.CLAMP,);
     return { opacity };
   });
   return (

@@ -14,7 +14,7 @@ export default function ImagePickerExample({image, setImage}: any) {
       Keyboard.dismiss();
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'images', // Sửa lại giá trị mediaTypes
+        mediaTypes: ImagePicker.MediaTypeOptions.All, // Sửa lại giá trị mediaTypes
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,

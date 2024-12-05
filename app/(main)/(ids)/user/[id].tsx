@@ -207,11 +207,14 @@ const User = () => {
       );
       if (response) {
         console.log(response.data.user);
-        console.log(response.data.user.avatar.url);
-        if(response.data.user.avatar.url){
-          setAvatarUrl(response.data.user.avatar.url);
-        }
+        console.log(response.data.user.avatar);
+        // if(response.data.user.avatar.url){
+        //   setAvatarUrl(response.data.user.avatar.url);
+        // }
         setUser(response.data.user);
+        if (user) {
+          console.log("name:", user.userName)
+        }
         setLoading(false);
         setIsSuccess(false);
       }
@@ -475,7 +478,7 @@ const User = () => {
                 </Pressable>
                 <TouchableOpacity onLongPress={fetchUser}>
                   <Text style={styles.text}>
-                    {session.userInfo == null ? game.name : user.userName}
+                    {user.userName == null ? game.name : user.userName}
                   </Text>
                 </TouchableOpacity>
 

@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mapContainer: {
-    flex: 1,
+    flex: 3 / 4,
     margin: 15,
     borderRadius: 10,
     overflow: "hidden",
@@ -234,10 +234,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   buttonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    // left: 20,
-    width: "100%",
     padding: 10,
     alignItems: "center",
   },
@@ -256,4 +252,3 @@ const styles = StyleSheet.create({
 });
 
 export default Map;
- 

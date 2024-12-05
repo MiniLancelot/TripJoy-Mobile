@@ -26,10 +26,7 @@ import { useAuth } from "@/app/(auth)/AuthContext";
 import GoogleIcon from "@/components/Icons/GoogleIcon";
 import FacebookIcon from "@/components/Icons/FacebookIcon";
 import Toast from "react-native-toast-message";
-import { InputOutline } from "react-native-input-outline";
 import AnimationTextInput from "@/components/TextInput/MyTextInput";
-
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const Login = () => {
   const router = useRouter();
@@ -260,7 +257,7 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
-    paddingTop: 30,
+    paddingTop: 90,
     alignItems: "center",
     // minHeight: 100,
   },

@@ -123,10 +123,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "#fff",
     width: "100%",
-    height: "24%",
+    height: "21%",
     bottom: 0,
-    borderEndEndRadius: 14,
-    borderStartEndRadius: 14,
+    borderBottomEndRadius: 14,
+    borderBottomStartRadius: 14,
   },
   imagesContainer: {
     flexDirection: "row",

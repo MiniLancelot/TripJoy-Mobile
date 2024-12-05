@@ -28,7 +28,7 @@ const NewsfeedScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.searchBoxContainer}>
-        <Pressable style={styles.searchBoxInnerContainer} onPress={() => router.push("/(main)/(search)/search")}>
+        <Pressable style={styles.searchBoxInnerContainer} onPress={() => router.push(`/(search)/search`)}>
           <View style={{marginLeft: 20, marginTop: 2}}>
             <Ionicons name="search" size={18} color="#c3c5c7" />
           </View>

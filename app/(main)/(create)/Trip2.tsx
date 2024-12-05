@@ -1,10 +1,9 @@
-import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button } from "react-native";
+import { View, Text, StyleSheet, TextInput, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import TextCarousel from "@/components/Others/TextCarousel";
 import get_user_search from "@/services/user/getUserBySearch";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { FlashList } from "@shopify/flash-list";
-import TextField from "@/components/TextInput/MyTextInput";
 
 
 type UserProps = {
@@ -22,9 +21,9 @@ const Trip2 = () => {
   const { session } = useAuth();
   const [users, setUsers] = useState<UserProps[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [value, setValue] = useState('')
+
   useEffect(() => {
     fetchName();
   }, []);
@@ -73,16 +72,6 @@ const Trip2 = () => {
           onChangeText={(text) => setSearchQuery(text)}
         />
       </View>
-      <View>
-        <TextField value={value}
-        // label="Cardholder name"
-        // errorText={error}
-        onChangeText={(text) => setValue(text)}/>
-      </View>
-      <Button
-        title="Set error"
-        onPress={() => setError('This field is required.')}
-      />
       <View style={styles.innerContainer}>
         {loading ? (
           <View

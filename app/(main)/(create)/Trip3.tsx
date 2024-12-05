@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, TextInput, StyleSheet, Text, Pressable } from "react-native";
+import { View, TextInput, StyleSheet, Text, Pressable, ScrollView } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { format, set } from "date-fns";
 import ProvinceDropdown from "@/components/Dropdowns/ProvinceDropdown";
@@ -111,7 +111,7 @@ const Trip3 = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <TextInput
         placeholder="Nhập tên chuyến đi"
         value={data.title ?? ""}
@@ -171,7 +171,7 @@ const Trip3 = () => {
       >
         <Text>Thêm chuyến đi</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 };
 
