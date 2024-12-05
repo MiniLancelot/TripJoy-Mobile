@@ -46,7 +46,7 @@ type UserProps = {
   userName: string;
   email: string;
   phoneNumber: string | null;
-  avatar: string | null;
+  avatar: any | null;
   dateOfBirth: string | null;
   address: string | null;
   gender: boolean | null;
@@ -97,7 +97,7 @@ const User = () => {
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
-  const [avatarUrl, setAvatarUrl] = useState(tempAvatar);
+  const [avatarUrl, setAvatarUrl] = useState<string>(tempAvatar);
 
   // const avatarUri = user.avatar == null ? tempAvatar : user.avatar.url;
 
@@ -208,9 +208,9 @@ const User = () => {
       if (response) {
         console.log(response.data.user);
         console.log(response.data.user.avatar);
-        // if(response.data.user.avatar.url){
-        //   setAvatarUrl(response.data.user.avatar.url);
-        // }
+        if(response.data.user.avatar.url){
+          setAvatarUrl(response.data.user.avatar.url);
+        }
         setUser(response.data.user);
         if (user) {
           console.log("name:", user.userName)

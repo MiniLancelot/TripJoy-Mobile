@@ -28,13 +28,14 @@ import GenderDropdown from "@/components/Dropdowns/GenderDropdown";
 import AnimationTextInput from "@/components/TextInput/MyTextInput";
 import Toast from "react-native-toast-message";
 import * as ImagePicker from 'expo-image-picker';
+import { format } from "date-fns";
 
 type UserProfileProps = {
   id: string;
   userName: string;
   email: string;
   phoneNumber: string | null;
-  avatar: string | null;
+  avatar: any | null;
   dateOfBirth: string | null;
   address: any;
   gender: number | null;
@@ -116,6 +117,7 @@ const UpdateProfile = () => {
       if (response) {
         console.log(response.data.user);
         setProfile(response.data.user.profile);
+        
         // console.log(session.userInfo);
         setIsLoading(false);
       }
@@ -127,21 +129,41 @@ const UpdateProfile = () => {
   const updateProfile = async () => {
     try {
       setIsLoading(true);
-      const response = await update_user(session.userToken.accessToken, {
-        UserName: profile.userName,
-        PhoneNumber: profile.phoneNumber,
-        DateOfBirth: profile.dateOfBirth,
-        Avatar: {
-          Url: "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=large",
-          Format: 1,
-        },
-        Address: {
-          district: profile.address.district,
-          ward: profile.address.ward,
-          province: profile.address.province,
-        },
-        Gender: profile.gender,
-      });
+      const _form = new FormData();
+      _form.append("UserName", profile.userName);
+      _form.append("PhoneNumber", profile.phoneNumber ?? "");
+      _form.append("DateOfBirth", profile.dateOfBirth ?? "");
+      const parts = profile.avatar.url.split("/"); // Chia đường dẫn theo dấu '/'
+      const fileName = parts[parts.length - 1]; // Lấy phần tử cuối cùng trong mảng (tên tệp)
+      const file: any = {
+        uri: profile.avatar.url,
+        name: fileName,
+        type: "image/jpg",
+      };
+      _form.append("Avatar", file);
+      _form.append("Address.District", JSON.stringify(profile.address.district));
+      _form.append("Address.Ward", JSON.stringify(profile.address.ward));
+      _form.append("Address.Province", JSON.stringify(profile.address.province));
+      _form.append("Address.Country", JSON.stringify(profile.address.country));
+      _form.append("Gender", JSON.stringify(profile.gender));
+
+      const response = await update_user(session.userToken.accessToken, _form);
+      
+      // const response = await update_user(session.userToken.accessToken, {
+      //   UserName: profile.userName,
+      //   PhoneNumber: profile.phoneNumber,
+      //   DateOfBirth: profile.dateOfBirth,
+      //   Avatar: {
+      //     Url: "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=large",
+      //     Format: 1,
+      //   },
+      //   Address: {
+      //     district: profile.address.district,
+      //     ward: profile.address.ward,
+      //     province: profile.address.province,
+      //   },
+      //   Gender: profile.gender,
+      // });
       if (response) {
         console.log(response.data);
         setIsSuccess(true);
@@ -193,7 +215,8 @@ const UpdateProfile = () => {
     console.log(result);
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      // setImage(result.assets[0].uri);
+      handleChangeProfileState("avatar", {url: result.assets[0].uri, format: 1});
     }
   };
 
@@ -208,7 +231,9 @@ const UpdateProfile = () => {
           />
           <ScrollView>
             <View style={styles.avatarContainer}>
-              <Image source={{ uri: tempAvatar }} style={styles.image} />
+              <Pressable onPress={pickImage}>
+                <Image source={{ uri: profile.avatar? profile.avatar.url : tempAvatar }} style={styles.image} />
+              </Pressable>
             </View>
             <View style={styles.inputsContainer}>
               <View style={styles.outerUsernameInput}>
@@ -418,8 +443,8 @@ const UpdateProfile = () => {
             </View>
           </Pressable>
         </View>
-        <Button title="Pick an image from camera roll" onPress={pickImage} />
-        {image && <Image source={{ uri: image }} style={{width: 200, height: 200}} />}
+        {/* <Button title="Pick an image from camera roll" onPress={pickImage} />
+        {image && <Image source={{ uri: image }} style={{width: 200, height: 200}} />} */}
           </ScrollView>
 
           {/* <TextInput

@@ -6,6 +6,7 @@ const update_user = async (token: any, data: any) => {
         const result = await user("/users", {
             method: "PUT",
             headers: {
+                'Content-Type': 'multipart/form-data',
                 Authorization: `Bearer ${token}`,
             },
             data: data
