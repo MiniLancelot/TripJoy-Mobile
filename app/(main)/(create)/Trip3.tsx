@@ -176,14 +176,14 @@ const Trip3 = () => {
       </Pressable>
     </ScrollView>
   );
-};
+}; 
 
 const getMarkedDatesBetween = (startDate: string, endDate: string) => {
   const dates: any = {};
   let currentDate = new Date(startDate);
   const end = new Date(endDate);
 
-  while (currentDate <= end) {
+  while (currentDate < end) {
     currentDate.setDate(currentDate.getDate() + 1);
     const dateString = format(currentDate, "yyyy-MM-dd");
     if (dateString !== startDate && dateString !== endDate) {
