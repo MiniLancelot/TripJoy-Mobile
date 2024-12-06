@@ -137,8 +137,11 @@ const Trip3 = () => {
         placeholder="Nhập kinh phí dự kiến"
         keyboardType="phone-pad"
         value={data.estimatedBudget.toString()}
-        onChangeText={(text) =>
-          handleChangeProfileState("estimatedBudget", parseInt(text))
+        onChangeText={(text) =>{
+          const numericValue = text.replace(/[^0-9]/g, '');
+          handleChangeProfileState("estimatedBudget", numericValue);
+        }
+          
         }
         style={styles.input}
       />

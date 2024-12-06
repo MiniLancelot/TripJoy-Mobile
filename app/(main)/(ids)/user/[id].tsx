@@ -208,7 +208,7 @@ const User = () => {
       if (response) {
         console.log(response.data.user);
         console.log(response.data.user.avatar);
-        if(response.data.user.avatar.url){
+        if(response.data.user.avatar){
           setAvatarUrl(response.data.user.avatar.url);
         }
         setUser(response.data.user);
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "white",
-    height: 80,
+    height: 100,
   },
   headerAvatarNameConatainer: {
     flexDirection: "row",

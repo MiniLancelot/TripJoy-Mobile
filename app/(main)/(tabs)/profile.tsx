@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#fff",
-    height: 80,
+    height: 90,
   },
   headerAvatarNameConatainer: {
     flexDirection: "row",

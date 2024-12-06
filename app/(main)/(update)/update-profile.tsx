@@ -437,7 +437,7 @@ const UpdateProfile = () => {
                     { color: isLoginDisabled ? "#b9bcc6" : "#fff" },
                   ]}
                 >
-                  Đăng Nhập
+                  Cập nhật
                 </Text>
               )}
             </View>
@@ -516,9 +516,9 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
   },
   checkboxContainer: {
     flexDirection: "row",

@@ -115,11 +115,11 @@ const FriendInvitation = () => {
           refreshing={loading}
           onRefresh={refreshHandler}
           estimatedItemSize={65}
-          renderItem={({ item }: { item: { id: string; userName: string; avatar: string } }) => (
+          renderItem={({ item }: { item: { id: string; userName: string; avatar: any } }) => (
             <FriendItem
               id={item.id}
               name={item.userName}
-              avatar = {item.avatar}
+              avatar = {item.avatar.url}
               _onClick={handleFriendRequest}
             />
           )}
