@@ -133,7 +133,7 @@ const Trip3 = () => {
     !data.estimatedBudget ||
     !data.provinceStartId ||
     !data.provinceEndId||
-    !data.vehicle;
+    data.vehicle < 0;
 
     const renderCustomHeader = (date: string) => {
       const currentMonth = format(new Date(date), "MMMM yyyy", { locale: vi });
@@ -225,6 +225,7 @@ const Trip3 = () => {
       }, 500);
     } catch (err: any) {
       console.error(err);
+      setIsLoading(false);
     }
   };
 
@@ -290,31 +291,7 @@ const Trip3 = () => {
                   </Pressable>
                 )}
               </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  gap: 10,
-                  width: "100%",
-                  marginVertical: 5,
-                }}
-              >
-                <ProvinceDropdown
-                  value={data.provinceStartId}
-                  setValue={(value) =>
-                    handleChangeProfileState("provinceStartId", value)
-                  }
-                  bearer={session.userToken.accessToken}
-                  placeholder="Điểm bắt đầu"
-                />
-                <ProvinceDropdown
-                  value={data.provinceEndId}
-                  setValue={(value) =>
-                    handleChangeProfileState("provinceEndId", value)
-                  }
-                  bearer={session.userToken.accessToken}
-                  placeholder="Điểm kết thúc"
-                />
-              </View>
+              
               <Pressable
                 onPress={handleOpen}
                 style={{
@@ -349,6 +326,31 @@ const Trip3 = () => {
                   </View>
                 </View>
               </Pressable>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 10,
+                  width: "100%",
+                  marginVertical: 5,
+                }}
+              >
+                <ProvinceDropdown
+                  value={data.provinceStartId}
+                  setValue={(value) =>
+                    handleChangeProfileState("provinceStartId", value)
+                  }
+                  bearer={session.userToken.accessToken}
+                  placeholder="Điểm bắt đầu"
+                />
+                <ProvinceDropdown
+                  value={data.provinceEndId}
+                  setValue={(value) =>
+                    handleChangeProfileState("provinceEndId", value)
+                  }
+                  bearer={session.userToken.accessToken}
+                  placeholder="Điểm kết thúc"
+                />
+              </View>
               <View style={styles.outerUsernameInput}>
                 <AnimationTextInput
                   placeholder="Kinh phí dự tính (đ)"

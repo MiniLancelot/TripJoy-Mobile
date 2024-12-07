@@ -153,6 +153,7 @@ const ProvinceDropdown = ({
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
           setValue(item.value);
+          console.info(item.label);
           setIsFocus(false);
           setSearchState(false);
         }}

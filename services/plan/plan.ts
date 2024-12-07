@@ -1,5 +1,6 @@
 import { plan } from "@/utils/request";
 import showError from "@/utils/showError";
+import { getAccessToken } from "@rnmapbox/maps";
 
 const addPlan = async (data: any, accessToken: any) => {
   try {
@@ -34,4 +35,19 @@ const getAllPlan = async (accessToken: any) => {
   }
 }
 
-export { addPlan, getAllPlan };
+const getPlanLocationById = async(accessToken: any, id: string) => {
+  try {
+    const result = await plan(`/plans/${id}/planLocations`,{
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    })
+    return result;
+  }catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { addPlan, getAllPlan, getPlanLocationById };

@@ -17,6 +17,8 @@ import { Trips } from "@/constants/Trip";
 import Carousel from "react-native-reanimated-carousel";
 import TripCarousel from "@/components/Trips/TripCarousel";
 import { router } from "expo-router";
+import { getAllPlan, getPlanLocationById } from "@/services/plan/plan";
+import { useAuth } from "@/app/(auth)/AuthContext";
 
 const { width } = Dimensions.get("window");
 const IMG_HEIGHT = 200;
@@ -25,13 +27,32 @@ type TripProps = {
   title: string;
   subtitle: string;
   illustration: string;
+  id: string,
 };
 
 const Trip = () => {
+  const { session, logout } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TripProps[]>([]);
   useEffect(() => {
     setData(Trips);
+    fetchPlans();
   }, []);
+
+  const fetchPlans = async () => {
+    try {
+      const response = await getAllPlan(session.userToken.accessToken);
+      if (response) {
+        console.log(response.data.plans.data);
+        setData(response.data.plans.data);
+        setIsLoading(false);
+      }
+
+    }catch (err: any) {
+      setError(err.message);
+    }
+  }
 
   const bannerImage =
     "https://mangdendiscovery.vn/wp-content/uploads/2023/02/1-5.jpg";
@@ -76,7 +97,7 @@ const Trip = () => {
       </View>
       {/* <Carousel width={width} /> */}
       <View style={{paddingBottom: 50}}>
-        <TripCarousel />
+        <TripCarousel data={data} />
       </View>
     </ScrollView>
   );
