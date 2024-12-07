@@ -16,6 +16,7 @@ import CurrentTripCard from "@/components/Trips/CurrentTripCard";
 import { Trips } from "@/constants/Trip";
 import Carousel from "react-native-reanimated-carousel";
 import TripCarousel from "@/components/Trips/TripCarousel";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 const IMG_HEIGHT = 200;
@@ -64,7 +65,7 @@ const Trip = () => {
             count={3}
             image={currentImage}
           />
-          <Pressable style={styles.addBtn} onPress={() => alert("Hello")}>
+          <Pressable style={styles.addBtn} onPress={() => router.push("/Trip3")}>
             <FontAwesome6 name="add" size={28} color={"#fff"} />
             <Text style={{ fontSize: 16, fontWeight: "500", color: "#fff" }}>
               Tạo mới

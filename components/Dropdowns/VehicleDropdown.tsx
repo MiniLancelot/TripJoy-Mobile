@@ -82,7 +82,7 @@ export default VehicleDropdown;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    padding: 16,
+    padding: 12,
     paddingHorizontal: 0,
   },
   dropdown: {

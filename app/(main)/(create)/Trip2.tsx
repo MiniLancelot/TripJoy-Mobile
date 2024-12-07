@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, ScrollView } from "react-native";
-import DraggableFlatList, { NestableDraggableFlatList, NestableScrollContainer } from "react-native-draggable-flatlist";
-import { GestureHandlerRootView,  } from "react-native-gesture-handler";
+import DraggableFlatList, {
+  NestableDraggableFlatList,
+  NestableScrollContainer,
+} from "react-native-draggable-flatlist";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LogBox } from 'react-native';
+
+// Ignore specific warning
+LogBox.ignoreLogs([
+  'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation'
+]);
 
 export default function App() {
   const [parentList, setParentList] = useState([
@@ -25,20 +34,18 @@ export default function App() {
     },
   ]);
 
-  const handleParentDragEnd = ({ data }:any) => {
+  const handleParentDragEnd = ({ data }: any) => {
     setParentList(data);
   };
 
   const handleChildDragEnd = (listId: string, result: { data: any[] }) => {
     const { data } = result;
     setParentList((prev) =>
-      prev.map((list) =>
-        list.id === listId ? { ...list, data } : list
-      )
+      prev.map((list) => (list.id === listId ? { ...list, data } : list))
     );
   };
 
-  const renderChildList = ({ item, drag, isActive } :any) => (
+  const renderChildList = ({ item, drag, isActive }: any) => (
     <View
       style={[
         styles.childContainer,
@@ -50,14 +57,14 @@ export default function App() {
       </Text>
       <DraggableFlatList
         data={item.data}
-        keyExtractor={(child : any) => child.id}
+        keyExtractor={(child: any) => child.id}
         renderItem={renderChildItem}
         onDragEnd={(result) => handleChildDragEnd(item.id, result)}
       />
     </View>
   );
 
-  const renderChildItem = ({ item, drag, isActive }: any ) => (
+  const renderChildItem = ({ item, drag, isActive }: any) => (
     <View
       style={[
         styles.item,
@@ -72,23 +79,17 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <ScrollView>
+      {/* <ScrollView> */}
         <NestableScrollContainer>
-      <NestableDraggableFlatList
-        data={parentList}
-        keyExtractor={(item) => item.id}
-        renderItem={renderChildList}
-        onDragEnd={handleParentDragEnd}
-      />
-      <NestableDraggableFlatList
-        data={parentList}
-        keyExtractor={(item) => item.id}
-        renderItem={renderChildList}
-        onDragEnd={handleParentDragEnd}
-      />
-      </NestableScrollContainer>
-      </ScrollView>
-      
+          <DraggableFlatList
+            data={parentList}
+            keyExtractor={(item) => item.id}
+            renderItem={renderChildList}
+            onDragEnd={handleParentDragEnd}
+          />
+        
+        </NestableScrollContainer>
+      {/* </ScrollView> */}
     </GestureHandlerRootView>
   );
 }
