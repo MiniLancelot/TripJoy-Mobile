@@ -16,6 +16,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { getPlanLocationById } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
+import { router } from "expo-router";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;
@@ -165,7 +166,7 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
                   />
                 ))}
                 <TouchableOpacity
-                  onPress={() => console.log("Chi tiết")}
+                  onPress={() => router.push(`/trip/${item.id}`)}
                   style={{ marginLeft: 120 }}
                 >
                   <Text

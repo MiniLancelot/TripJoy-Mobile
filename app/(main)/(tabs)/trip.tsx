@@ -93,7 +93,11 @@ const Trip = () => {
             </Text>
           </Pressable>
         </View>
+        <View style={{flexDirection: "row", gap : 226}}>
         <Text style={styles.mainText2}>Đã đi</Text>
+        <Text style={styles.seeMore}>Tất cả</Text>
+        </View>
+        
       </View>
       {/* <Carousel width={width} /> */}
       <View style={{paddingBottom: 50}}>
@@ -175,6 +179,13 @@ const styles = StyleSheet.create({
     color: "#8D909B",
     fontWeight: "800",
     fontSize: 24,
+    paddingLeft: 5,
+    marginTop: 20,
+  },
+  seeMore: {
+    color: "#8D909B",
+    fontWeight: "600",
+    fontSize: 20,
     paddingLeft: 5,
     marginTop: 20,
   },

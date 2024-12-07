@@ -35,7 +35,7 @@ const getAllPlan = async (accessToken: any) => {
   }
 }
 
-const getPlanLocationById = async(accessToken: any, id: string) => {
+const getPlanLocationById = async(accessToken: any, id: any) => {
   try {
     const result = await plan(`/plans/${id}/planLocations`,{
       method: "GET",

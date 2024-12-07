@@ -4,7 +4,7 @@ import { Stack } from 'expo-router'
 
 const Layout = () => {
   return (
-    <Stack screenOptions={{headerTitleAlign: 'center', headerShadowVisible: false, headerLargeTitle: true}}>
+    <Stack screenOptions={{headerTitleAlign: 'center', headerShadowVisible: false, headerLargeTitle: true, headerShown: false}}>
         <Stack.Screen name="Trip1"/>
         <Stack.Screen name="Trip2"/>
     </Stack>
