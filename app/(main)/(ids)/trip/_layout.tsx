@@ -16,7 +16,8 @@ const _layout = () => {
           shadowColor: "blue",
         },
       }}>
-        <Tabs.Screen name="[id]" options={{title: "Hello"}}/>
+        <Tabs.Screen name="[id]" options={{title: "Bản đồ"}}/>
+        <Tabs.Screen name="planLocations" options={{title: "Lộ trình"}}/>
     </Tabs>
   )
 }

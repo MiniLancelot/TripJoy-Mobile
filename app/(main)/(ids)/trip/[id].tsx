@@ -1,4 +1,65 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+// import { View, Text } from 'react-native'
+// import React, { useEffect, useState } from 'react'
+// import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+// import { useAuth } from '@/app/(auth)/AuthContext';
+// import { getPlanLocationById } from '@/services/plan/plan';
+
+// type Province = {
+//     provinceId: string;
+//     provinceName: string;
+//   };
+
+//   type TripProps = {
+//     id: string;
+//     title: string;
+//     estimatedStartDate: string;
+//     estimatedEndDate: string;
+//     provinceStart: Province;
+//     provinceEnd: Province;
+//   }
+
+// const ChosenTrip = () => {
+//     const { id } = useLocalSearchParams();
+//   const router = useRouter();
+//   const { session } = useAuth();
+//   const navigation = useNavigation();
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+
+//   const fetchPlan = async () => {
+//     try {
+//       setIsLoading(true);
+//       const response = await getPlanLocationById(session.userToken.accessToken, id);
+//       if (response) {
+//         console.log(response.data.plan.title);
+//         // setPlanData(response.data.plan);
+//         setIsLoading(false);
+//       }
+//     } catch (err: any) {
+//       setError(err.message);
+//       console.log("fail")
+//     }
+//   }
+//   useEffect(() => {
+//     fetchPlan();
+//   }, [])
+
+//   return (
+//     <View>
+//       <Text>id</Text>
+//     </View>
+//   )
+// }
+
+// export default ChosenTrip
+
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import {
   Text,
   StyleSheet,
@@ -8,6 +69,7 @@ import {
   FlatList,
   Alert,
   KeyboardAvoidingView,
+  Pressable,
 } from "react-native";
 import Mapbox, {
   Camera,
@@ -16,21 +78,85 @@ import Mapbox, {
   SymbolLayer,
   Images,
 } from "@rnmapbox/maps";
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+  BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
 import { point, featureCollection } from "@turf/helpers";
 import axios from "axios";
-import { useRouter } from "expo-router"; // Import the useRouter hook
+import { useRouter, useLocalSearchParams, useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/app/(auth)/AuthContext";
+import { getPlanLocationById } from "@/services/plan/plan";
+import { useTabStore } from "@/utils/store";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import MyProfileModal from "@/components/Modals/MyProfileModal";
+import CalendarModal from "@/components/Modals/CalendarModal";
+import { Calendar } from "react-native-calendars";
+
+type Province = {
+  provinceId: string;
+  provinceName: string;
+};
+
+type SearchParams = {
+  id: string;
+};
+
+type TripProps = {
+  id: string;
+  title: string;
+  estimatedStartDate: string;
+  estimatedEndDate: string;
+  provinceStart: Province;
+  provinceEnd: Province;
+};
 
 const accessToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 Mapbox.setAccessToken(accessToken);
 
-const pinIcon = require("@/assets/images/others/pin.png"); // Custom pin icon
+const ChosenTrip = () => {
+  const { id } = useLocalSearchParams<SearchParams>();
+  const setSharedId = useTabStore((state) => state.setSharedId);
+  const { session } = useAuth();
+  const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const today = new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState<string | null>(today);
 
-const Map = () => {
+
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [currentLocation, setCurrentLocation] = useState<number[] | null>(null);
   const cameraRef = useRef<any>(null);
-  const router = useRouter(); // Get the router instance
+  const router = useRouter();
+  const pinIcon = require("@/assets/images/others/pin.png");
+
+  const fetchPlan = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getPlanLocationById(
+        session.userToken.accessToken,
+        id
+      );
+      if (response) {
+        console.log(response.data.plan.title);
+        // setPlanData(response.data.plan);
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message);
+      console.log("fail");
+    }
+  };
+  useEffect(() => {
+    fetchPlan();
+  }, []);
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) return;
@@ -47,7 +173,7 @@ const Map = () => {
         setSearchResults(results);
       } else {
         setSearchResults([]);
-        Alert.alert("No Results", "No locations found within Vietnam.");
+        // Alert.alert("No Results", "No locations found within Vietnam.");
       }
     } catch (error) {
       console.error("Error fetching geocoding results:", error);
@@ -63,6 +189,10 @@ const Map = () => {
     return () => clearTimeout(delayDebounce);
   }, [searchQuery, handleSearch]);
 
+  useEffect(() => {
+    if (id) setSharedId(id);
+  }, [id]);
+
   const handleSelectLocation = (location: any) => {
     const longitude = parseFloat(location.lon);
     const latitude = parseFloat(location.lat);
@@ -74,8 +204,10 @@ const Map = () => {
       zoomLevel: 15,
       duration: 1000,
     });
+    // handleOpen();
 
     setSearchResults([]); // Clear results after selection
+    setSearchQuery("");
     setSearchQuery(location.display_name); // Update search box with the selected place name
 
     Alert.alert(
@@ -88,66 +220,159 @@ const Map = () => {
     ? featureCollection([point(currentLocation)])
     : null;
 
+  const snapPoints = useMemo(() => ["30%"], []);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  // const handleOpen = () => bottomSheetRef.current?.expand();
+  // const handleSheetChanges = useCallback((index: number) => {
+  //   console.log("handleSheetChanges", index);
+  // }, []);
+
+  const handleDayPress = (day: any) => {
+    setSelectedDate(day.dateString);
+    console.log("Selected Date:", day.dateString);
+    setIsModalOpen(false); // Close the modal on date selection
+  };
+
   return (
     <KeyboardAvoidingView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
-
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for a place in Vietnam..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-
-      {/* Display search results overlayed on top of the map */}
-      {searchQuery.trim() && searchResults.length > 0 && (
-        <FlatList
-          data={searchResults}
-          keyExtractor={(item, index) => `${item.place_id}-${index}`}
-          style={styles.resultsOverlay}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.resultItem}
-              onPress={() => handleSelectLocation(item)}
-            >
-              <Text style={styles.resultText}>{item.display_name}</Text>
+      <GestureHandlerRootView>
+        {/* <BottomSheetModalProvider> */}
+        <View style={styles.topContainer}>
+          <View style={styles.backBtnWrapper}>
+            <TouchableOpacity onPress={() => router.replace("/(tabs)/trip")}>
+              <Ionicons name="arrow-back-outline" size={25} color="#4a4d52" />
             </TouchableOpacity>
-          )}
-        />
-      )}
+          </View>
+          <View style={styles.searchBoxContainer}>
+            <TextInput
+              autoFocus
+              style={styles.searchBar}
+              placeholder="Tìm kiếm"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+        </View>
 
-      <View style={styles.mapContainer}>
-        <MapView
-          style={styles.map}
-          styleURL="mapbox://styles/mapbox/streets-v12"
-        >
-          <Camera
-            ref={cameraRef}
-            followUserLocation={false}
-            zoomLevel={15}
-            centerCoordinate={currentLocation || [105.85, 21.03]} // Default to Hanoi
+        {searchQuery.trim() && searchResults.length > 0 && (
+          <FlatList
+            data={searchResults}
+            keyExtractor={(item, index) => `${item.place_id}-${index}`}
+            ListHeaderComponent={<View style={{ height: 40 }} />}
+            ListFooterComponent={<View style={{ height: 10 }} />}
+            style={styles.resultsOverlay}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.resultItem}
+                onPress={() => handleSelectLocation(item)}
+              >
+                <View
+                  style={{
+                    borderBottomWidth: 1,
+                    paddingBottom: 10,
+                    borderBottomColor: "#eee",
+                  }}
+                >
+                  <Text style={styles.resultText}>{item.display_name}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
           />
+        )}
 
-          {/* Show selected location pin */}
-          {cameraFeature && (
-            <ShapeSource id="cameraLocation" shape={cameraFeature}>
-              <SymbolLayer
-                id="selected-location-pin"
-                style={{
-                  iconImage: "pinIcon",
-                  iconSize: 0.5, // Adjust size
-                }}
-              />
-              <Images images={{ pinIcon }} />
-            </ShapeSource>
-          )}
-        </MapView>
-      </View>
+        <View style={styles.mapContainer}>
+          <MapView
+            style={styles.map}
+            styleURL="mapbox://styles/mapbox/streets-v12"
+          >
+            <Camera
+              ref={cameraRef}
+              followUserLocation={false}
+              zoomLevel={15}
+              centerCoordinate={currentLocation || [108.218, 16.06]} // Default to Hanoi
+            />
+
+            {/* Show selected location pin */}
+            {cameraFeature && (
+              <ShapeSource id="cameraLocation" shape={cameraFeature}>
+                <SymbolLayer
+                  id="selected-location-pin"
+                  style={{
+                    iconImage: "pinIcon",
+                    iconSize: 0.5, // Adjust size
+                  }}
+                />
+                <Images images={{ pinIcon }} />
+              </ShapeSource>
+            )}
+          </MapView>
+        </View>
+        <BottomSheet
+          ref={bottomSheetRef}
+          // onChange={handleSheetChanges}
+          index={0}
+          snapPoints={snapPoints}
+          enablePanDownToClose={false}
+        >
+          <BottomSheetView style={styles.contentContainer}>
+            <Text style={{ fontSize: 20, fontWeight: "500" }}>
+              Thêm địa điểm trên chuyến đi 🎉
+            </Text>
+            <View style={{ gap: 5, marginTop: 35 }}>
+              <Text>Name</Text>
+              <Text>Address</Text>
+              <Text>Long</Text>
+              <Text>Lat</Text>
+              <TouchableOpacity onPress={() => setIsModalOpen(true)}>
+                <Text>Date</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{ marginTop: 10 }}
+                onPress={() => console.log("Thêm vào lộ trình")}
+              >
+                <Text>Thêm địa điểm vào lộ trình</Text>
+              </TouchableOpacity>
+            </View>
+            <View></View>
+          </BottomSheetView>
+        </BottomSheet>
+
+        <CalendarModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      >
+        <View style={styles.modalContainer}>
+        <Calendar
+            current={selectedDate} // Default value if no date is selected
+            onDayPress={handleDayPress}
+            markedDates={
+              selectedDate
+                ? {
+                    [selectedDate]: {
+                      selected: true,
+                      disableTouchEvent: true,
+                      selectedColor: "#46e835",
+                    },
+                  }
+                : {}
+            }
+            theme={{
+              todayTextColor: "#46e835",
+              arrowColor: "#46e835",
+              selectedDayBackgroundColor: "#46e835",
+              dotColor: "#46e835",
+            }}
+          />
+        </View>
+      </CalendarModal>
+        {/* </BottomSheetModalProvider> */}
+      </GestureHandlerRootView>
     </KeyboardAvoidingView>
   );
 };
@@ -155,6 +380,10 @@ const Map = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
   },
   backButton: {
     position: "absolute",
@@ -187,20 +416,23 @@ const styles = StyleSheet.create({
   },
   resultsOverlay: {
     position: "absolute",
-    top: 110, // Position below the search bar and back button
-    left: 10,
-    right: 10,
-    maxHeight: 200, // Limit list height
+    top: 54,
+    width: "94.2%",
+    right: 12,
+    maxHeight: 200,
     backgroundColor: "#fff",
-    zIndex: 3, // Ensure it's above the map
-    borderRadius: 5,
-    borderColor: "#ccc",
-    borderWidth: 1,
+    zIndex: 1,
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderRadius: 10,
+    // borderColor: "#ccc",
+    // borderWidth: 1,
   },
   resultItem: {
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    paddingLeft: 50,
+    // borderBottomWidth: 1,
+    // borderBottomColor: "#eee",
   },
   resultText: {
     fontSize: 16,
@@ -211,6 +443,72 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
+
+  topContainer: {
+    flexDirection: "row",
+    width: "94%",
+    paddingHorizontal: 15,
+    zIndex: 2,
+    position: "absolute",
+    marginTop: 35,
+    left: 12,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 2,
+    borderRadius: 40,
+  },
+
+  backBtnWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingLeft: 10,
+  },
+
+  searchBar: {
+    backgroundColor: "#fff",
+    // borderColor: "#E0E2DB",
+    // borderWidth: 1.2,
+    borderRadius: 100,
+    // borderWidth: 1,
+    // borderColor: "#e7e8ee",
+    margin: 5,
+    padding: 5,
+
+    justifyContent: "center",
+    alignItems: "center",
+    width: "90%",
+    height: 37,
+    fontSize: 16,
+    lineHeight: 24,
+    paddingLeft: 10,
+    paddingRight: 20,
+    fontWeight: "400",
+  },
+  searchBoxContainer: {
+    // marginTop: 10,
+    // marginBottom: 10,
+    alignItems: "center",
+    // justifyContent: "center",
+    flexDirection: "row",
+  },
+
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 16,
+    transform: [{ translateX: -10 }],
+  },
+  modalOptionContainer: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "row",
+    gap: 20,
+  },
+  modalText: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
 });
 
-export default Map;
+export default ChosenTrip;
