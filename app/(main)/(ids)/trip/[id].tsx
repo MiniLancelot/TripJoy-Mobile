@@ -89,7 +89,7 @@ import axios from "axios";
 import { useRouter, useLocalSearchParams, useNavigation } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/app/(auth)/AuthContext";
-import { getPlanLocationById } from "@/services/plan/plan";
+import { getPlanLocationById, addPlanLocation } from "@/services/plan/plan";
 import { useTabStore } from "@/utils/store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MyProfileModal from "@/components/Modals/MyProfileModal";
@@ -114,6 +114,14 @@ type TripProps = {
   provinceEnd: Province;
 };
 
+type PlanLocationProps = {
+  longitude: number;
+  latitude: number;
+  name: string;
+  address: string;
+  estimatedStartDate: string;
+}
+
 const accessToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 Mapbox.setAccessToken(accessToken);
 
@@ -128,11 +136,21 @@ const ChosenTrip = () => {
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string | null>(today);
 
+  const [planLocation, setPlanLocation] = useState<PlanLocationProps>({
+    name: "",
+    address: "",
+    longitude: 0,
+    latitude: 0,
+    estimatedStartDate: "",
+  });
+  
+  const [planData, setPlanData] = useState<TripProps | null>(null);
 
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [currentLocation, setCurrentLocation] = useState<number[] | null>(null);
+  const [location, setLocation] = useState<string[] | null>(null);
   const cameraRef = useRef<any>(null);
   const router = useRouter();
   const pinIcon = require("@/assets/images/others/pin.png");
@@ -154,6 +172,7 @@ const ChosenTrip = () => {
       console.log("fail");
     }
   };
+  
   useEffect(() => {
     fetchPlan();
   }, []);
@@ -170,6 +189,7 @@ const ChosenTrip = () => {
       const results = response.data;
 
       if (results.length) {
+        // console.log("Search results:", results);
         setSearchResults(results);
       } else {
         setSearchResults([]);
@@ -196,7 +216,12 @@ const ChosenTrip = () => {
   const handleSelectLocation = (location: any) => {
     const longitude = parseFloat(location.lon);
     const latitude = parseFloat(location.lat);
+    const name = location.name;
+    const parts = location.display_name.split(', ');
+    const address = parts.slice(1).join(', ');
     setCurrentLocation([longitude, latitude]);
+    // setLocation([name, address]);
+    setPlanLocation({name: name, address: address, longitude: longitude, latitude: latitude, estimatedStartDate: selectedDate || ""});
 
     // Move the camera to the selected location
     cameraRef.current?.setCamera({
@@ -212,7 +237,7 @@ const ChosenTrip = () => {
 
     Alert.alert(
       "Selected Location",
-      `Latitude: ${latitude}, Longitude: ${longitude}`
+      `Latitude: ${latitude}, Longitude: ${longitude}, Name: ${name}, Address: ${address}`
     );
   };
 
@@ -230,7 +255,46 @@ const ChosenTrip = () => {
   const handleDayPress = (day: any) => {
     setSelectedDate(day.dateString);
     console.log("Selected Date:", day.dateString);
+    setPlanLocation((prev) =>
+      (prev = {
+        ...prev,
+        estimatedStartDate: day.dateString,
+      }));
+    console.log("Plan Location:", planLocation);
     setIsModalOpen(false); // Close the modal on date selection
+  };
+
+  const handleAddLocation = () => {
+    if (!planLocation.name || !planLocation.address) {
+      Alert.alert("Error", "Please select a location first.");
+      return;
+    }
+
+    if (!planLocation.estimatedStartDate) {
+      Alert.alert("Error", "Please select a date first.");
+      return;
+    }
+
+    addPlanLocation(
+      {planLocation:{
+        name: planLocation.name,
+        address: planLocation.address,
+        longitude: planLocation.longitude,
+        latitude: planLocation.latitude,
+        estimatedStartDate: planLocation.estimatedStartDate,
+      }},
+      session.userToken.accessToken,
+      id
+    )
+      .then((response) => {
+        console.log("Add Plan Location Response:", response.data);
+        Alert.alert("Success", "Location added to the trip.");
+        // navigation.navigate("/(tabs)/trip");
+      })
+      .catch((error) => {
+        console.error("Error adding location to trip:", error);
+        Alert.alert("Error", "Failed to add location to the trip.");
+      });
   };
 
   return (
@@ -324,17 +388,17 @@ const ChosenTrip = () => {
               Thêm địa điểm trên chuyến đi 🎉
             </Text>
             <View style={{ gap: 5, marginTop: 35 }}>
-              <Text>Name</Text>
-              <Text>Address</Text>
-              <Text>Long</Text>
-              <Text>Lat</Text>
+              <Text>Name: {planLocation.name ?? ""}</Text>
+              <Text>Address: {planLocation.address ?? ""}</Text>
+              <Text>Long: {planLocation.longitude}</Text>
+              <Text>Lat : {planLocation.latitude}</Text>
               <TouchableOpacity onPress={() => setIsModalOpen(true)}>
-                <Text>Date</Text>
+                <Text>Date: {planLocation.estimatedStartDate ?? ""}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={{ marginTop: 10 }}
-                onPress={() => console.log("Thêm vào lộ trình")}
+                onPress={handleAddLocation}
               >
                 <Text>Thêm địa điểm vào lộ trình</Text>
               </TouchableOpacity>

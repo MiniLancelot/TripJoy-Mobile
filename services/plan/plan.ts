@@ -49,5 +49,70 @@ const getPlanLocationById = async(accessToken: any, id: any) => {
     throw error;
   }
 }
+const getPlanById = async(accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/plans/${id}`,{
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    })
+    return result;
+  }catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
 
-export { addPlan, getAllPlan, getPlanLocationById };
+const addPlanLocation = async (data: any, accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/plans/${id}/planLocations`, {
+      method: "POST",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const getPlanLocationsByPlanId = async (accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/plans/${id}/planLocations`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const changeOrderPlanLocations = async (data: any, accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/plans/${id}/planLocations/changeOrder`, {
+      method: "PATCH",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations };
