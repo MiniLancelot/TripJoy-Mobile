@@ -1,4 +1,10 @@
-import { View, Text, ActivityIndicator, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { useTabStore } from "@/utils/store";
 import {
@@ -62,7 +68,7 @@ const planLocations = () => {
 
   useEffect(() => {
     console.log("Plan Locations: ", plan);
-  },[plan]);
+  }, [plan]);
 
   useEffect(() => {
     if (isRefreshing) {
@@ -91,37 +97,39 @@ const planLocations = () => {
     }
   };
 
-  // if (loading) {
-  //   return (
-  //     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-  //       <ActivityIndicator size="large" color="gray" />
-  //       <Text style={styles.loadingText}>Loading...</Text>
-  //     </View>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color="gray" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
 
-  // if (error) {
-  //   return (
-  //     <View>
-  //       <Text style={styles.errorText}>Error: {error}</Text>
-  //     </View>
-  //   );
-  // }
+  if (error) {
+    return (
+      <View>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
 
   return (
-    <View>
-      <Text>Plan Locations : {sharedId}</Text>
-      <Pressable onPress={() => setIsRefreshing(true)}>
-        <Text>Refresh</Text>
-      </Pressable>
-      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "seashell" }}>
+    <View style={{ flex: 1, backgroundColor: "seashell" }}>
+      <GestureHandlerRootView>
+        <Text>Plan Locations : {sharedId}</Text>
+        <Pressable onPress={() => setIsRefreshing(true)}>
+          <Text>Refresh</Text>
+        </Pressable>
         <DraggableFlatList
           data={plan}
           keyExtractor={(item) => item.planLocationId}
-          renderItem={({ item }) => (
+          renderItem={({ item, drag }) => (
             <View>
-              <Text style={styles.title}>{item.locationId}</Text>
-              <Text>{item.planLocationId}</Text>
+              <Pressable onLongPress={drag}>
+                <Text style={styles.title}>{item.locationId}</Text>
+                <Text>{item.planLocationId}</Text>
+              </Pressable>
             </View>
           )}
           onDragEnd={({ from, to }) => {
