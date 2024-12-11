@@ -172,7 +172,7 @@ const ChosenTrip = () => {
       console.log("fail");
     }
   };
-  
+
   useEffect(() => {
     fetchPlan();
   }, []);
@@ -245,7 +245,7 @@ const ChosenTrip = () => {
     ? featureCollection([point(currentLocation)])
     : null;
 
-  const snapPoints = useMemo(() => ["30%"], []);
+  const snapPoints = useMemo(() => ["40%"], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   // const handleOpen = () => bottomSheetRef.current?.expand();
   // const handleSheetChanges = useCallback((index: number) => {

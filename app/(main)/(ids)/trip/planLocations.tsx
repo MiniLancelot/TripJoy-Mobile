@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   Pressable,
+  Image,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useTabStore } from "@/utils/store";
@@ -18,12 +19,14 @@ import { FlashList } from "@shopify/flash-list";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import DraggableFlatList from "react-native-draggable-flatlist";
 import { fi, se } from "date-fns/locale";
+import { router } from "expo-router";
 
 type PlanLocationsProps = {
   planId: string;
   locationId: string;
   planLocationId: string;
   order: number;
+  images: string;
 };
 
 const planLocations = () => {
@@ -33,6 +36,9 @@ const planLocations = () => {
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
+
+  const tempAvatar =
+    "https://icons-for-free.com/iff/png/512/mountains+photo+photos+placeholder+sun+icon-1320165661388177228.png";
 
   const fetchData = async () => {
     try {
@@ -50,6 +56,7 @@ const planLocations = () => {
               locationId: item.locationId,
               planLocationId: item.planLocationId,
               order: item.order,
+              images: item.images[0].url,
             })
           );
         console.log("Filtered Data: ", filteredData);
@@ -62,6 +69,11 @@ const planLocations = () => {
       setLoading(false);
     }
   };
+
+  const planDetail = (id: string) => {
+    router.push(`/(main)/(ids)/trip/updatePlanLocation/${id}`);
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -126,9 +138,20 @@ const planLocations = () => {
           keyExtractor={(item) => item.planLocationId}
           renderItem={({ item, drag }) => (
             <View>
-              <Pressable onLongPress={drag}>
+              <Pressable
+                onLongPress={drag}
+                onPress={() => planDetail(item.planLocationId)}
+              >
                 <Text style={styles.title}>{item.locationId}</Text>
                 <Text>{item.planLocationId}</Text>
+                <Pressable>
+                  <Image
+                    source={{
+                      uri: item.images ?? tempAvatar,
+                    }}
+                    style={styles.image}
+                  />
+                </Pressable>
               </Pressable>
             </View>
           )}
@@ -173,6 +196,11 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 10,
+  },
+  image: {
+    width: 280,
+    height: 220,
+    borderRadius: 30,
   },
   avatar2: {
     width: 250,

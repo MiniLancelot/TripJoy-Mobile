@@ -115,4 +115,22 @@ const changeOrderPlanLocations = async (data: any, accessToken: any, id: any) =>
   }
 }
 
-export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations };
+const addPlanLocationImage = async (data: any, accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/planLocations/${id}/images/add`, {
+      method: "PATCH",
+      data: data,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${accessToken}`
+      },
+
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage };
