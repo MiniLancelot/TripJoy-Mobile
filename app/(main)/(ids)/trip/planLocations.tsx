@@ -27,6 +27,8 @@ type PlanLocationsProps = {
   planLocationId: string;
   order: number;
   images: string;
+  name: string;
+  address: string;
 };
 
 const planLocations = () => {
@@ -51,12 +53,14 @@ const planLocations = () => {
         console.log("Data: ", data.data.planLocations.data);
         const filteredData: PlanLocationsProps[] =
           data.data.planLocations.data.map(
-            (item: any): PlanLocationsProps => ({
-              planId: item.planId,
-              locationId: item.locationId,
-              planLocationId: item.planLocationId,
-              order: item.order,
-              images: item.images[0].url,
+            (_item: any): PlanLocationsProps => ({
+              planId: _item.planId,
+              locationId: _item.locationId,
+              planLocationId: _item.planLocationId,
+              order: _item.order,
+              images: _item.images == null ? _item.images[0].url : "",
+              name: _item.locationName,
+              address: _item.locationAddress,
             })
           );
         console.log("Filtered Data: ", filteredData);
@@ -65,6 +69,7 @@ const planLocations = () => {
       }
     } catch (_error: any) {
       setError(_error);
+      console.log("Error: ", _error);
     } finally {
       setLoading(false);
     }
@@ -142,16 +147,16 @@ const planLocations = () => {
                 onLongPress={drag}
                 onPress={() => planDetail(item.planLocationId)}
               >
-                <Text style={styles.title}>{item.locationId}</Text>
-                <Text>{item.planLocationId}</Text>
-                <Pressable>
+                <Text style={styles.title}>{item.name}</Text>
+                <Text>{item.address}</Text>
+                {item.images == "" ? (<Pressable>
                   <Image
                     source={{
                       uri: item.images ?? tempAvatar,
                     }}
                     style={styles.image}
                   />
-                </Pressable>
+                </Pressable>): null}
               </Pressable>
             </View>
           )}
