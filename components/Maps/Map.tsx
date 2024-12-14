@@ -1,5 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Text, StyleSheet, View, Button, TouchableOpacity, Alert } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  View,
+  Button,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import Mapbox, {
   Camera,
   MapView,
@@ -20,7 +27,7 @@ const Map = () => {
   const [distance, setDistance] = useState<number | null>(null);
   const [currentLocation, setCurrentLocation] = useState<number[] | null>(null);
   const cameraRef = useRef<any>(null);
-  const [isAnimating, setIsAnimating] = useState(false); // Track if animation is active
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const pin = require("@/assets/images/others/pin.png");
   const camIcon = require("@/assets/images/others/avatarTest.webp");
@@ -40,15 +47,9 @@ const Map = () => {
           .slice(1, -1)
           .map((coord) => coord.join("%2C"))
           .join("%3B");
-        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
-          "%2C"
-        )}%3B${waypoints}%3B${end.join(
-          "%2C"
-        )}?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${accessToken}`;
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join("%2C")}%3B${waypoints}%3B${end.join("%2C")}?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${accessToken}`;
       } else {
-        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
-          ","
-        )};${end.join(",")}?geometries=geojson&access_token=${accessToken}`;
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${accessToken}`;
       }
 
       try {
@@ -93,30 +94,28 @@ const Map = () => {
 
   const startAnimation = () => {
     if (!route || !route.coordinates.length) return;
-  
-    setIsAnimating(true); // Set animation as active
-  
+
+    setIsAnimating(true);
+
     let index = 0;
     const interval = setInterval(() => {
       if (index < route.coordinates.length) {
         const nextLocation = route.coordinates[index];
         setCurrentLocation(nextLocation);
-  
-        // Use Camera's ref to animate the camera view
+
         cameraRef.current?.setCamera({
           centerCoordinate: nextLocation,
           zoomLevel: 15,
-          duration: 1000, // Smooth animation
+          duration: 1000,
         });
         index++;
       } else {
         clearInterval(interval);
-        setIsAnimating(false); // End of animation
-  
-        // Alert when route is finished
+        setIsAnimating(false);
+
         Alert.alert("Route Finished", "You have reached your destination!");
       }
-    }, 1000); // Update location every 1 second
+    }, 1000);
   };
 
   const locationPoints = Locations.map((location, index) => ({
@@ -188,25 +187,26 @@ const Map = () => {
           )}
         </MapView>
       </View>
+      <View style={{position: "absolute", bottom: 10, right: 10, backgroundColor:"white", borderRadius: 20}}>
+        {distance && (
+          <View style={styles.distanceContainer}>
+            <Text style={styles.distanceText}>
+              Khoảng cách: {(distance / 1000).toFixed(2)} km
+            </Text>
+          </View>
+        )}
 
-      {distance && (
-        <View style={styles.distanceContainer}>
-          <Text style={styles.distanceText}>
-            Khoảng cách: {(distance / 1000).toFixed(2)} km
-          </Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={startAnimation}
+            disabled={isAnimating} // Disable button during animation
+          >
+            <Text style={styles.buttonText}>
+              {isAnimating ? "Đang chạy..." : "Bắt đầu"}
+            </Text>
+          </TouchableOpacity>
         </View>
-      )}
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={startAnimation}
-          disabled={isAnimating} // Disable button during animation
-        >
-          <Text style={styles.buttonText}>
-            {isAnimating ? "Đang chạy..." : "Bắt đầu"}
-          </Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -217,10 +217,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mapContainer: {
-    flex: 3 / 4,
-    margin: 15,
+    // flex: 3 / 4,
+    flex: 1,
+    // margin: 15,
     borderRadius: 10,
     overflow: "hidden",
+
   },
   map: {
     flex: 1,

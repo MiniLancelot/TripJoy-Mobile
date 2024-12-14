@@ -144,7 +144,7 @@ const ProvinceDropdown = ({
         valueField="value"
         placeholder={
           !isFocus
-            ? data.find((item) => item.value === value)?.label || "Chọn tỉnh/thành phố"
+            ? data.find((item) => item.value === value)?.label || "Tỉnh/thành phố"
             : "..."
         }
         searchPlaceholder="Search..."
@@ -153,6 +153,7 @@ const ProvinceDropdown = ({
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
           setValue(item.value);
+          console.info(item.label);
           setIsFocus(false);
           setSearchState(false);
         }}
@@ -173,6 +174,7 @@ export default ProvinceDropdown;
 
 const styles = StyleSheet.create({
   container: {
+    width: "49%",
     backgroundColor: "white",
     padding: 16,
     paddingHorizontal: 0,

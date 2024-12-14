@@ -1,142 +1,124 @@
-import { View, Text, StyleSheet, TextInput, ActivityIndicator } from "react-native";
-import React, { useEffect, useState } from "react";
-import TextCarousel from "@/components/Others/TextCarousel";
-import get_user_search from "@/services/user/getUserBySearch";
-import { useAuth } from "@/app/(auth)/AuthContext";
-import { FlashList } from "@shopify/flash-list";
+import React, { useState } from "react";
+import { StyleSheet, View, Text, ScrollView } from "react-native";
+import DraggableFlatList, {
+  NestableDraggableFlatList,
+  NestableScrollContainer,
+} from "react-native-draggable-flatlist";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LogBox } from 'react-native';
 
+// Ignore specific warning
+LogBox.ignoreLogs([
+  'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation'
+]);
 
-type UserProps = {
-  id: string;
-  userName: string;
-  email: string;
-  phoneNumber: string | null;
-  avatar: string | null;
-  birthday: string | null;
-  address: string | null;
-  gender: boolean | null;
-};
+export default function App() {
+  const [parentList, setParentList] = useState([
+    {
+      id: "list1",
+      title: "List 1",
+      data: [
+        { id: "1", label: "Item 1" },
+        { id: "2", label: "Item 2" },
+        { id: "3", label: "Item 3" },
+      ],
+    },
+    {
+      id: "list2",
+      title: "List 2",
+      data: [
+        { id: "4", label: "Item 4" },
+        { id: "5", label: "Item 5" },
+        { id: "6", label: "Item 6" },
+      ],
+    },
+  ]);
 
-const Trip2 = () => {
-  const { session } = useAuth();
-  const [users, setUsers] = useState<UserProps[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    fetchName();
-  }, []);
-
-  const fetchName = async () => {
-    try {
-      const result = await get_user_search(session.userToken.accessToken, "");
-      if (result) {
-        setUsers(result.data.users.data);
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleParentDragEnd = ({ data }: any) => {
+    setParentList(data);
   };
 
-  const filteredUsers = searchQuery
-  ? users.filter(user =>
-      user.userName.toLowerCase().startsWith(searchQuery.toLowerCase())
-    )
-  : [];
-
-  const renderItem = ({ item }: { item: UserProps }) => {
-    const startIndex = item.userName.toLowerCase().indexOf(searchQuery.toLowerCase());
-    const endIndex = startIndex + searchQuery.length;
-
-    return (
-      <Text>
-        {item.userName.substring(0, startIndex)}
-        <Text style={styles.highlightText}>
-          {item.userName.substring(startIndex, endIndex)}
-        </Text>
-        {item.userName.substring(endIndex)}
-      </Text>
+  const handleChildDragEnd = (listId: string, result: { data: any[] }) => {
+    const { data } = result;
+    setParentList((prev) =>
+      prev.map((list) => (list.id === listId ? { ...list, data } : list))
     );
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.searchBoxContainer}>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search"
-          value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
-        />
-      </View>
-      <View style={styles.innerContainer}>
-        {loading ? (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <ActivityIndicator size="large" color="gray" />
-          </View>
-        ) : (
-          <FlashList
-            renderItem={renderItem}
-            data={filteredUsers}
-            estimatedItemSize={50}
-          />
-        )}
-      </View>
+  const renderChildList = ({ item, drag, isActive }: any) => (
+    <View
+      style={[
+        styles.childContainer,
+        { backgroundColor: isActive ? "lightblue" : "white" },
+      ]}
+    >
+      <Text style={styles.heading} onLongPress={drag}>
+        {item.title}
+      </Text>
+      <DraggableFlatList
+        data={item.data}
+        keyExtractor={(child: any) => child.id}
+        renderItem={renderChildItem}
+        onDragEnd={(result) => handleChildDragEnd(item.id, result)}
+      />
     </View>
   );
-};
+
+  const renderChildItem = ({ item, drag, isActive }: any) => (
+    <View
+      style={[
+        styles.item,
+        { backgroundColor: isActive ? "lightcoral" : "white" },
+      ]}
+    >
+      <Text style={styles.text} onLongPress={drag}>
+        {item.label}
+      </Text>
+    </View>
+  );
+
+  return (
+    <GestureHandlerRootView style={styles.container}>
+      {/* <ScrollView> */}
+        <NestableScrollContainer>
+          <DraggableFlatList
+            data={parentList}
+            keyExtractor={(item) => item.id}
+            renderItem={renderChildList}
+            onDragEnd={handleParentDragEnd}
+          />
+        
+        </NestableScrollContainer>
+      {/* </ScrollView> */}
+    </GestureHandlerRootView>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    padding: 10,
+    backgroundColor: "#f8f8f8",
+  },
+  childContainer: {
+    padding: 10,
+    marginBottom: 20,
+    borderRadius: 5,
+    elevation: 2,
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  item: {
     padding: 15,
-    paddingTop: 25,
+    marginVertical: 5,
+    borderRadius: 5,
+    backgroundColor: "white",
+    elevation: 1,
   },
   text: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  innerContainer: {
-    borderRadius: 10,
-    padding: 10,
-    backgroundColor: "#E0E2DB",
-    flex: 1,
-  },
-  searchBar: {
-    backgroundColor: "#f5f7fa",
-    // borderColor: "#E0E2DB",
-    // borderWidth: 1.2,
-    borderRadius: 100,
-
-    margin: 10,
-    padding: 10,
-    paddingHorizontal: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    height: 55,
-    fontSize: 18,
-    lineHeight: 28,
-    paddingRight: 90,
-    fontWeight: "500",
-  },
-  searchBoxContainer: {
-    marginTop: 25,
-    marginBottom: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-  },
-  highlightText: {
-    color: "#1AC8ED",
+    fontSize: 16,
   },
 });
-
-export default Trip2;

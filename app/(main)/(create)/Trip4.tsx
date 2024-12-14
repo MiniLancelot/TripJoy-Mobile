@@ -1,9 +1,12 @@
-import { View, Text } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/app/(auth)/AuthContext'
 import { FlashList } from '@shopify/flash-list'
 import { getAllPlan } from '@/services/plan/plan'
 import { Image } from 'expo-image'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { NestableScrollContainer } from 'react-native-draggable-flatlist'
+import Trip2 from './Trip2'
 
 const Trip4 = () => {
 
@@ -15,6 +18,7 @@ const Trip4 = () => {
     const fetchData = async () => {
       try {
         const result = await getAllPlan(session.userToken.accessToken);
+        // console.log(result.data)
         setData(result.data.plans.data);
       } catch (error) {
         console.error("Fetch data error:", error);
@@ -25,6 +29,9 @@ const Trip4 = () => {
 
   
   return (
+    <GestureHandlerRootView>
+      <ScrollView>
+      <NestableScrollContainer>
     <View style={[{flex:1, backgroundColor:'white'}]}>
       <FlashList
       data={data}
@@ -45,7 +52,14 @@ const Trip4 = () => {
         </View>
       )}
       />
+      <View style={{marginHorizontal: 30}}>
+      <Trip2/>  
+      </View>
+      
     </View>
+    </NestableScrollContainer>
+         </ScrollView>
+    </GestureHandlerRootView>
   )
 }
 

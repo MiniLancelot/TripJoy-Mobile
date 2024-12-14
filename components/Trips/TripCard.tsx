@@ -7,13 +7,16 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Animated, {
   Extrapolation,
   SharedValue,
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
+import { getPlanLocationById } from "@/services/plan/plan";
+import { useAuth } from "@/app/(auth)/AuthContext";
+import { router } from "expo-router";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;
@@ -25,13 +28,34 @@ type TProps = {
   item: any;
 };
 
+type Province = {
+  provinceId: string;
+  provinceName: string;
+};
+
+type TripProps = {
+  title: string;
+  estimatedStartDate: string;
+  estimatedEndDate: string;
+  provinceStart: Province;
+  provinceEnd: Province;
+}
+
 const catImages = [
   "https://i.pinimg.com/736x/d1/7c/c7/d17cc7bf0e13fcdf975dd682d5df792f.jpg",
   "https://i.pinimg.com/originals/34/bf/b0/34bfb03034a7d7b89ab174c9b903b7a6.jpg",
   "https://w0.peakpx.com/wallpaper/440/401/HD-wallpaper-loadnig-cat-meme-loading-cat-meme-cat-thumbnail.jpg",
 ];
 
+const tempImage = "https://farm7.staticflickr.com/6014/5904905173_7fc1c39880_o.jpg"
 const TripCard = ({ item, scrollX, id, total }: TProps) => {
+  const { session } = useAuth();
+  const [planData, setPlanData] = useState<TripProps>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentImage, setCurrentImage] = useState(item.avatar || tempImage);
+
+
   const inputRange = [
     (id - 1) * ITEM_WIDTH,
     id * ITEM_WIDTH,
@@ -59,6 +83,40 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
     const opacity = interpolate(scrollX.value, inputRange, [0, 1, 0],Extrapolation.CLAMP,);
     return { opacity };
   });
+
+  const imageUrl = item.avatar ? item.avatar : tempImage;
+  // const problematicImageUrl = "https://movieticketbooking.s3.amazonaws.com/e98b58e0-2435-4b7b-8650-b94afa374ac4.png";
+  // const imageUrl = item.avatar === problematicImageUrl ? tempImage : item.avatar ? item.avatar : tempImage;
+
+
+  const fetchPlan = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getPlanLocationById(session.userToken.accessToken, item.id);
+      if (response) {
+        console.log(response.data.plan);
+        setPlanData(response.data.plan);
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message);
+      console.log("fail")
+    }
+  }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+    fetchPlan();
+  }, 3000);
+  return () => clearTimeout(timer); 
+  }, [])
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+    });
+  };
   return (
     <Animated.View
       style={[
@@ -76,8 +134,12 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
     >
       <Animated.View style={[translateImageStyle]}>
         <ImageBackground
-          source={{ uri: item.illustration }}
+          source={{ uri: currentImage  }}
           style={style.imageBackgroundStyle}
+          onError={() => {
+            console.log("Error loading image");
+            setCurrentImage(tempImage)
+          }}
         >
           <Animated.View
             style={[style.imageBackgroundView, translateTextStyle]}
@@ -85,9 +147,12 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
             <View style={style.userImageView}>
               {/* <Image source={item.icon} style={style.userImage} /> */}
               <View style={style.titleCardView}>
+                <TouchableOpacity onLongPress={fetchPlan}>
                 <Text style={style.titleStyle}>{item?.title}</Text>
+
+                </TouchableOpacity>
                 <Text style={style.descriptionStyle}>
-                  {item?.startTime} đến {item?.endTime}
+                  {planData?.estimatedStartDate ? formatDate(planData.estimatedStartDate) : ''} đến {planData?.estimatedEndDate ? formatDate(planData.estimatedEndDate) : ''}
                 </Text>
               </View>
             </View>
@@ -101,7 +166,7 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
                   />
                 ))}
                 <TouchableOpacity
-                  onPress={() => console.log("Chi tiết")}
+                  onPress={() => router.push(`/trip/${item.id}`)}
                   style={{ marginLeft: 120 }}
                 >
                   <Text

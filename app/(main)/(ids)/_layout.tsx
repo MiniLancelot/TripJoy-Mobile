@@ -9,7 +9,9 @@ const _layout = () => {
         // headerStyle: { backgroundColor: "#fff" },
         headerShadowVisible: true,
         headerShown: true,
-    }} />
+    }} >
+      <Stack.Screen name="trip" options={{headerShown: false}}/>
+    </Stack>
   )
 }
 

@@ -9,7 +9,7 @@ import { Trips } from '@/constants/Trip';
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get('window').width - OFFSET * 2;
 
-const TripCarousel = () => {
+const TripCarousel = ({data} : any) => {
   const scrollX = useSharedValue(0);
 
   return (
@@ -25,17 +25,17 @@ const TripCarousel = () => {
           scrollX.value = event.nativeEvent.contentOffset.x;
         }}
         scrollEventThrottle={16}>
-        {Trips.map((item, id) => (
+        {data.slice(0,7).map((item : any, id : any) => (
           <TripCard
-            key={id}
+            key={item.id}
             item={item}
-            id={id}
+            id = {id}
             scrollX={scrollX}
-            total={Trips.length}
+            total={data.length}
           />
         ))}
       </Animated.ScrollView>
-      <CarouselPagination data={Trips} scrollX={scrollX} />
+      <CarouselPagination data={data} scrollX={scrollX} />
     </View>
   );
 };

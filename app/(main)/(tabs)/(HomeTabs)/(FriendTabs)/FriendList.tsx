@@ -111,9 +111,9 @@ const FriendList = () => {
           refreshing={loading}
           onRefresh={refreshHandler}
           estimatedItemSize={65}
-          renderItem={({ item }: { item: { avatar: string; id: string; userName: string } }) => (
+          renderItem={({ item }: { item: { avatar: any; id: string; userName: string } }) => (
             <Friend
-              avatar={item.avatar}
+              avatar={item.avatar.url}
               id={item.id}
               name={item.userName}
               _onClick={handleRemoveFriend}
