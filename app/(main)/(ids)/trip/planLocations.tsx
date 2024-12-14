@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useTabStore } from "@/utils/store";
 import {
   changeOrderPlanLocations,
+  deletePlanLocationImage,
   getPlanById,
   getPlanLocationsByPlanId,
 } from "@/services/plan/plan";
@@ -58,7 +59,7 @@ const planLocations = () => {
               locationId: _item.locationId,
               planLocationId: _item.planLocationId,
               order: _item.order,
-              images: _item.images != null ? _item.images[0].url : "",
+              images: _item.images.length != 0 ? _item.images[0].url : "",
               name: _item.locationName,
               address: _item.locationAddress,
             })
@@ -69,7 +70,7 @@ const planLocations = () => {
       }
     } catch (_error: any) {
       setError(_error);
-      console.log("Error: ", _error);
+      console.log("Error1233453: ", _error);
     } finally {
       setLoading(false);
     }
@@ -114,6 +115,24 @@ const planLocations = () => {
     }
   };
 
+  const _deletePlanLocationImage = async (id: string, data: any) => {
+    try {
+      const _data = {
+        url: data
+      }
+      const result = await deletePlanLocationImage(
+        _data,
+        session.userToken.accessToken,
+        id
+      );
+      if (result) {
+        console.log("Result: ", result);
+      }
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
+
   if (loading) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -149,7 +168,7 @@ const planLocations = () => {
               >
                 <Text style={styles.title}>{item.name}</Text>
                 <Text>{item.address}</Text>
-                {item.images != "" ? (<Pressable>
+                {item.images != "" ? (<Pressable onPress={() => _deletePlanLocationImage(item.locationId, item.images)}>
                   <Image
                     source={{
                       uri: item.images ?? tempAvatar,

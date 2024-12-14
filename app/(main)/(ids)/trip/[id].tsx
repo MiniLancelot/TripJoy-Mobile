@@ -96,6 +96,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MyProfileModal from "@/components/Modals/MyProfileModal";
 import CalendarModal from "@/components/Modals/CalendarModal";
 import { Calendar } from "react-native-calendars";
+import { ca } from "date-fns/locale";
 
 type Province = {
   provinceId: string;
@@ -178,8 +179,24 @@ const ChosenTrip = () => {
     }
   };
 
+  const _getPlanLocationById = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getPlanLocationById(session.userToken.accessToken, id);
+      if (response) {
+        console.log(response.data.planLocations.data);
+        // console.log(response.data.plan.title);
+        // setPlanData(response.data.plan);
+        setIsLoading(false);
+      }
+    }catch (err: any) {
+      console.log("fail jdhfksdhkfsdkjf");
+    }
+  }
+
   useEffect(() => {
     fetchPlan();
+    _getPlanLocationById();
   }, []);
 
   const handleSearch = useCallback(async (query: string) => {
@@ -304,6 +321,7 @@ const ChosenTrip = () => {
       .then((response) => {
         console.log("Add Plan Location Response:", response.data);
         Alert.alert("Success", "Location added to the trip.");
+        _getPlanLocationById();
         // navigation.navigate("/(tabs)/trip");
       })
       .catch((error) => {
