@@ -58,7 +58,7 @@ const planLocations = () => {
               locationId: _item.locationId,
               planLocationId: _item.planLocationId,
               order: _item.order,
-              images: _item.images == null ? _item.images[0].url : "",
+              images: _item.images != null ? _item.images[0].url : "",
               name: _item.locationName,
               address: _item.locationAddress,
             })
@@ -149,14 +149,14 @@ const planLocations = () => {
               >
                 <Text style={styles.title}>{item.name}</Text>
                 <Text>{item.address}</Text>
-                {item.images == "" ? (<Pressable>
+                {item.images != "" ? (<Pressable>
                   <Image
                     source={{
                       uri: item.images ?? tempAvatar,
                     }}
                     style={styles.image}
                   />
-                </Pressable>): null}
+                </Pressable>) : null}
               </Pressable>
             </View>
           )}
