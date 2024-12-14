@@ -27,7 +27,7 @@ const Map = () => {
   const [distance, setDistance] = useState<number | null>(null);
   const [currentLocation, setCurrentLocation] = useState<number[] | null>(null);
   const cameraRef = useRef<any>(null);
-  const [isAnimating, setIsAnimating] = useState(false); // Track if animation is active
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const pin = require("@/assets/images/others/pin.png");
   const camIcon = require("@/assets/images/others/avatarTest.webp");
@@ -47,15 +47,9 @@ const Map = () => {
           .slice(1, -1)
           .map((coord) => coord.join("%2C"))
           .join("%3B");
-        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
-          "%2C"
-        )}%3B${waypoints}%3B${end.join(
-          "%2C"
-        )}?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${accessToken}`;
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join("%2C")}%3B${waypoints}%3B${end.join("%2C")}?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${accessToken}`;
       } else {
-        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
-          ","
-        )};${end.join(",")}?geometries=geojson&access_token=${accessToken}`;
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${accessToken}`;
       }
 
       try {
