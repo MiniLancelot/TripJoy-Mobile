@@ -70,6 +70,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import Mapbox, {
   Camera,
@@ -120,7 +121,7 @@ type PlanLocationProps = {
   name: string;
   address: string;
   estimatedStartDate: string;
-}
+};
 
 const accessToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 Mapbox.setAccessToken(accessToken);
@@ -143,9 +144,13 @@ const ChosenTrip = () => {
     latitude: 0,
     estimatedStartDate: "",
   });
-  
+
   const [planData, setPlanData] = useState<TripProps | null>(null);
 
+  const isCreatingDisabled =
+    !planLocation.name ||
+    !planLocation.address ||
+    !planLocation.estimatedStartDate;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -217,11 +222,17 @@ const ChosenTrip = () => {
     const longitude = parseFloat(location.lon);
     const latitude = parseFloat(location.lat);
     const name = location.name;
-    const parts = location.display_name.split(', ');
-    const address = parts.slice(1).join(', ');
+    const parts = location.display_name.split(", ");
+    const address = parts.slice(1).join(", ");
     setCurrentLocation([longitude, latitude]);
     // setLocation([name, address]);
-    setPlanLocation({name: name, address: address, longitude: longitude, latitude: latitude, estimatedStartDate: selectedDate || ""});
+    setPlanLocation({
+      name: name,
+      address: address,
+      longitude: longitude,
+      latitude: latitude,
+      estimatedStartDate: selectedDate || "",
+    });
 
     // Move the camera to the selected location
     cameraRef.current?.setCamera({
@@ -245,7 +256,7 @@ const ChosenTrip = () => {
     ? featureCollection([point(currentLocation)])
     : null;
 
-  const snapPoints = useMemo(() => ["40%"], []);
+  const snapPoints = useMemo(() => ["33%"], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   // const handleOpen = () => bottomSheetRef.current?.expand();
   // const handleSheetChanges = useCallback((index: number) => {
@@ -255,11 +266,13 @@ const ChosenTrip = () => {
   const handleDayPress = (day: any) => {
     setSelectedDate(day.dateString);
     console.log("Selected Date:", day.dateString);
-    setPlanLocation((prev) =>
-      (prev = {
-        ...prev,
-        estimatedStartDate: day.dateString,
-      }));
+    setPlanLocation(
+      (prev) =>
+        (prev = {
+          ...prev,
+          estimatedStartDate: day.dateString,
+        })
+    );
     console.log("Plan Location:", planLocation);
     setIsModalOpen(false); // Close the modal on date selection
   };
@@ -276,13 +289,15 @@ const ChosenTrip = () => {
     }
 
     addPlanLocation(
-      {planLocation:{
-        name: planLocation.name,
-        address: planLocation.address,
-        longitude: planLocation.longitude,
-        latitude: planLocation.latitude,
-        estimatedStartDate: planLocation.estimatedStartDate,
-      }},
+      {
+        planLocation: {
+          name: planLocation.name,
+          address: planLocation.address,
+          longitude: planLocation.longitude,
+          latitude: planLocation.latitude,
+          estimatedStartDate: planLocation.estimatedStartDate,
+        },
+      },
       session.userToken.accessToken,
       id
     )
@@ -295,6 +310,15 @@ const ChosenTrip = () => {
         console.error("Error adding location to trip:", error);
         Alert.alert("Error", "Failed to add location to the trip.");
       });
+  };
+
+  const getFirstPart = (displayName: string) => {
+    return displayName.split(",")[0];
+  };
+
+  const getRestPart = (displayName: string) => {
+    const parts = displayName.split(",");
+    return parts.slice(1).join(",").trim();
   };
 
   return (
@@ -335,14 +359,31 @@ const ChosenTrip = () => {
                 style={styles.resultItem}
                 onPress={() => handleSelectLocation(item)}
               >
+                <View>
+                  <Ionicons
+                    name="location-outline"
+                    size={25}
+                    color="#4a4d52"
+                    style={styles.locationIcon}
+                  />
+                </View>
                 <View
                   style={{
                     borderBottomWidth: 1,
                     paddingBottom: 10,
                     borderBottomColor: "#eee",
+                    gap: 5,
+                    alignItems: "flex-start",
+                    width: 300,
+                    transform: [{ translateX: -15 }],
                   }}
                 >
-                  <Text style={styles.resultText}>{item.display_name}</Text>
+                  <Text style={styles.resultText}>
+                    {getFirstPart(item.display_name)}
+                  </Text>
+                  <Text style={{ fontSize: 12 }}>
+                    {getRestPart(item.display_name)}
+                  </Text>
                 </View>
               </TouchableOpacity>
             )}
@@ -358,7 +399,7 @@ const ChosenTrip = () => {
               ref={cameraRef}
               followUserLocation={false}
               zoomLevel={15}
-              centerCoordinate={currentLocation || [108.218, 16.06]} // Default to Hanoi
+              centerCoordinate={currentLocation || [108.218, 16.06]}
             />
 
             {/* Show selected location pin */}
@@ -384,57 +425,100 @@ const ChosenTrip = () => {
           enablePanDownToClose={false}
         >
           <BottomSheetView style={styles.contentContainer}>
-            <Text style={{ fontSize: 20, fontWeight: "500" }}>
+            <Text
+              style={{ fontSize: 20, fontWeight: "500", alignItems: "center" }}
+            >
               Thêm địa điểm trên chuyến đi 🎉
             </Text>
-            <View style={{ gap: 5, marginTop: 35 }}>
-              <Text>Name: {planLocation.name ?? ""}</Text>
-              <Text>Address: {planLocation.address ?? ""}</Text>
-              <Text>Long: {planLocation.longitude}</Text>
-              <Text>Lat : {planLocation.latitude}</Text>
+            <View style={styles.bottomSheetInnerContainer}>
+              <Text style={styles.btsLocationName}>
+                {planLocation.name ? planLocation.name : "Tên địa điểm"}
+              </Text>
+              <Text style={styles.btsOtherFields}>
+                {planLocation.address ? planLocation.address : "Địa chỉ"}
+              </Text>
+              {/* <Text>Long: {planLocation.longitude}</Text>
+              <Text>Lat : {planLocation.latitude}</Text> */}
               <TouchableOpacity onPress={() => setIsModalOpen(true)}>
-                <Text>Date: {planLocation.estimatedStartDate ?? ""}</Text>
+                <Text style={styles.btsOtherFields}>
+                  Ngày khởi hành:{" "}
+                  {planLocation.estimatedStartDate
+                    ? planLocation.estimatedStartDate
+                    : ""}
+                </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              
+
+              {/* <TouchableOpacity
                 style={{ marginTop: 10 }}
                 onPress={handleAddLocation}
               >
                 <Text>Thêm địa điểm vào lộ trình</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
-            <View></View>
+            <View>
+            <View style={styles.loginButtonContainer}>
+                <Pressable
+                  onPress={handleAddLocation}
+                  disabled={isCreatingDisabled || isLoading}
+                  android_ripple={
+                    isCreatingDisabled ? null : { color: "#b9bcc6" }
+                  }
+                >
+                  <View
+                    style={[
+                      styles.innerLoginButtonContainer,
+                      isCreatingDisabled && styles.loginButtonDisabled,
+                    ]}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator color="#fff" size={28} />
+                    ) : (
+                      <Text
+                        style={[
+                          styles.loginButtonText,
+                          { color: isCreatingDisabled ? "#b9bcc6" : "#fff" },
+                        ]}
+                      >
+                        Tạo mới
+                      </Text>
+                    )}
+                  </View>
+                </Pressable>
+              </View>
+            </View>
           </BottomSheetView>
         </BottomSheet>
 
         <CalendarModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      >
-        <View style={styles.modalContainer}>
-        <Calendar
-            current={selectedDate} // Default value if no date is selected
-            onDayPress={handleDayPress}
-            markedDates={
-              selectedDate
-                ? {
-                    [selectedDate]: {
-                      selected: true,
-                      disableTouchEvent: true,
-                      selectedColor: "#46e835",
-                    },
-                  }
-                : {}
-            }
-            theme={{
-              todayTextColor: "#46e835",
-              arrowColor: "#46e835",
-              selectedDayBackgroundColor: "#46e835",
-              dotColor: "#46e835",
-            }}
-          />
-        </View>
-      </CalendarModal>
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        >
+          <View style={styles.modalContainer}>
+            <Calendar
+              current={selectedDate} // Default value if no date is selected
+              onDayPress={handleDayPress}
+              markedDates={
+                selectedDate
+                  ? {
+                      [selectedDate]: {
+                        selected: true,
+                        disableTouchEvent: true,
+                        selectedColor: "#46e835",
+                      },
+                    }
+                  : {}
+              }
+              theme={{
+                todayTextColor: "#46e835",
+                arrowColor: "#46e835",
+                selectedDayBackgroundColor: "#46e835",
+                dotColor: "#46e835",
+              }}
+            />
+          </View>
+        </CalendarModal>
         {/* </BottomSheetModalProvider> */}
       </GestureHandlerRootView>
     </KeyboardAvoidingView>
@@ -495,11 +579,19 @@ const styles = StyleSheet.create({
   resultItem: {
     padding: 10,
     paddingLeft: 50,
+    flexDirection: "row",
+    gap: 0,
+    alignItems: "center",
     // borderBottomWidth: 1,
     // borderBottomColor: "#eee",
   },
   resultText: {
     fontSize: 16,
+    fontWeight: "500",
+  },
+
+  locationIcon: {
+    transform: [{ translateX: -32 }, { translateY: -21 }],
   },
   mapContainer: {
     flex: 1,
@@ -572,6 +664,50 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
     fontWeight: "500",
+  },
+
+  bottomSheetInnerContainer: {
+    gap: 10,
+    marginTop: 15,
+    paddingHorizontal: 10,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    // marginLeft: -160,
+  },
+
+  btsLocationName: {
+    fontSize: 18,
+    fontWeight: "500",
+  },
+
+  btsOtherFields: {
+    fontSize: 16,
+    fontWeight: "400",
+  },
+  loginButtonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#13c892",
+    borderRadius: 12,
+    overflow: "hidden",
+    width: "100%",
+    marginTop: 25,
+  },
+  innerLoginButtonContainer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginButtonText: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: "semibold",
+    lineHeight: 28,
+    transform: [{ translateX: -2 }],
+  },
+  loginButtonDisabled: {
+    backgroundColor: "#e7e8ee",
+    color: "#b9bcc6",
   },
 });
 

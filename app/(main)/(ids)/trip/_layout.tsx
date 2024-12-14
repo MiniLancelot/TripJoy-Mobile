@@ -17,7 +17,7 @@ const _layout = () => {
         },
       }}>
         <Tabs.Screen name="[id]" options={{title: "Bản đồ"}}/>
-        <Tabs.Screen name="planLocations" options={{title: "Lộ trình"}}/>
+        <Tabs.Screen name="planLocations" options={{title: "Lộ trình", headerShown: true}}/>
     </Tabs>
   )
 }

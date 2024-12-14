@@ -221,7 +221,7 @@ const Trip3 = () => {
         text2: "Hãy bắt đầu chuyến đi của bạn",
       });
       setTimeout(() => {
-        router.replace("/trip");
+        router.replace("/(tabs)/trip");
       }, 500);
     } catch (err: any) {
       console.error(err);
