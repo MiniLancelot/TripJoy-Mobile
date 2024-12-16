@@ -29,6 +29,7 @@ import * as ImagePicker from "expo-image-picker";
 import AnimationTextInput from "@/components/TextInput/MyTextInput";
 import Toast from "react-native-toast-message";
 import { vi } from "date-fns/locale";
+import { Province } from "@/constants/Provinces";
 
 
 type PlanProfileProps = {
@@ -36,8 +37,8 @@ type PlanProfileProps = {
   startDate: string;
   endDate: string;
   estimatedBudget: number;
-  provinceStartId: string;
-  provinceEndId: string;
+  provinceStart: Province;
+  provinceEnd: Province;
   method: number;
   vehicle: number;
   avatar: any | null;
@@ -98,8 +99,8 @@ const Trip3 = () => {
     startDate: "",
     endDate: "",
     estimatedBudget: 0,
-    provinceStartId: "",
-    provinceEndId: "",
+    provinceStart: {provinceId: "", provinceName: ""},
+    provinceEnd: {provinceId: "", provinceName: ""},
     method: 0,
     vehicle: 0,
     avatar: null,
@@ -131,8 +132,8 @@ const Trip3 = () => {
     !data.startDate ||
     !data.endDate ||
     !data.estimatedBudget ||
-    !data.provinceStartId ||
-    !data.provinceEndId||
+    !data.provinceStart ||
+    !data.provinceEnd||
     data.vehicle < 0;
 
     const renderCustomHeader = (date: string) => {
@@ -196,8 +197,8 @@ const Trip3 = () => {
       _form.append("Plan.StartDate", data.startDate);
       _form.append("Plan.EndDate", data.endDate);
       _form.append("Plan.EstimatedBudget", data.estimatedBudget.toString());
-      _form.append("Plan.ProvinceStartId", data.provinceStartId);
-      _form.append("Plan.ProvinceEndId", data.provinceEndId);
+      _form.append("Plan.ProvinceStartId", data.provinceStart.provinceId);
+      _form.append("Plan.ProvinceEndId", data.provinceEnd.provinceId);
       _form.append("Plan.Method", data.method.toString());
       _form.append("Plan.Vehicle", data.vehicle.toString());
       if (data.avatar) {
@@ -335,17 +336,17 @@ const Trip3 = () => {
                 }}
               >
                 <ProvinceDropdown
-                  _value={data.provinceStartId}
+                  _value={data.provinceStart}
                   setValue={(value) =>
-                    handleChangeProfileState("provinceStartId", value)
+                    handleChangeProfileState("provinceStart", value)
                   }
                   bearer={session.userToken.accessToken}
                   placeholder="Điểm bắt đầu"
                 />
                 <ProvinceDropdown
-                  _value={data.provinceEndId}
+                  _value={data.provinceEnd}
                   setValue={(value) =>
-                    handleChangeProfileState("provinceEndId", value)
+                    handleChangeProfileState("provinceEnd", value)
                   }
                   bearer={session.userToken.accessToken}
                   placeholder="Điểm kết thúc"

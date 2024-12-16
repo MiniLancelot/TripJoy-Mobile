@@ -139,7 +139,7 @@ const deletePlanLocationImage = async (data: any, accessToken: any, id: any) => 
       method: "PATCH",
       data: data,
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
       },
 
@@ -151,4 +151,19 @@ const deletePlanLocationImage = async (data: any, accessToken: any, id: any) => 
   }
 }
 
-export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage };
+const deletePlanLocationByPlanLocationId = async (accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/planLocations/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId };

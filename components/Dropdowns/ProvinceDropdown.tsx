@@ -4,6 +4,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import getPronvinces from "@/services/plan/getProvinces";
 import { is } from "date-fns/locale";
+import { Province } from "@/constants/Provinces";
 // import debounce from "@/services/debounce";
 
 interface DataProps {
@@ -12,8 +13,8 @@ interface DataProps {
 }
 
 interface ProvinceDropdownProps {
-  _value: string;
-  setValue: (value: string) => void;
+  _value: Province;
+  setValue: (value: Province) => void;
   bearer: string;
   placeholder?: string;
 }
@@ -115,7 +116,7 @@ const ProvinceDropdown = ({
   }, [page, searchState]);
 
   const renderLabel = () => {
-    if (_value === "" || isFocus) {
+    if (_value == null || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: "blue" }]}>
           {placeholder}
@@ -150,11 +151,11 @@ const ProvinceDropdown = ({
             : "..."
         }
         searchPlaceholder="Search..."
-        value={_value}
+        value={_value.provinceId}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
-          setValue(item.value);
+          setValue({ provinceId: item.value, provinceName: item.label });
           console.info(item.label);
           setProvinceName(item.label);
           setIsFocus(false);

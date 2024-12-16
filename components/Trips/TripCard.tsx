@@ -6,6 +6,7 @@ import {
   View,
   Image,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Animated, {
@@ -39,7 +40,7 @@ type TripProps = {
   estimatedEndDate: string;
   provinceStart: Province;
   provinceEnd: Province;
-}
+};
 
 const catImages = [
   "https://i.pinimg.com/736x/d1/7c/c7/d17cc7bf0e13fcdf975dd682d5df792f.jpg",
@@ -47,14 +48,14 @@ const catImages = [
   "https://w0.peakpx.com/wallpaper/440/401/HD-wallpaper-loadnig-cat-meme-loading-cat-meme-cat-thumbnail.jpg",
 ];
 
-const tempImage = "https://farm7.staticflickr.com/6014/5904905173_7fc1c39880_o.jpg"
+const tempImage =
+  "https://farm7.staticflickr.com/6014/5904905173_7fc1c39880_o.jpg";
 const TripCard = ({ item, scrollX, id, total }: TProps) => {
   const { session } = useAuth();
   const [planData, setPlanData] = useState<TripProps>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentImage, setCurrentImage] = useState(item.avatar || tempImage);
-
 
   const inputRange = [
     (id - 1) * ITEM_WIDTH,
@@ -66,9 +67,14 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
       scrollX.value,
       inputRange,
       [0.97, 0.97, 0.97],
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     );
-    const opacity = interpolate(scrollX.value, inputRange, [0.6, 1, 0.6],Extrapolation.CLAMP,);
+    const opacity = interpolate(
+      scrollX.value,
+      inputRange,
+      [0.6, 1, 0.6],
+      Extrapolation.CLAMP
+    );
     return { transform: [{ scale: translate }], opacity };
   });
   const translateImageStyle = useAnimatedStyle(() => {
@@ -80,7 +86,12 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
     return { transform: [{ translateX: translate }] };
   });
   const translateTextStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(scrollX.value, inputRange, [0, 1, 0],Extrapolation.CLAMP,);
+    const opacity = interpolate(
+      scrollX.value,
+      inputRange,
+      [0, 1, 0],
+      Extrapolation.CLAMP
+    );
     return { opacity };
   });
 
@@ -88,11 +99,13 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
   // const problematicImageUrl = "https://movieticketbooking.s3.amazonaws.com/e98b58e0-2435-4b7b-8650-b94afa374ac4.png";
   // const imageUrl = item.avatar === problematicImageUrl ? tempImage : item.avatar ? item.avatar : tempImage;
 
-
   const fetchPlan = async () => {
     try {
       setIsLoading(true);
-      const response = await getPlanLocationById(session.userToken.accessToken, item.id);
+      const response = await getPlanLocationById(
+        session.userToken.accessToken,
+        item.id
+      );
       if (response) {
         console.log(response.data.plan);
         setPlanData(response.data.plan);
@@ -100,21 +113,21 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
       }
     } catch (err: any) {
       setError(err.message);
-      console.log("fail")
+      console.log("fail");
     }
-  }
+  };
   useEffect(() => {
     const timer = setTimeout(() => {
-    fetchPlan();
-  }, 3000);
-  return () => clearTimeout(timer); 
-  }, [])
+      fetchPlan();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
     });
   };
   return (
@@ -134,11 +147,11 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
     >
       <Animated.View style={[translateImageStyle]}>
         <ImageBackground
-          source={{ uri: currentImage  }}
+          source={{ uri: currentImage }}
           style={style.imageBackgroundStyle}
           onError={() => {
             console.log("Error loading image");
-            setCurrentImage(tempImage)
+            setCurrentImage(tempImage);
           }}
         >
           <Animated.View
@@ -148,12 +161,20 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
               {/* <Image source={item.icon} style={style.userImage} /> */}
               <View style={style.titleCardView}>
                 <TouchableOpacity onLongPress={fetchPlan}>
-                <Text style={style.titleStyle}>{item?.title}</Text>
-
+                  <Text style={style.titleStyle}>{item?.title}</Text>
                 </TouchableOpacity>
                 <Text style={style.descriptionStyle}>
-                  {planData?.estimatedStartDate ? formatDate(planData.estimatedStartDate) : ''} đến {planData?.estimatedEndDate ? formatDate(planData.estimatedEndDate) : ''}
+                  {planData?.estimatedStartDate
+                    ? formatDate(planData.estimatedStartDate)
+                    : ""}{" "}
+                  đến{" "}
+                  {planData?.estimatedEndDate
+                    ? formatDate(planData.estimatedEndDate)
+                    : ""}
                 </Text>
+                <Pressable onPress={() => console.log("Update")}>
+                  <Text>Cập nhật</Text>
+                </Pressable>
               </View>
             </View>
             <View style={style.bottomContainer}>

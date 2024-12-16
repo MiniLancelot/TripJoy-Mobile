@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useTabStore } from "@/utils/store";
 import {
   changeOrderPlanLocations,
+  deletePlanLocationByPlanLocationId,
   deletePlanLocationImage,
   getPlanById,
   getPlanLocationsByPlanId,
@@ -89,10 +90,13 @@ const planLocations = () => {
   }, [plan]);
 
   useEffect(() => {
-    if (isRefreshing) {
-      fetchData();
-      setIsRefreshing(false);
-    }
+    const timeout = setTimeout(() => {
+      if (isRefreshing) {
+        fetchData();
+        setIsRefreshing(false);
+      }
+    }, 1000);
+    return () => clearTimeout(timeout);
   }, [isRefreshing]);
 
   const swapItems = async (from: number, to: number) => {
@@ -127,9 +131,21 @@ const planLocations = () => {
       );
       if (result) {
         console.log("Result: ", result);
+        setIsRefreshing(true);
       }
     } catch (error: any) {
       console.log(error);
+    }
+  }
+  const _deletePlanLocationByPlanId = async (id: string) => {
+    try {
+      const result = await deletePlanLocationByPlanLocationId(session.userToken.accessToken, id);
+      if (result) {
+        console.log("Result: ", result);
+      }
+    } catch (error: any) {
+      console.log(error);
+      setIsRefreshing(true);
     }
   }
 
@@ -164,11 +180,11 @@ const planLocations = () => {
             <View>
               <Pressable
                 onLongPress={drag}
-                onPress={() => planDetail(item.planLocationId)}
+                // onPress={() => planDetail(item.planLocationId)}
               >
                 <Text style={styles.title}>{item.name}</Text>
                 <Text>{item.address}</Text>
-                {item.images != "" ? (<Pressable onPress={() => _deletePlanLocationImage(item.locationId, item.images)}>
+                {item.images != "" ? (<Pressable onLongPress={() => _deletePlanLocationImage(item.planLocationId, item.images)}>
                   <Image
                     source={{
                       uri: item.images ?? tempAvatar,
@@ -176,6 +192,12 @@ const planLocations = () => {
                     style={styles.image}
                   />
                 </Pressable>) : null}
+              </Pressable>
+              <Pressable onPress={() => planDetail(item.planLocationId)}>
+                <Text>Detail</Text>
+              </Pressable>
+              <Pressable onPress={() => _deletePlanLocationByPlanId(item.planLocationId)}>
+                <Text>Delete</Text>
               </Pressable>
             </View>
           )}
