@@ -40,7 +40,7 @@ type PlanProfileProps = {
   provinceEndId: string;
   method: number;
   vehicle: number;
-  avatar: any | null;
+  avatar: string | null;
 };
 
 LocaleConfig.locales["vi"] = {

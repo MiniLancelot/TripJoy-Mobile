@@ -179,6 +179,7 @@ const UpdateProfile = () => {
       }
     } catch (err: any) {
       setError(err.message);
+      console.log(err.message);
     }
   };
 

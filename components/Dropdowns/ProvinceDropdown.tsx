@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import getPronvinces from "@/services/plan/getProvinces";
+import { is } from "date-fns/locale";
 // import debounce from "@/services/debounce";
 
 interface DataProps {
@@ -11,14 +12,14 @@ interface DataProps {
 }
 
 interface ProvinceDropdownProps {
-  value: string;
+  _value: string;
   setValue: (value: string) => void;
   bearer: string;
   placeholder?: string;
 }
 
 const ProvinceDropdown = ({
-  value,
+  _value,
   setValue,
   bearer,
   placeholder,
@@ -30,6 +31,7 @@ const ProvinceDropdown = ({
   const [allItemsLoaded, setAllItemsLoaded] = useState(false);
   const [searchState, setSearchState] = useState(false);
   const [data, setData] = useState<DataProps[]>([]);
+  const [provinceName, setProvinceName] = useState<string>("");
 
   // Fetch provinces with pagination
   const fetchMoreData = async () => {
@@ -100,7 +102,7 @@ const ProvinceDropdown = ({
       searchProvince(province);
     } else {
       setSearchState(false);
-      setData([]);
+      // setData([]);
       setPage(0);
       setAllItemsLoaded(false);
       fetchMoreData();
@@ -113,7 +115,7 @@ const ProvinceDropdown = ({
   }, [page, searchState]);
 
   const renderLabel = () => {
-    if (value === "" || isFocus) {
+    if (_value === "" || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: "blue" }]}>
           {placeholder}
@@ -143,17 +145,18 @@ const ProvinceDropdown = ({
         labelField="label"
         valueField="value"
         placeholder={
-          !isFocus
-            ? data.find((item) => item.value === value)?.label || "Tỉnh/thành phố"
+          !isFocus ?
+            provinceName || "Tỉnh/thành phố"
             : "..."
         }
         searchPlaceholder="Search..."
-        value={value.toString()}
+        value={_value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
           setValue(item.value);
           console.info(item.label);
+          setProvinceName(item.label);
           setIsFocus(false);
           setSearchState(false);
         }}
