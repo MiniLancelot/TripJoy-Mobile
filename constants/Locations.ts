@@ -12,12 +12,12 @@ export const Locations = [
         longtitude:  108.22240876399776, 
     },
  
-       {
-        id: 2,
-        name: "Chùa Phổ Đà",
-        latitude: 16.055962483347987, 
-        longtitude: 108.21869266329396
-    },
+    //    {
+    //     id: 2,
+    //     name: "Chùa Phổ Đà",
+    //     latitude: 16.055962483347987, 
+    //     longtitude: 108.21869266329396
+    // },
     // {
     //     id: 2,
     //     name: "Bánh Mỳ Ông Tý",
@@ -30,10 +30,10 @@ export const Locations = [
     //     latitude: 16.053456373704382, 
     //     longtitude: 108.21754835498233
     // },
-    // {
-    //     id: 6,
-    //     name: "Văn miếu Quốc Tử Giám",
-    //     latitude: 21.028267695698077, 
-    //     longtitude: 105.83562628151849
-    // }
+    {
+        id: 6,
+        name: "Văn miếu Quốc Tử Giám",
+        latitude: 21.028267695698077, 
+        longtitude: 105.83562628151849
+    }
 ]

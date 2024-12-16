@@ -78,6 +78,7 @@ import Mapbox, {
   ShapeSource,
   SymbolLayer,
   Images,
+  LineLayer,
 } from "@rnmapbox/maps";
 import BottomSheet, {
   BottomSheetModal,
@@ -85,7 +86,7 @@ import BottomSheet, {
   BottomSheetModalProvider,
   BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
-import { point, featureCollection } from "@turf/helpers";
+import { point, featureCollection, lineString } from "@turf/helpers";
 import axios from "axios";
 import { useRouter, useLocalSearchParams, useNavigation } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -97,6 +98,7 @@ import MyProfileModal from "@/components/Modals/MyProfileModal";
 import CalendarModal from "@/components/Modals/CalendarModal";
 import { Calendar } from "react-native-calendars";
 import { ca } from "date-fns/locale";
+import { Locations } from "@/constants/Locations";
 
 type Province = {
   provinceId: string;
@@ -155,11 +157,16 @@ const ChosenTrip = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
+
+  const [route, setRoute] = useState<{ coordinates: number[][] } | null>(null);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<number[] | null>(null);
   const [location, setLocation] = useState<string[] | null>(null);
   const cameraRef = useRef<any>(null);
   const router = useRouter();
   const pinIcon = require("@/assets/images/others/pin.png");
+  const camIcon = require("@/assets/images/others/avatarTest.webp");
 
   const fetchPlan = async () => {
     try {
@@ -182,22 +189,97 @@ const ChosenTrip = () => {
   const _getPlanLocationById = async () => {
     try {
       setIsLoading(true);
-      const response = await getPlanLocationById(session.userToken.accessToken, id);
+      const response = await getPlanLocationById(
+        session.userToken.accessToken,
+        id
+      );
       if (response) {
-        console.log(response.data.planLocations.data);
-        // console.log(response.data.plan.title);
-        // setPlanData(response.data.plan);
+        console.log(response.data.planLocations);
+
         setIsLoading(false);
       }
-    }catch (err: any) {
-      console.log("fail jdhfksdhkfsdkjf");
+    } catch (err: any) {
+      console.log("fail");
     }
-  }
+  };
 
   useEffect(() => {
     fetchPlan();
     _getPlanLocationById();
   }, []);
+
+  useEffect(() => {
+    const fetchRoute = async () => {
+      const coordinates = Locations.map((location) => [
+        location.longtitude,
+        location.latitude,
+      ]);
+      const start = coordinates[0];
+      const end = coordinates[coordinates.length - 1];
+      let url;
+
+      if (coordinates.length > 2) {
+        const waypoints = coordinates
+          .slice(1, -1)
+          .map((coord) => coord.join("%2C"))
+          .join("%3B");
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
+          "%2C"
+        )}%3B${waypoints}%3B${end.join(
+          "%2C"
+        )}?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${accessToken}`;
+      } else {
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
+          ","
+        )};${end.join(",")}?geometries=geojson&access_token=${accessToken}`;
+      }
+
+      try {
+        const response = await axios.get(url);
+        const routeGeoJSON = response.data.routes[0].geometry;
+        // const routeDistance = response.data.routes[0].distance;
+        const routeDistance = response.data.routes[0].distance / 1000;
+        setDistance(routeDistance);
+        setRoute(routeGeoJSON);
+        setCurrentLocation(coordinates[0]);
+
+        let zoomLevel;
+      if (routeDistance < 1) {
+        zoomLevel = 15;
+      } else if (routeDistance < 10) {
+        zoomLevel = 12;
+      } else if (routeDistance < 100) {
+        zoomLevel = 10;
+      } else {
+        zoomLevel = 8;
+      } 
+
+      // Update camera with the calculated zoom level
+      cameraRef.current?.setCamera({
+        centerCoordinate: coordinates[0], // Center on the starting point
+        zoomLevel,
+        duration: 1000, // Smooth transition
+      });
+
+      } catch (error) {
+        console.error("Error fetching route:", error);
+      }
+    };
+
+    fetchRoute();
+  }, []);
+
+  const locationPoints = Locations.map((location, index) => ({
+    ...point([location.longtitude, location.latitude]),
+    properties: {
+      label: `${index + 1}. ${location.name}`,
+    },
+  }));
+  const myLocationFeature = featureCollection(locationPoints);
+
+  const cameraFeature = currentLocation
+    ? featureCollection([point(currentLocation)])
+    : null;
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) return;
@@ -215,7 +297,6 @@ const ChosenTrip = () => {
         setSearchResults(results);
       } else {
         setSearchResults([]);
-        // Alert.alert("No Results", "No locations found within Vietnam.");
       }
     } catch (error) {
       console.error("Error fetching geocoding results:", error);
@@ -268,10 +349,6 @@ const ChosenTrip = () => {
       `Latitude: ${latitude}, Longitude: ${longitude}, Name: ${name}, Address: ${address}`
     );
   };
-
-  const cameraFeature = currentLocation
-    ? featureCollection([point(currentLocation)])
-    : null;
 
   const snapPoints = useMemo(() => ["33%"], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -409,31 +486,63 @@ const ChosenTrip = () => {
         )}
 
         <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            styleURL="mapbox://styles/mapbox/streets-v12"
-          >
-            <Camera
-              ref={cameraRef}
-              followUserLocation={false}
-              zoomLevel={15}
-              centerCoordinate={currentLocation || [108.218, 16.06]}
-            />
+        <MapView
+  style={styles.map}
+  styleURL="mapbox://styles/mapbox/streets-v12"
+>
+  <Camera
+    ref={cameraRef}
+    followUserLocation={false}
+    zoomLevel={15}
+    centerCoordinate={currentLocation || [108.218, 16.06]}
+  />
 
-            {/* Show selected location pin */}
-            {cameraFeature && (
-              <ShapeSource id="cameraLocation" shape={cameraFeature}>
-                <SymbolLayer
-                  id="selected-location-pin"
-                  style={{
-                    iconImage: "pinIcon",
-                    iconSize: 0.5, // Adjust size
-                  }}
-                />
-                <Images images={{ pinIcon }} />
-              </ShapeSource>
-            )}
-          </MapView>
+  {/* Render all locations */}
+  <ShapeSource id="allLocations" shape={myLocationFeature}>
+    <SymbolLayer
+      id="location-markers"
+      style={{
+        iconImage: "pinIcon",
+        iconSize: 0.5,
+        textField: ["get", "label"],
+        textSize: 12,
+        textOffset: [0, 2],
+        textColor: "#000",
+      }}
+    />
+    <Images images={{ pinIcon }} />
+  </ShapeSource>
+
+  {/* Route rendering */}
+  {route && (
+    <ShapeSource id="routeSource" shape={lineString(route.coordinates)}>
+      <LineLayer
+        id="routeLayer"
+        style={{
+          lineColor: "#13c892",
+          lineWidth: 3,
+          lineDasharray: [2, 2],
+          lineCap: "round",
+          lineJoin: "round",
+        }}
+      />
+    </ShapeSource>
+  )}
+
+  {/* Selected location marker */}
+  {cameraFeature && (
+    <ShapeSource id="cameraLocation" shape={cameraFeature}>
+      <SymbolLayer
+        id="selected-location-pin"
+        style={{
+          iconImage: "camIcon",
+          iconSize: 0.2,
+        }}
+      />
+      <Images images={{ camIcon }} />
+    </ShapeSource>
+  )}
+</MapView>
         </View>
         <BottomSheet
           ref={bottomSheetRef}
@@ -466,8 +575,6 @@ const ChosenTrip = () => {
                 </Text>
               </TouchableOpacity>
 
-              
-
               {/* <TouchableOpacity
                 style={{ marginTop: 10 }}
                 onPress={handleAddLocation}
@@ -476,7 +583,7 @@ const ChosenTrip = () => {
               </TouchableOpacity> */}
             </View>
             <View>
-            <View style={styles.loginButtonContainer}>
+              <View style={styles.loginButtonContainer}>
                 <Pressable
                   onPress={handleAddLocation}
                   disabled={isCreatingDisabled || isLoading}
