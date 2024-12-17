@@ -5,10 +5,11 @@ interface FriendProps {
   id: string;
   name: string;
   avatar: string;
+  _status: boolean;
   _onClick: any;
 }
 
-const Friend = ({ id, name, _onClick, avatar }: FriendProps) => {
+const Friend = ({ id, name, _onClick, avatar, _status }: FriendProps) => {
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
   const avatarUri = avatar == null ? tempAvatar : avatar;
@@ -24,6 +25,7 @@ const Friend = ({ id, name, _onClick, avatar }: FriendProps) => {
         <View>
           <Text>{name}</Text>
         </View>
+        {_status ? <Text>Online</Text> : <Text>Offline</Text>}
       </Pressable>
       {/* <Pressable onPress={() => _onClick(id)} style={{}}>
         <Text>Bạn bè</Text>

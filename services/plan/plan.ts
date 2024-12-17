@@ -166,4 +166,18 @@ const deletePlanLocationByPlanLocationId = async (accessToken: any, id: any) => 
   }
 }
 
-export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId };
+const getPlanInvitations = async (accessToken: any) => {
+  try {
+    const result = await plan(`/planInvitations`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },  
+    });
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId, getPlanInvitations };

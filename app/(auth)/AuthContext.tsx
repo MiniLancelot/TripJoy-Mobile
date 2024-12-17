@@ -8,12 +8,13 @@ import _register from "@/services/identity/register";
 import _forgotPassword from "@/services/identity/forgotPassword";
 import Toast from "react-native-toast-message";
 import get_user_profile from "@/services/user/userProfile";
-
+import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 interface AuthProps {
     session: {
         userToken: any | null;
         userInfo: any | null;
     };
+    _onlineFriends: any[];
     // forget_password_url?: string;
     login?: (data: any) => Promise<any>;
     logout?: (data: any) => Promise<any>;
@@ -68,6 +69,7 @@ export const AuthProvider = ({ children }: any) => {
                         refreshToken: result.data.refreshToken,
                     })
                 );
+                initializeSocketConnection(result.data.user.userId);
                 get_user_profile(result.data.accessToken).then((result) => {
                     if (result && result.status == 200) {
                         setUserInfo(result.data);
@@ -77,6 +79,46 @@ export const AuthProvider = ({ children }: any) => {
             }
         } catch (error: any) {
             throw error;
+        }
+    };
+
+    const [connection, setConnection] = useState<HubConnection | null>(null);
+    const [onlineFriends, setOnlineFriends] = useState<any[]>([]);
+
+    // Hàm khởi tạo kết nối Socket
+    const initializeSocketConnection = async (userInfo: any) => {
+        const hubConnection: HubConnection = new HubConnectionBuilder()
+            .withUrl("http://192.168.1.96:6700/notification-hub", { withCredentials: true }) // URL SignalR server
+            .withAutomaticReconnect()
+            .build();
+
+        // Nhận danh sách bạn bè đang online
+        hubConnection.on("OnlineFriends", (friends: any[]) => {
+            setOnlineFriends(friends);
+        });
+
+        // Sự kiện bạn bè online
+        hubConnection.on("FriendOnline", (friend: any) => {
+            setOnlineFriends((prevFriends) => {
+                if (!prevFriends.includes(friend)) {
+                    return [...prevFriends, friend];
+                }
+                return prevFriends;
+            });
+        });
+
+        // Sự kiện bạn bè offline
+        hubConnection.on("FriendOffline", (friend: any) => {
+            setOnlineFriends((prevFriends) => prevFriends.filter((f) => f !== friend));
+        });
+
+        // Kết nối và gửi ID người dùng lên server
+        try {
+            await hubConnection.start();
+            await hubConnection.invoke("AddNewUser", userInfo);
+            setConnection(hubConnection);
+        } catch (err) {
+            console.error("SignalR connection failed:", err);
         }
     };
 
@@ -117,6 +159,10 @@ export const AuthProvider = ({ children }: any) => {
                 setUserToken(null);
                 setUserInfo(null);
                 AsyncStorage.removeItem("user");
+            }
+            if (connection) {
+                connection.stop();
+                setConnection(null);
             }
         });
     };
@@ -230,6 +276,7 @@ export const AuthProvider = ({ children }: any) => {
         verify_otp_forget_password: verify_otp_forget_password,
         change_password: change_password,
         session: {userToken, userInfo},
+        _onlineFriends: onlineFriends,
     };
 
     return (
