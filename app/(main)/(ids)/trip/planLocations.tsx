@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Pressable,
   Image,
+  Alert,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useTabStore } from "@/utils/store";
@@ -122,8 +123,8 @@ const planLocations = () => {
   const _deletePlanLocationImage = async (id: string, data: any) => {
     try {
       const _data = {
-        url: data
-      }
+        url: data,
+      };
       const result = await deletePlanLocationImage(
         _data,
         session.userToken.accessToken,
@@ -136,18 +137,38 @@ const planLocations = () => {
     } catch (error: any) {
       console.log(error);
     }
-  }
+  };
   const _deletePlanLocationByPlanId = async (id: string) => {
-    try {
-      const result = await deletePlanLocationByPlanLocationId(session.userToken.accessToken, id);
-      if (result) {
-        console.log("Result: ", result);
-      }
-    } catch (error: any) {
-      console.log(error);
-      setIsRefreshing(true);
-    }
-  }
+    Alert.alert(
+      "Delete Plan Location",
+      "Are you sure you want to delete this plan location?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              const result = await deletePlanLocationByPlanLocationId(
+                session.userToken.accessToken,
+                id
+              );
+              if (result) {
+                console.log("Result: ", result);
+              }
+            } catch (error: any) {
+              console.log(error);
+            } finally {
+              setIsRefreshing(true);
+            }
+          },
+        },
+      ]
+    );
+  };
 
   if (loading) {
     return (
@@ -184,19 +205,27 @@ const planLocations = () => {
               >
                 <Text style={styles.title}>{item.name}</Text>
                 <Text>{item.address}</Text>
-                {item.images != "" ? (<Pressable onLongPress={() => _deletePlanLocationImage(item.planLocationId, item.images)}>
-                  <Image
-                    source={{
-                      uri: item.images ?? tempAvatar,
-                    }}
-                    style={styles.image}
-                  />
-                </Pressable>) : null}
+                {item.images != "" ? (
+                  <Pressable
+                    onLongPress={() =>
+                      _deletePlanLocationImage(item.planLocationId, item.images)
+                    }
+                  >
+                    <Image
+                      source={{
+                        uri: item.images ?? tempAvatar,
+                      }}
+                      style={styles.image}
+                    />
+                  </Pressable>
+                ) : null}
               </Pressable>
               <Pressable onPress={() => planDetail(item.planLocationId)}>
                 <Text>Detail</Text>
               </Pressable>
-              <Pressable onPress={() => _deletePlanLocationByPlanId(item.planLocationId)}>
+              <Pressable
+                onPress={() => _deletePlanLocationByPlanId(item.planLocationId)}
+              >
                 <Text>Delete</Text>
               </Pressable>
             </View>

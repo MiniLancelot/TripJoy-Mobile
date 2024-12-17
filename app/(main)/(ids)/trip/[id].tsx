@@ -98,6 +98,7 @@ import MyProfileModal from "@/components/Modals/MyProfileModal";
 import CalendarModal from "@/components/Modals/CalendarModal";
 import { Calendar } from "react-native-calendars";
 import { ca } from "date-fns/locale";
+import { set } from "date-fns";
 import { Locations } from "@/constants/Locations";
 
 type Province = {
@@ -119,6 +120,9 @@ type TripProps = {
 };
 
 type PlanLocationProps = {
+  planLocationId: string;
+  planId: string;
+  locationId: string;
   longitude: number;
   latitude: number;
   name: string;
@@ -135,10 +139,12 @@ const ChosenTrip = () => {
   const { session } = useAuth();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false); 
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string | null>(today);
+  const [planLocations, setPlanLocations] = useState<PlanLocationProps[]>([]);
 
   const [planLocation, setPlanLocation] = useState<PlanLocationProps>({
     name: "",
@@ -146,6 +152,9 @@ const ChosenTrip = () => {
     longitude: 0,
     latitude: 0,
     estimatedStartDate: "",
+    locationId: "",
+    planId: "",
+    planLocationId: "",
   });
 
   const [planData, setPlanData] = useState<TripProps | null>(null);
@@ -194,8 +203,19 @@ const ChosenTrip = () => {
         id
       );
       if (response) {
-        console.log(response.data.planLocations);
-
+        console.log(response.data.planLocations.data);
+        // console.log(response.data.plan.title);
+        setPlanLocations(response.data.planLocations.data.map((item: any): PlanLocationProps => ({
+          planId: item.planId,
+          locationId: item.locationId,
+          planLocationId: item.planLocationId,
+          longitude: item.longitude,
+          latitude: item.latitude,
+          name: item.locationName,
+          address: item.locationAddress,
+          estimatedStartDate: item.estimatedStartDate.split("T")[0],
+        })));
+        console.log("Plan locations: ", planLocations)
         setIsLoading(false);
       }
     } catch (err: any) {
@@ -209,68 +229,88 @@ const ChosenTrip = () => {
   }, []);
 
   useEffect(() => {
-    const fetchRoute = async () => {
-      const coordinates = Locations.map((location) => [
-        location.longtitude,
-        location.latitude,
-      ]);
-      const start = coordinates[0];
-      const end = coordinates[coordinates.length - 1];
-      let url;
+    if(isAdding) {
+      _getPlanLocationById();
+      setIsAdding(false);
+    }
+  },[isAdding])
 
-      if (coordinates.length > 2) {
-        const waypoints = coordinates
-          .slice(1, -1)
-          .map((coord) => coord.join("%2C"))
-          .join("%3B");
-        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
-          "%2C"
-        )}%3B${waypoints}%3B${end.join(
-          "%2C"
-        )}?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${accessToken}`;
-      } else {
-        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
-          ","
-        )};${end.join(",")}?geometries=geojson&access_token=${accessToken}`;
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const fetchRoute = async () => {
+        const coordinates = planLocations.map((location): any => [
+          location.longitude,
+          location.latitude,
+        ]);
+        const start = coordinates[0];
+        const end = coordinates[coordinates.length - 1];
+        let url;
+  
+        if (coordinates.length > 2) {
+          const waypoints = coordinates
+            .slice(1, -1)
+            .map((coord) => coord.join("%2C"))
+            .join("%3B");
+          url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
+            "%2C"
+          )}%3B${waypoints}%3B${end.join(
+            "%2C"
+          )}?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${accessToken}`;
+        } else {
+          url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${start.join(
+            ","
+          )};${end.join(",")}?geometries=geojson&access_token=${accessToken}`;
+        }
+  
+        try {
+          const response = await axios.get(url);
+          const routeGeoJSON = response.data.routes[0].geometry;
+          // const routeDistance = response.data.routes[0].distance;
+          const routeDistance = response.data.routes[0].distance / 1000;
+          setDistance(routeDistance);
+          setRoute(routeGeoJSON);
+          setCurrentLocation(coordinates[0]);
+  
+          let zoomLevel;
+        if (routeDistance < 1) {
+          zoomLevel = 15;
+        } else if (routeDistance < 10) {
+          zoomLevel = 12;
+        } else if (routeDistance < 100) {
+          zoomLevel = 10;
+        } else {
+          zoomLevel = 8;
+        } 
+  
+        // Update camera with the calculated zoom level
+        cameraRef.current?.setCamera({
+          centerCoordinate: coordinates[0], // Center on the starting point
+          zoomLevel,
+          duration: 1000, // Smooth transition
+        });
+  
+        } catch (error) {
+          console.error("Error fetching route:", error);
+        }
+      };
+  
+      if (planLocations.length) {
+        fetchRoute();
       }
 
-      try {
-        const response = await axios.get(url);
-        const routeGeoJSON = response.data.routes[0].geometry;
-        // const routeDistance = response.data.routes[0].distance;
-        const routeDistance = response.data.routes[0].distance / 1000;
-        setDistance(routeDistance);
-        setRoute(routeGeoJSON);
-        setCurrentLocation(coordinates[0]);
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [planLocations]);
 
-        let zoomLevel;
-      if (routeDistance < 1) {
-        zoomLevel = 15;
-      } else if (routeDistance < 10) {
-        zoomLevel = 12;
-      } else if (routeDistance < 100) {
-        zoomLevel = 10;
-      } else {
-        zoomLevel = 8;
-      } 
+  useEffect(() => {
+    if(isAdding) {
+      _getPlanLocationById();
+      setIsAdding(false);
+    }
+  },[isAdding])
 
-      // Update camera with the calculated zoom level
-      cameraRef.current?.setCamera({
-        centerCoordinate: coordinates[0], // Center on the starting point
-        zoomLevel,
-        duration: 1000, // Smooth transition
-      });
-
-      } catch (error) {
-        console.error("Error fetching route:", error);
-      }
-    };
-
-    fetchRoute();
-  }, []);
-
-  const locationPoints = Locations.map((location, index) => ({
-    ...point([location.longtitude, location.latitude]),
+  const locationPoints = planLocations.map((location, index) => ({
+    ...point([location.longitude, location.latitude]),
     properties: {
       label: `${index + 1}. ${location.name}`,
     },
@@ -330,6 +370,9 @@ const ChosenTrip = () => {
       longitude: longitude,
       latitude: latitude,
       estimatedStartDate: selectedDate || "",
+      planId: "",
+      planLocationId: "",
+      locationId: "",
     });
 
     // Move the camera to the selected location
@@ -344,10 +387,10 @@ const ChosenTrip = () => {
     setSearchQuery("");
     setSearchQuery(location.display_name); // Update search box with the selected place name
 
-    Alert.alert(
-      "Selected Location",
-      `Latitude: ${latitude}, Longitude: ${longitude}, Name: ${name}, Address: ${address}`
-    );
+    // Alert.alert(
+    //   "Selected Location",
+    //   `Latitude: ${latitude}, Longitude: ${longitude}, Name: ${name}, Address: ${address}`
+    // );
   };
 
   const snapPoints = useMemo(() => ["33%"], []);
@@ -398,7 +441,7 @@ const ChosenTrip = () => {
       .then((response) => {
         console.log("Add Plan Location Response:", response.data);
         Alert.alert("Success", "Location added to the trip.");
-        _getPlanLocationById();
+        setIsAdding(true);
         // navigation.navigate("/(tabs)/trip");
       })
       .catch((error) => {
@@ -552,11 +595,13 @@ const ChosenTrip = () => {
           enablePanDownToClose={false}
         >
           <BottomSheetView style={styles.contentContainer}>
+            <Pressable onPress={()=> setIsAdding(true)}>
             <Text
               style={{ fontSize: 20, fontWeight: "500", alignItems: "center" }}
             >
               Thêm địa điểm trên chuyến đi 🎉
             </Text>
+            </Pressable>
             <View style={styles.bottomSheetInnerContainer}>
               <Text style={styles.btsLocationName}>
                 {planLocation.name ? planLocation.name : "Tên địa điểm"}
