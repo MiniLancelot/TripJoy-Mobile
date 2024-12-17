@@ -1,58 +1,3 @@
-// import { View, Text } from 'react-native'
-// import React, { useEffect, useState } from 'react'
-// import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-// import { useAuth } from '@/app/(auth)/AuthContext';
-// import { getPlanLocationById } from '@/services/plan/plan';
-
-// type Province = {
-//     provinceId: string;
-//     provinceName: string;
-//   };
-
-//   type TripProps = {
-//     id: string;
-//     title: string;
-//     estimatedStartDate: string;
-//     estimatedEndDate: string;
-//     provinceStart: Province;
-//     provinceEnd: Province;
-//   }
-
-// const ChosenTrip = () => {
-//     const { id } = useLocalSearchParams();
-//   const router = useRouter();
-//   const { session } = useAuth();
-//   const navigation = useNavigation();
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [error, setError] = useState<string | null>(null);
-
-//   const fetchPlan = async () => {
-//     try {
-//       setIsLoading(true);
-//       const response = await getPlanLocationById(session.userToken.accessToken, id);
-//       if (response) {
-//         console.log(response.data.plan.title);
-//         // setPlanData(response.data.plan);
-//         setIsLoading(false);
-//       }
-//     } catch (err: any) {
-//       setError(err.message);
-//       console.log("fail")
-//     }
-//   }
-//   useEffect(() => {
-//     fetchPlan();
-//   }, [])
-
-//   return (
-//     <View>
-//       <Text>id</Text>
-//     </View>
-//   )
-// }
-
-// export default ChosenTrip
-
 import React, {
   useRef,
   useState,
@@ -79,6 +24,7 @@ import Mapbox, {
   SymbolLayer,
   Images,
   LineLayer,
+  LocationPuck,
 } from "@rnmapbox/maps";
 import BottomSheet, {
   BottomSheetModal,
@@ -100,6 +46,7 @@ import { Calendar } from "react-native-calendars";
 import { ca } from "date-fns/locale";
 import { set } from "date-fns";
 import { Locations } from "@/constants/Locations";
+import * as Location from "expo-location";
 
 type Province = {
   provinceId: string;
@@ -130,6 +77,11 @@ type PlanLocationProps = {
   estimatedStartDate: string;
 };
 
+interface Location {
+  latitude: number;
+  longitude: number;
+}
+
 const accessToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 Mapbox.setAccessToken(accessToken);
 
@@ -143,6 +95,7 @@ const ChosenTrip = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const today = new Date().toISOString().split("T")[0];
+  const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(today);
   const [planLocations, setPlanLocations] = useState<PlanLocationProps[]>([]);
 
@@ -393,7 +346,7 @@ const ChosenTrip = () => {
     // );
   };
 
-  const snapPoints = useMemo(() => ["33%"], []);
+  const snapPoints = useMemo(() => ["36%"], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   // const handleOpen = () => bottomSheetRef.current?.expand();
   // const handleSheetChanges = useCallback((index: number) => {
@@ -458,6 +411,31 @@ const ChosenTrip = () => {
     const parts = displayName.split(",");
     return parts.slice(1).join(",").trim();
   };
+
+    const getLocationPermission = async () => {
+    let { status } = await Location.getForegroundPermissionsAsync();
+    if (status !== "granted") {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+        return;
+      }
+    }
+    showCurrentLocation();
+  };
+
+  const showCurrentLocation = async () => {
+    let location = await Location.getCurrentPositionAsync({});
+    setUserLocation({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    });
+    console.log(userLocation);
+  };
+
+    useEffect(() => {
+    getLocationPermission();
+  }, []);
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -533,12 +511,16 @@ const ChosenTrip = () => {
   style={styles.map}
   styleURL="mapbox://styles/mapbox/streets-v12"
 >
+{userLocation && (
   <Camera
     ref={cameraRef}
     followUserLocation={false}
     zoomLevel={15}
-    centerCoordinate={currentLocation || [108.218, 16.06]}
+    centerCoordinate={currentLocation || [userLocation.longitude, userLocation.latitude]}
   />
+)}
+
+<LocationPuck pulsing={{ isEnabled: true }} puckBearingEnabled puckBearing="heading"/>
 
   {/* Render all locations */}
   <ShapeSource id="allLocations" shape={myLocationFeature}>

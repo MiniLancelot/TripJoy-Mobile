@@ -79,7 +79,7 @@ const planLocations = () => {
   };
 
   const planDetail = (id: string) => {
-    router.push(`/(main)/(ids)/trip/updatePlanLocation/${id}`);
+    router.push(`/(main)/(ids)/updatePlanLocation/${id}`);
   };
 
   useEffect(() => {

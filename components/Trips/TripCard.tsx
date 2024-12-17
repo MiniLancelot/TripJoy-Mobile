@@ -172,9 +172,9 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
                     ? formatDate(planData.estimatedEndDate)
                     : ""}
                 </Text>
-                <Pressable onPress={() => console.log("Update")}>
+                {/* <Pressable onPress={() => console.log("Update")}>
                   <Text>Cập nhật</Text>
-                </Pressable>
+                </Pressable> */}
               </View>
             </View>
             <View style={style.bottomContainer}>
