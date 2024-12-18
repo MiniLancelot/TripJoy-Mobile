@@ -9,6 +9,7 @@ import _forgotPassword from "@/services/identity/forgotPassword";
 import Toast from "react-native-toast-message";
 import get_user_profile from "@/services/user/userProfile";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { socketURL } from "@/utils/baseUrl";
 interface AuthProps {
     session: {
         userToken: any | null;
@@ -88,7 +89,7 @@ export const AuthProvider = ({ children }: any) => {
     // Hàm khởi tạo kết nối Socket
     const initializeSocketConnection = async (userInfo: any) => {
         const hubConnection: HubConnection = new HubConnectionBuilder()
-            .withUrl("http://192.168.1.96:6700/notification-hub", { withCredentials: true }) // URL SignalR server
+            .withUrl(`${socketURL}/notification-hub`, { withCredentials: true }) // URL SignalR server
             .withAutomaticReconnect()
             .build();
 
