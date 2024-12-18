@@ -213,8 +213,9 @@ const planLocations = () => {
           data={plan}
           keyExtractor={(item) => item.planLocationId}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, drag }) => (
+          renderItem={({ item, getIndex, drag }) => (
             <PlanLocationItem
+              index={getIndex()}
               item={item}
               drag={drag}
               onDelete={_deletePlanLocationByPlanId}

@@ -13,6 +13,7 @@ type PlanLocationsProps = {
   };
 
 type PlanLocationItemProps = {
+  index: number | undefined;
   item: PlanLocationsProps;
   drag: () => void;
   onDelete: (id: string) => void;
@@ -22,6 +23,7 @@ type PlanLocationItemProps = {
 };
 
 const PlanLocationItem = ({
+  index,
   item,
   drag,
   onDelete,
@@ -32,6 +34,7 @@ const PlanLocationItem = ({
   return (
     <View style={styles.container}>
       <Pressable onLongPress={drag}>
+        <Text>{index}</Text>
         <Text style={styles.title}>{item.name}</Text>
         <Text>{item.estimatedStartDate}</Text>
         <Text>{item.address}</Text>
