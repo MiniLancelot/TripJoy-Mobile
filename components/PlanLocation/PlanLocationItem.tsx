@@ -29,7 +29,7 @@ const PlanLocationItem = ({
   tempAvatar,
 }: PlanLocationItemProps) => {
   return (
-    <View>
+    <View style={styles.container}>
       <Pressable onLongPress={drag}>
         <Text style={styles.title}>{item.name}</Text>
         <Text>{item.address}</Text>
@@ -57,6 +57,12 @@ const PlanLocationItem = ({
 };
 
 const styles = StyleSheet.create({
+  container:{
+    flex: 1,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#000",
+  },
   title: {
     fontSize: 17,
     fontWeight: "500",
