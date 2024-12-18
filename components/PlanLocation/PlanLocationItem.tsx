@@ -9,6 +9,7 @@ type PlanLocationsProps = {
     images: string;
     name: string;
     address: string;
+    estimatedStartDate: string
   };
 
 type PlanLocationItemProps = {
@@ -32,6 +33,7 @@ const PlanLocationItem = ({
     <View style={styles.container}>
       <Pressable onLongPress={drag}>
         <Text style={styles.title}>{item.name}</Text>
+        <Text>{item.estimatedStartDate}</Text>
         <Text>{item.address}</Text>
         {item.images !== "" ? (
           <Pressable

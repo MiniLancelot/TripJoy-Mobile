@@ -134,7 +134,7 @@ const FriendList = () => {
           estimatedItemSize={65}
           renderItem={({ item }: { item: FriendProps }) => (
             <Friend
-              avatar={item.avatar == null ? null : item.avatar}
+              avatar={item.avatar == null ? null : item.avatar.url}
               id={item.userId}
               name={item.name}
               _onClick={handleRemoveFriend}

@@ -13,5 +13,6 @@ const identity = createAxiosInstance('identity-service');
 const user = createAxiosInstance('useraccess-service');
 const location = createAxiosInstance('locationattraction-service');
 const plan = createAxiosInstance('travelplan-service');
+const chat = createAxiosInstance('chat-service');
 
-export { identity, user, location, plan };
+export { identity, user, location, plan, chat };

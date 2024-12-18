@@ -34,6 +34,7 @@ type PlanLocationsProps = {
   images: string;
   name: string;
   address: string;
+  estimatedStartDate: string;
 };
 
 const planLocations = () => {
@@ -66,6 +67,7 @@ const planLocations = () => {
               images: _item.images.length != 0 ? _item.images[0].url : "",
               name: _item.locationName,
               address: _item.locationAddress,
+              estimatedStartDate: _item.estimatedStartDate.split("T")[0],
             })
           );
         console.log("Filtered Data: ", filteredData);

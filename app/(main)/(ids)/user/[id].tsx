@@ -40,6 +40,8 @@ import {
   revoke_friend_request,
   send_friend_request,
 } from "@/services/user/friend_request";
+// import { openChat } from "@/services/chat/chat";
+// import { useChatStore } from "@/utils/store";
 
 type UserProps = {
   id: string;
@@ -91,7 +93,7 @@ const User = () => {
     gender: null,
     status: 0,
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
@@ -208,12 +210,12 @@ const User = () => {
       if (response) {
         console.log(response.data.user);
         console.log(response.data.user.avatar);
-        if(response.data.user.avatar){
+        if (response.data.user.avatar) {
           setAvatarUrl(response.data.user.avatar.url);
         }
         setUser(response.data.user);
         if (user) {
-          console.log("name:", user.userName)
+          console.log("name:", user.userName);
         }
         setLoading(false);
         setIsSuccess(false);
@@ -384,6 +386,19 @@ const User = () => {
     }
   };
 
+  const handleCreateChatRoom = () => {
+    // try {
+    //   const response = await openChat(user.id, session.userToken.accessToken);
+    //   if (response) {
+    //     console.log(response.data);
+    //     router.push(`/chat/${response.data.room.roomId}`);
+    //   }
+    // } catch (err: any) {
+    //   console.info("chat err: " + err.message);
+    // }
+    router.push(`/chat/${user.id}`);
+  };
+
   return (
     <View style={styles.profileContainer}>
       <Stack.Screen
@@ -394,7 +409,7 @@ const User = () => {
           // headerStyle: { backgroundColor: "#fff" },
           headerLeft: () => {
             return (
-              <>
+              <View>
                 <View style={styles.backBtnWrapper}>
                   <Pressable onPress={() => router.back()}>
                     <Animated.Text style={iconColorAnimatedStyle}>
@@ -421,7 +436,7 @@ const User = () => {
                     {user.userName}
                   </Animated.Text>
                 </Pressable>
-              </>
+              </View>
             );
           },
           headerBackground: () => (
@@ -539,6 +554,15 @@ const User = () => {
                   case FriendStatus.FRIEND:
                     return (
                       <View style={styles.outerEditContainer}>
+                        <View style={styles.editContainer}>
+                          <Pressable
+                            onPress={handleCreateChatRoom}
+                            style={styles.innerEditContainer}
+                          >
+                            <Text style={styles.editText}>Nhắn tin</Text>
+
+                          </Pressable>
+                        </View>
                         <View style={styles.editContainer}>
                           <Pressable
                             onPress={handleRemoveFriend}
