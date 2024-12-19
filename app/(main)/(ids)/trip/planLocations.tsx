@@ -173,7 +173,6 @@ const planLocations = () => {
       ]
     );
   };
-  
 
   if (loading) {
     return (
@@ -208,6 +207,22 @@ const planLocations = () => {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerRight: () => {
+            return (
+              <Pressable
+                onPress={() => setIsRefreshing(true)}
+                style={styles.settingButton}
+              >
+                <Text>
+                  <Ionicons name="refresh-outline" size={20} />
+                </Text>
+              </Pressable>
+            );
+          },
+        }}
+      />
       <GestureHandlerRootView>
         <DraggableFlatList
           data={plan}

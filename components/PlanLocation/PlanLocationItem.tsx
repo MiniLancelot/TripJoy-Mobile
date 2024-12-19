@@ -45,24 +45,17 @@ const PlanLocationItem = ({
     <View style={styles.container}>
       <Text style={styles.dateText}>{formatDate(item.estimatedStartDate)}</Text>
       <View style={styles.cardOuterContainer}>
-        <Text style={styles.indexText}>{index !== undefined ? ++index : index}</Text>
+        <Text style={styles.indexText}>
+          {index !== undefined ? ++index : index}
+        </Text>
         <Pressable onLongPress={drag} style={styles.cardContainer}>
-          <Text style={styles.title}>{item.name}</Text>
-
-          <Text>{item.address}</Text>
           {item.images !== "" ? (
-            <Pressable
-              onLongPress={() =>
-                onDeleteImage(item.planLocationId, item.images)
-              }
-            >
-              <Image
-                source={{
-                  uri: item.images || DEFAULT_IMAGE,
-                }}
-                style={styles.image}
-              />
-            </Pressable>
+            <Image
+              source={{
+                uri: item.images || DEFAULT_IMAGE,
+              }}
+              style={styles.image}
+            />
           ) : (
             <Image
               source={{
@@ -71,13 +64,18 @@ const PlanLocationItem = ({
               style={styles.image}
             />
           )}
+          <View style={{ flex: 1, justifyContent: "flex-start" }}>
+            <Text style={styles.title}>{item.name}</Text>
 
-          <Pressable onPress={() => onDetail(item.planLocationId)}>
-            <Text>Detail</Text>
-          </Pressable>
-          <Pressable onPress={() => onDelete(item.planLocationId)}>
-            <Text>Delete</Text>
-          </Pressable>
+            <Text numberOfLines={1} ellipsizeMode="tail" >{item.address}</Text>
+
+            {/* <Pressable onPress={() => onDetail(item.planLocationId)}>
+              <Text>Detail</Text>
+            </Pressable>
+            <Pressable onPress={() => onDelete(item.planLocationId)}>
+              <Text>Delete</Text>
+            </Pressable> */}
+          </View>
         </Pressable>
       </View>
     </View>
@@ -94,9 +92,9 @@ const styles = StyleSheet.create({
   cardOuterContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 20,
+    gap: 15,
   },
-  indexText:{
+  indexText: {
     fontSize: 12,
     fontWeight: "500",
     padding: 10,
@@ -113,7 +111,10 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#ffffff",
     elevation: 5,
-    width: "80%",
+    width: "85%",
+    flexDirection: "row",
+    
+    gap: 10,
   },
   dateText: {
     marginLeft: 0,
@@ -128,8 +129,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 85,
+    height: 85,
     borderRadius: 15,
   },
 });
