@@ -26,6 +26,7 @@ type PlanLocationItemProps = {
   onDelete: (id: string) => void;
   onDeleteImage: (id: string, imageUrl: string) => void;
   onDetail: (id: string) => void;
+  _onDetail: (id: string) => void;
   tempAvatar: string;
 };
 
@@ -39,6 +40,7 @@ const PlanLocationItem = ({
   onDelete,
   onDeleteImage,
   onDetail,
+  _onDetail,
   tempAvatar,
 }: PlanLocationItemProps) => {
   const formatDate = (dateString: string) => {
@@ -77,7 +79,10 @@ const PlanLocationItem = ({
 
             <Text style={{fontSize: 12}} numberOfLines={1} ellipsizeMode="tail" >{item.address}</Text>
 
-            <Pressable onPress={() => onDetail(item.planLocationId)} style={styles.detailButton}>
+            {/* <Pressable onPress={() => onDetail(item.planLocationId)} style={styles.detailButton}>
+              <Text style={{color: "#fff"}}>Chi tiết</Text>
+            </Pressable> */}
+            <Pressable onPress={() => _onDetail(item.planLocationId)} style={styles.detailButton}>
               <Text style={{color: "#fff"}}>Chi tiết</Text>
             </Pressable>
             <Pressable onPress={() => onDelete(item.planLocationId) } style={styles.deleteButton}>

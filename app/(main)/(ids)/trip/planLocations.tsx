@@ -7,7 +7,7 @@ import {
   Image,
   Alert,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTabStore } from "@/utils/store";
 import {
   changeOrderPlanLocations,
@@ -25,6 +25,11 @@ import { fi, se } from "date-fns/locale";
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import PlanLocationItem from "@/components/PlanLocation/PlanLocationItem";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 
 type PlanLocationsProps = {
   planId: string;
@@ -41,6 +46,9 @@ const planLocations = () => {
   const { session } = useAuth();
   const sharedId = useTabStore((state) => state.sharedId);
   const [plan, setPlan] = useState<PlanLocationsProps[]>([]);
+  const [chosenPlanLocation, setChosenPlanLocation] = useState<
+    PlanLocationsProps | undefined
+  >(undefined);
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -103,6 +111,28 @@ const planLocations = () => {
     }, 1000);
     return () => clearTimeout(timeout);
   }, [isRefreshing]);
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const handleOpen = (planLocationId: string) => {
+    setChosenPlanLocation(
+      plan.find((item) => item.planLocationId === planLocationId)
+    );
+    bottomSheetRef.current?.expand();
+  };
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+
+  const renderBackDrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      ></BottomSheetBackdrop>
+    ),
+    []
+  );
 
   const swapItems = async (from: number, to: number) => {
     const firstItem = plan[from].planLocationId;
@@ -177,20 +207,22 @@ const planLocations = () => {
   if (loading) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Stack.Screen options={{
-          headerRight: () => {
-            return (
-              <Pressable
-                onPress={() => setIsRefreshing(true)}
-                style={styles.settingButton}
-              >
-                <Text>
-                  <Ionicons name="refresh-outline" size={20} />
-                </Text>
-              </Pressable>
-            );
-          },
-        }}/>
+        <Stack.Screen
+          options={{
+            headerRight: () => {
+              return (
+                <Pressable
+                  onPress={() => setIsRefreshing(true)}
+                  style={styles.settingButton}
+                >
+                  <Text>
+                    <Ionicons name="refresh-outline" size={20} />
+                  </Text>
+                </Pressable>
+              );
+            },
+          }}
+        />
         <ActivityIndicator size="large" color="gray" />
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
@@ -207,44 +239,69 @@ const planLocations = () => {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerRight: () => {
-            return (
-              <Pressable
-                onPress={() => setIsRefreshing(true)}
-                style={styles.settingButton}
-              >
-                <Text>
-                  <Ionicons name="refresh-outline" size={20} />
-                </Text>
-              </Pressable>
-            );
-          },
-        }}
-      />
       <GestureHandlerRootView>
-        <DraggableFlatList
-          data={plan}
-          keyExtractor={(item) => item.planLocationId}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item, getIndex, drag }) => (
-            <PlanLocationItem
-              index={getIndex()}
-              item={item}
-              drag={drag}
-              onDelete={_deletePlanLocationByPlanId}
-              onDeleteImage={_deletePlanLocationImage}
-              onDetail={planDetail}
-              tempAvatar={tempAvatar}
-            />
-          )}
-          onDragEnd={({ from, to }) => {
-            if (from !== to) {
-              swapItems(from, to);
-            }
-          }}
-        />
+        <BottomSheetModalProvider>
+          <Stack.Screen
+            options={{
+              headerRight: () => {
+                return (
+                  <Pressable
+                    onPress={() => setIsRefreshing(true)}
+                    style={styles.settingButton}
+                  >
+                    <Text>
+                      <Ionicons name="refresh-outline" size={20} />
+                    </Text>
+                  </Pressable>
+                );
+              },
+            }}
+          />
+
+          <DraggableFlatList
+            data={plan}
+            keyExtractor={(item) => item.planLocationId}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, getIndex, drag }) => (
+              <PlanLocationItem
+                index={getIndex()}
+                item={item}
+                drag={drag}
+                onDelete={_deletePlanLocationByPlanId}
+                onDeleteImage={_deletePlanLocationImage}
+                onDetail={planDetail}
+                tempAvatar={tempAvatar}
+                _onDetail={handleOpen}
+              />
+            )}
+            onDragEnd={({ from, to }) => {
+              if (from !== to) {
+                swapItems(from, to);
+              }
+            }}
+          />
+
+          <BottomSheet
+            ref={bottomSheetRef}
+            onChange={handleSheetChanges}
+            snapPoints={["30%"]}
+            index={-1}
+            backdropComponent={renderBackDrop}
+            enablePanDownToClose={true}
+          >
+            <BottomSheetView style={{ flex: 1 }}>
+              <Text>Bottom Sheet Content</Text>
+              {/* <Text>{chosenPlanLocation?.planId}</Text>
+              <Text>{chosenPlanLocation?.locationId}</Text> */}
+              <Text>{chosenPlanLocation?.planLocationId}</Text>
+              <Text>{chosenPlanLocation?.order}</Text>
+              {/* <Text>{chosenPlanLocation?.images}</Text> */}
+              <Text>{chosenPlanLocation?.name}</Text>
+              <Text>{chosenPlanLocation?.address}</Text>
+              <Text>{chosenPlanLocation?.estimatedStartDate}</Text>
+            </BottomSheetView>
+          </BottomSheet>
+        </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </View>
   );

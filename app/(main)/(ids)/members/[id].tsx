@@ -31,8 +31,8 @@ interface FriendProps {
 
 enum InviteStatus {
   INVITED = 0,
-  SELF = 1,
-  JOINED = 2,
+  SELF = 2,
+  JOINED = 1,
   NOT_INVITED = 3,
 }
 
