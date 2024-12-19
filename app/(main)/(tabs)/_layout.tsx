@@ -44,6 +44,8 @@ const Layout = () => {
     "(HomeTabs)/PersonalScreen",
     "(HomeTabs)/(FriendTabs)/FriendList",
     "(HomeTabs)/(FriendTabs)/FriendInvitation",
+    // "(HomeTabs)/(FriendTabs)/[id]",
+    // "(HomeTabs)/(FriendTabs)/TripInvitationResponse",
     // "(CreateTabs)",
   ];
 
