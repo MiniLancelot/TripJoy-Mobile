@@ -18,6 +18,7 @@ import Animated, {
 import { getPlanLocationById } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { router } from "expo-router";
+import { da } from "date-fns/locale";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;
@@ -172,8 +173,8 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
                     ? formatDate(planData.estimatedEndDate)
                     : ""}
                 </Text>
-                {/* <Pressable onPress={() => console.log("Update")}>
-                  <Text>Cập nhật</Text>
+                {/* <Pressable onPress={() => router.push(`/(FriendTabs)/${item.id}`)}>
+                  <Text>Mời</Text>
                 </Pressable> */}
               </View>
             </View>

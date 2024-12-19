@@ -17,9 +17,24 @@ const inviteMember = async (userId: any, planId: any, accessToken: any) => {
   }
 };
 
+const getPlanInvitaitonsAvailable = async (planId: any, pageIndex: number, accessToken: any) => {
+  try {
+    const result = await plan(`/plans/${planId}/planInvitations/available?pageIndex=${pageIndex}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+};
+
 const revokeMember = async (userId: any, planId: any, accessToken: any) => {
   try {
-    const result = await plan(`/plans/${planId}/members/invite/${userId}`, {
+    const result = await plan(`/plans/${planId}/members/revoke/${userId}`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
@@ -111,4 +126,4 @@ const removeMember = async (planId: any, userId: any, accessToken: any) => {
   }
 }
 
-export { inviteMember, revokeMember, acceptInvitation, declineInvitation, getMembersByPlanId, changePermission, removeMember };
+export { inviteMember, revokeMember, acceptInvitation, declineInvitation, getMembersByPlanId, changePermission, removeMember, getPlanInvitaitonsAvailable };
