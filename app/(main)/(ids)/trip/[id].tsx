@@ -91,7 +91,7 @@ const ChosenTrip = () => {
   const { session } = useAuth();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
-  const [isAdding, setIsAdding] = useState(false); 
+  const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const today = new Date().toISOString().split("T")[0];
@@ -158,17 +158,21 @@ const ChosenTrip = () => {
       if (response) {
         console.log(response.data.planLocations.data);
         // console.log(response.data.plan.title);
-        setPlanLocations(response.data.planLocations.data.map((item: any): PlanLocationProps => ({
-          planId: item.planId,
-          locationId: item.locationId,
-          planLocationId: item.planLocationId,
-          longitude: item.longitude,
-          latitude: item.latitude,
-          name: item.locationName,
-          address: item.locationAddress,
-          estimatedStartDate: item.estimatedStartDate.split("T")[0],
-        })));
-        console.log("Plan locations: ", planLocations)
+        setPlanLocations(
+          response.data.planLocations.data.map(
+            (item: any): PlanLocationProps => ({
+              planId: item.planId,
+              locationId: item.locationId,
+              planLocationId: item.planLocationId,
+              longitude: item.longitude,
+              latitude: item.latitude,
+              name: item.locationName,
+              address: item.locationAddress,
+              estimatedStartDate: item.estimatedStartDate.split("T")[0],
+            })
+          )
+        );
+        console.log("Plan locations: ", planLocations);
         setIsLoading(false);
       }
     } catch (err: any) {
@@ -182,11 +186,11 @@ const ChosenTrip = () => {
   }, []);
 
   useEffect(() => {
-    if(isAdding) {
+    if (isAdding) {
       _getPlanLocationById();
       setIsAdding(false);
     }
-  },[isAdding])
+  }, [isAdding]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -198,7 +202,7 @@ const ChosenTrip = () => {
         const start = coordinates[0];
         const end = coordinates[coordinates.length - 1];
         let url;
-  
+
         if (coordinates.length > 2) {
           const waypoints = coordinates
             .slice(1, -1)
@@ -214,7 +218,7 @@ const ChosenTrip = () => {
             ","
           )};${end.join(",")}?geometries=geojson&access_token=${accessToken}`;
         }
-  
+
         try {
           const response = await axios.get(url);
           const routeGeoJSON = response.data.routes[0].geometry;
@@ -223,44 +227,42 @@ const ChosenTrip = () => {
           setDistance(routeDistance);
           setRoute(routeGeoJSON);
           setCurrentLocation(coordinates[0]);
-  
+
           let zoomLevel;
-        if (routeDistance < 1) {
-          zoomLevel = 15;
-        } else if (routeDistance < 10) {
-          zoomLevel = 12;
-        } else if (routeDistance < 100) {
-          zoomLevel = 10;
-        } else {
-          zoomLevel = 8;
-        } 
-  
-        // Update camera with the calculated zoom level
-        cameraRef.current?.setCamera({
-          centerCoordinate: coordinates[0], // Center on the starting point
-          zoomLevel,
-          duration: 1000, // Smooth transition
-        });
-  
+          if (routeDistance < 1) {
+            zoomLevel = 15;
+          } else if (routeDistance < 10) {
+            zoomLevel = 12;
+          } else if (routeDistance < 100) {
+            zoomLevel = 10;
+          } else {
+            zoomLevel = 8;
+          }
+
+          // Update camera with the calculated zoom level
+          cameraRef.current?.setCamera({
+            centerCoordinate: coordinates[0], // Center on the starting point
+            zoomLevel,
+            duration: 1000, // Smooth transition
+          });
         } catch (error) {
           console.error("Error fetching route:", error);
         }
       };
-  
+
       if (planLocations.length) {
         fetchRoute();
       }
-
     }, 1000);
     return () => clearTimeout(timeout);
   }, [planLocations]);
 
   useEffect(() => {
-    if(isAdding) {
+    if (isAdding) {
       _getPlanLocationById();
       setIsAdding(false);
     }
-  },[isAdding])
+  }, [isAdding]);
 
   const locationPoints = planLocations.map((location, index) => ({
     ...point([location.longitude, location.latitude]),
@@ -412,7 +414,7 @@ const ChosenTrip = () => {
     return parts.slice(1).join(",").trim();
   };
 
-    const getLocationPermission = async () => {
+  const getLocationPermission = async () => {
     let { status } = await Location.getForegroundPermissionsAsync();
     if (status !== "granted") {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -433,9 +435,13 @@ const ChosenTrip = () => {
     console.log(userLocation);
   };
 
-    useEffect(() => {
+  useEffect(() => {
     getLocationPermission();
   }, []);
+
+  const clearText = (setText: (text: string) => void) => {
+    setText("");
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -456,6 +462,11 @@ const ChosenTrip = () => {
               onChangeText={setSearchQuery}
             />
           </View>
+          {searchQuery.length > 0 && (
+            <TouchableOpacity style={{ position: "absolute", right: 20, top: 11 }} onPress={() => clearText(setSearchQuery)}>
+              <Ionicons name="close-circle-outline" size={24} color="#9FB7B9" />
+            </TouchableOpacity>
+          )}
         </View>
 
         {searchQuery.trim() && searchResults.length > 0 && (
@@ -507,67 +518,79 @@ const ChosenTrip = () => {
         )}
 
         <View style={styles.mapContainer}>
-        <MapView
-  style={styles.map}
-  styleURL="mapbox://styles/mapbox/streets-v12"
->
-{userLocation && (
-  <Camera
-    ref={cameraRef}
-    followUserLocation={false}
-    zoomLevel={15}
-    centerCoordinate={currentLocation || [userLocation.longitude, userLocation.latitude]}
-  />
-)}
+          <MapView
+            style={styles.map}
+            styleURL="mapbox://styles/mapbox/streets-v12"
+          >
+            {userLocation && (
+              <Camera
+                ref={cameraRef}
+                followUserLocation={false}
+                zoomLevel={15}
+                centerCoordinate={
+                  currentLocation || [
+                    userLocation.longitude,
+                    userLocation.latitude,
+                  ]
+                }
+              />
+            )}
 
-<LocationPuck pulsing={{ isEnabled: true }} puckBearingEnabled puckBearing="heading"/>
+            <LocationPuck
+              pulsing={{ isEnabled: true }}
+              puckBearingEnabled
+              puckBearing="heading"
+            />
 
-  {/* Render all locations */}
-  <ShapeSource id="allLocations" shape={myLocationFeature}>
-    <SymbolLayer
-      id="location-markers"
-      style={{
-        iconImage: "pinIcon",
-        iconSize: 0.5,
-        textField: ["get", "label"],
-        textSize: 12,
-        textOffset: [0, 2],
-        textColor: "#000",
-      }}
-    />
-    <Images images={{ pinIcon }} />
-  </ShapeSource>
+            {/* Render all locations */}
+            <ShapeSource id="allLocations" shape={myLocationFeature}>
+              <SymbolLayer
+                id="location-markers"
+                style={{
+                  iconImage: "pinIcon",
+                  iconSize: 0.5,
+                  textField: ["get", "label"],
+                  textSize: 12,
+                  textOffset: [0, 2],
+                  textColor: "#000",
+                }}
+              />
+              <Images images={{ pinIcon }} />
+            </ShapeSource>
 
-  {/* Route rendering */}
-  {route && (
-    <ShapeSource id="routeSource" shape={lineString(route.coordinates)}>
-      <LineLayer
-        id="routeLayer"
-        style={{
-          lineColor: "#13c892",
-          lineWidth: 3,
-          lineDasharray: [2, 2],
-          lineCap: "round",
-          lineJoin: "round",
-        }}
-      />
-    </ShapeSource>
-  )}
+            {/* Route rendering */}
+            {route && (
+              <ShapeSource
+                id="routeSource"
+                shape={lineString(route.coordinates)}
+              >
+                <LineLayer
+                  id="routeLayer"
+                  style={{
+                    lineColor: "#13c892",
+                    lineWidth: 3,
+                    lineDasharray: [2, 2],
+                    lineCap: "round",
+                    lineJoin: "round",
+                  }}
+                />
+              </ShapeSource>
+            )}
 
-  {/* Selected location marker */}
-  {cameraFeature && (
-    <ShapeSource id="cameraLocation" shape={cameraFeature}>
-      <SymbolLayer
-        id="selected-location-pin"
-        style={{
-          iconImage: "camIcon",
-          iconSize: 0.2,
-        }}
-      />
-      <Images images={{ camIcon }} />
-    </ShapeSource>
-  )}
-</MapView>
+            {/* Selected location marker */}
+            {cameraFeature && (
+              <ShapeSource id="cameraLocation" shape={cameraFeature}>
+                <SymbolLayer
+                  id="selected-location-pin"
+                  style={{
+                    iconImage: "camIcon",
+                    iconSize: 0.2,
+                  }}
+                />
+                <Images images={{ camIcon }} />
+              </ShapeSource>
+            )}
+          </MapView>
         </View>
         <BottomSheet
           ref={bottomSheetRef}
@@ -577,12 +600,16 @@ const ChosenTrip = () => {
           enablePanDownToClose={false}
         >
           <BottomSheetView style={styles.contentContainer}>
-            <Pressable onPress={()=> setIsAdding(true)}>
-            <Text
-              style={{ fontSize: 20, fontWeight: "500", alignItems: "center" }}
-            >
-              Thêm địa điểm trên chuyến đi 🎉
-            </Text>
+            <Pressable onPress={() => setIsAdding(true)}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "500",
+                  alignItems: "center",
+                }}
+              >
+                Thêm địa điểm trên chuyến đi 🎉
+              </Text>
             </Pressable>
             <View style={styles.bottomSheetInnerContainer}>
               <Text style={styles.btsLocationName}>

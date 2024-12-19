@@ -1,4 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+  BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 
 type PlanLocationsProps = {
@@ -21,6 +28,7 @@ type PlanLocationItemProps = {
   onDetail: (id: string) => void;
   tempAvatar: string;
 };
+
 const DEFAULT_IMAGE =
   "https://eadn-wc04-920528.nxedge.io/wp-content/uploads/2023/02/placeholder-726.png";
 
@@ -65,16 +73,16 @@ const PlanLocationItem = ({
             />
           )}
           <View style={{ flex: 1, justifyContent: "flex-start" }}>
-            <Text style={styles.title}>{item.name}</Text>
+            <Text numberOfLines={1} style={styles.title}>{item.name}</Text>
 
-            <Text numberOfLines={1} ellipsizeMode="tail" >{item.address}</Text>
+            <Text style={{fontSize: 12}} numberOfLines={1} ellipsizeMode="tail" >{item.address}</Text>
 
-            {/* <Pressable onPress={() => onDetail(item.planLocationId)}>
-              <Text>Detail</Text>
+            <Pressable onPress={() => onDetail(item.planLocationId)} style={styles.detailButton}>
+              <Text style={{color: "#fff"}}>Chi tiết</Text>
             </Pressable>
-            <Pressable onPress={() => onDelete(item.planLocationId)}>
-              <Text>Delete</Text>
-            </Pressable> */}
+            <Pressable onPress={() => onDelete(item.planLocationId) } style={styles.deleteButton}>
+              <Ionicons name="close-circle-outline" size={23} color="#ff6188" />
+            </Pressable>
           </View>
         </Pressable>
       </View>
@@ -124,15 +132,35 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   title: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "500",
     paddingVertical: 5,
+    marginBottom: 5,
   },
   image: {
-    width: 85,
-    height: 85,
+    width: 100,
+    height: 110,
     borderRadius: 15,
   },
+  
+  deleteButton: {
+    position: "absolute",
+    top: -20,
+    right: 0,
+    backgroundColor: "#ffffff",
+  },
+
+  detailButton: {
+    backgroundColor: "#ff7324",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginTop: 30,
+    alignItems: "center",
+    alignSelf: "flex-end",
+    width: 70,
+    
+  }
 });
 
 export default PlanLocationItem;
