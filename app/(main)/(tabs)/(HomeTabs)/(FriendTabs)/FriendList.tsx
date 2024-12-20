@@ -12,6 +12,7 @@ import { useAuth } from "@/app/(auth)/AuthContext";
 import { get_friends, remove_friend } from "@/services/user/friend_request";
 import { FlashList } from "@shopify/flash-list";
 import { set } from "date-fns";
+import { router } from "expo-router";
 
 interface FriendProps {
   userId: string;
@@ -19,6 +20,18 @@ interface FriendProps {
   avatar: any;
   status: boolean;
 }
+const handleCreateChatRoom = (id: string) => {
+  // try {
+  //   const response = await openChat(user.id, session.userToken.accessToken);
+  //   if (response) {
+  //     console.log(response.data);
+  //     router.push(`/chat/${response.data.room.roomId}`);
+  //   }
+  // } catch (err: any) {
+  //   console.info("chat err: " + err.message);
+  // }
+  router.push(`/chat/${id}`);
+};
 
 const FriendList = () => {
   const { session, _onlineFriends } = useAuth();
@@ -139,6 +152,7 @@ const FriendList = () => {
               name={item.name}
               _onClick={handleRemoveFriend}
               _status={item.status}
+              _onOpenChat={handleCreateChatRoom}
             />
           )}
           keyExtractor={(item) => item.userId}

@@ -173,9 +173,9 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
                     ? formatDate(planData.estimatedEndDate)
                     : ""}
                 </Text>
-                <Pressable onPress={() => router.push(`/members/${item.id}`)}>
+                {/* <Pressable onPress={() => router.push(`/members/${item.id}`)}>
                   <Text>Mời</Text>
-                </Pressable>
+                </Pressable> */}
               </View>
             </View>
             <View style={style.bottomContainer}>

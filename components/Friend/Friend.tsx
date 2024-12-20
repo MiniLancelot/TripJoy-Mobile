@@ -1,15 +1,17 @@
 import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import React from "react";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 interface FriendProps {
   id: string;
   name: string;
   avatar: string;
   _status: boolean;
   _onClick: any;
+  _onOpenChat: any;
 }
 
-const Friend = ({ id, name, _onClick, avatar, _status }: FriendProps) => {
+const Friend = ({ id, name, _onClick, avatar, _status, _onOpenChat }: FriendProps) => {
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
   const avatarUri = avatar == null ? tempAvatar : avatar;
@@ -30,7 +32,26 @@ const Friend = ({ id, name, _onClick, avatar, _status }: FriendProps) => {
       {/* <Pressable onPress={() => _onClick(id)} style={{}}>
         <Text>Bạn bè</Text>
       </Pressable> */}
-      <View style={styles.outerEditContainer}>
+      {/* <View style={styles.outerEditContainer}>
+        <View style={styles.editContainer}>
+          <Pressable
+            onPress={() => _onOpenChat(id)}
+            style={styles.innerEditContainer}
+          >
+            <Text style={styles.editText}>Nhắn tin</Text>
+          </Pressable>
+        </View>
+      </View> */}
+      <View style={[styles.outerEditContainer, { flexDirection: "row" }]}>
+      <View style={[{ marginRight: 10 }]}>
+          <Pressable
+            onPress={() => _onOpenChat(id)}
+            style={styles.innerEditContainer}
+          >
+            <Ionicons name="chatbubbles-outline" size={26} color={"#57e2e5"}/>
+            {/* <Text style={styles.editText}>Nhắn tin</Text> */}
+          </Pressable>
+        </View>
         <View style={styles.editContainer}>
           <Pressable
             onPress={() => _onClick(id)}

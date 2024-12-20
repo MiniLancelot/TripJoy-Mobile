@@ -56,6 +56,16 @@ const _layout = () => {
           />
         ), }}
       />
+      <Tabs.Screen
+        name="members"
+        options={{ title: "Thành viên", headerShown: true, tabBarIcon: ({ color, size, focused }) => (
+          <Ionicons
+            name={focused ? "people" : "people-outline"}
+            size={size}
+            color={color}
+          />
+        ), }}
+      />
     </Tabs>
   );
 };

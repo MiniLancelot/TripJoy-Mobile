@@ -21,6 +21,8 @@ import {
   revokeMember,
 } from "@/services/plan/invitePeople";
 import InviteFriend from "@/components/Friend/InviteFriendItem";
+import { useTabStore } from "@/utils/store";
+import { is } from "date-fns/locale";
 
 interface FriendProps {
   userId: string;
@@ -37,39 +39,51 @@ enum InviteStatus {
 }
 
 const InviteFriends = () => {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const sharedId = useTabStore((state) => state.sharedId);
   const { session } = useAuth();
   const [users, setUsers] = useState<FriendProps[]>([]);
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [_pageIndex, setPageIndex] = useState<number>(0);
   const [isEnd, setIsEnd] = useState<boolean>(false);
+  const [name, setName] = useState<string>("");
 
   const fetchPlanInvitationsAvailable = async (page: number) => {
     try {
       setLoading(true);
+      if (isEnd) return;
       const res = await getPlanInvitaitonsAvailable(
-        id,
+        sharedId,
         page,
         session.userToken.accessToken
       );
       if (res && res.status == 200) {
-        if (res.data.users.data.length == 0) {
+        if (res.data.users.count < 10) {
           setIsEnd(true);
-          return;
+          // return;
         };
-        setUsers(
-          res.data.users == null
-            ? []
-            : res.data.users.data.map((item: any): FriendProps => {
-                return {
-                  userId: item.userId,
-                  name: item.userName,
-                  avatar: item.avatar,
-                  status: item.status,
-                };
-              })
-        );
+        // setUsers((prev) => [...prev,
+        //   res.data.users == null
+        //     ? []
+        //     : res.data.users.data.map((item: any): FriendProps => {
+        //         return {
+        //           userId: item.userId,
+        //           name: item.userName,
+        //           avatar: item.avatar,
+        //           status: item.status,
+        //         };
+        //       })
+        //     ]);
+        setUsers(res.data.users == null
+          ? []
+          : res.data.users.data.map((item: any): FriendProps => {
+              return {
+                userId: item.userId,
+                name: item.userName,
+                avatar: item.avatar,
+                status: item.status,
+              };
+            }));
         console.log(
           "Invite friend request: ",
           res.data.users == null
@@ -78,7 +92,7 @@ const InviteFriends = () => {
         );
       }
     } catch (e) {
-      console.log(e);
+      console.info(e);
     } finally {
       setLoading(false);
     }
@@ -89,7 +103,14 @@ const InviteFriends = () => {
       setPageIndex((prevPage) => prevPage - 1);
       console.log("End of list");
     }
-  }, [isEnd]);
+  }, [isEnd])
+
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     fetchPlanInvitationsAvailable(_pageIndex);
+  //   }, 1500);
+  //   return () => clearTimeout(timer);
+  // }, [name]);
 
   const handleRefreshPrevious = () => {
     if (_pageIndex > 0 && !loading) {
@@ -110,7 +131,10 @@ const InviteFriends = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      fetchPlanInvitationsAvailable(_pageIndex);
+      if (_pageIndex == 0) {
+        setUsers([]);
+        fetchPlanInvitationsAvailable(0);
+      } else setPageIndex(0);
       setIsSuccess(false);
     }
   }, [isSuccess]);
@@ -121,12 +145,6 @@ const InviteFriends = () => {
     }
   }, [_pageIndex]);
 
-
-// const handleEndReached = () => {
-//   if (!loading) {
-//     setPageIndex((prevPage) => prevPage + 1);
-//   }
-// };
 
   const handleInvitationRequest = async (userId: string, status: number) => {
     switch (status) {
@@ -144,7 +162,7 @@ const InviteFriends = () => {
               text: "OK",
               onPress: async () => {
                 const response = await removeMember(
-                  id,
+                  sharedId,
                   userId,
                   session.userToken.accessToken
                 );
@@ -174,7 +192,7 @@ const InviteFriends = () => {
               onPress: async () => {
                 const response = await inviteMember(
                   userId,
-                  id,
+                  sharedId,
                   session.userToken.accessToken
                 );
                 if (response) {
@@ -203,7 +221,7 @@ const InviteFriends = () => {
               onPress: async () => {
                 const response = await revokeMember(
                   userId,
-                  id,
+                  sharedId,
                   session.userToken.accessToken
                 );
                 if (response) {
@@ -238,25 +256,11 @@ const InviteFriends = () => {
             />
           )}
           keyExtractor={(item) => item.userId}
-          // onEndReached={handleEndReached}
+          onEndReached={handleLoadNext}
         />
       ) : (
         <Text>No Friends ?</Text>
       )}
-      <Pressable
-        onPress={() => {
-          handleRefreshPrevious();
-        }}
-      >
-        <Text>Previous</Text>
-      </Pressable>
-      <Pressable
-        onPress={() => {
-          handleLoadNext();
-        }}
-      >
-        <Text>Next</Text>
-      </Pressable>
     </View>
   );
 };
