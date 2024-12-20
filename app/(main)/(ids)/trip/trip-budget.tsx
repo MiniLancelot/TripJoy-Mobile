@@ -2,10 +2,17 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import React from "react";
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { BarChart, LineChart, PieChart, PopulationPyramid } from "react-native-gifted-charts";
+
 
 const TripBudget = () => {
+  const data = [
+    {value: 54, color: '#177AD5'},
+    {value: 40, color: '#79D2DE'},
+    {value: 20, color: '#ED6665', shiftX: 28, shiftY: -18}
+];
   return (
-    <View>
+    <View style={{ flex: 1, }}>
       <Stack.Screen
         options={{
           headerRight: () => {
@@ -13,7 +20,7 @@ const TripBudget = () => {
               <Pressable
                 style={styles.settingButton}
                 onPress={() => {
-                  router.push("update-plan");
+                  router.push("/(update)/update-plan");
                 }}
               >
                 <Text>
@@ -25,6 +32,17 @@ const TripBudget = () => {
         }}
       />
       <Text>trip-budget</Text>
+      <PieChart
+    data={data}
+    showText
+    textColor="black"
+    radius={150}
+    textSize={20}
+    focusOnPress
+    showValuesAsLabels
+    showTextBackground
+    textBackgroundRadius={26}
+  />
     </View>
   );
 };

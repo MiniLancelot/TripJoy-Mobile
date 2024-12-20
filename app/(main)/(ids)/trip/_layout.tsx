@@ -48,7 +48,7 @@ const _layout = () => {
       />
       <Tabs.Screen
         name="trip-budget"
-        options={{ title: "Ngân sách", headerShown: true, tabBarIcon: ({ color, size, focused }) => (
+        options={{ title: "Chi tiêu", headerShown: true, tabBarIcon: ({ color, size, focused }) => (
           <Ionicons
             name={focused ? "cash" : "cash-outline"}
             size={size}

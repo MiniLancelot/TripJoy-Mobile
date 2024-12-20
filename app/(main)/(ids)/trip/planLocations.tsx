@@ -21,7 +21,6 @@ import { set } from "date-fns";
 import { FlashList } from "@shopify/flash-list";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import DraggableFlatList from "react-native-draggable-flatlist";
-import { fi, se } from "date-fns/locale";
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import PlanLocationItem from "@/components/PlanLocation/PlanLocationItem";
