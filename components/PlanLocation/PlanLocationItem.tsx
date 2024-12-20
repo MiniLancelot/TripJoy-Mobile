@@ -77,14 +77,21 @@ const PlanLocationItem = ({
           <View style={{ flex: 1, justifyContent: "flex-start" }}>
             <Text numberOfLines={1} style={styles.title}>{item.name}</Text>
 
-            <Text style={{fontSize: 12}} numberOfLines={1} ellipsizeMode="tail" >{item.address}</Text>
+            <Text style={{fontSize: 12}} numberOfLines={2} ellipsizeMode="tail" >{item.address}</Text>
 
             {/* <Pressable onPress={() => onDetail(item.planLocationId)} style={styles.detailButton}>
               <Text style={{color: "#fff"}}>Chi tiết</Text>
             </Pressable> */}
-            <Pressable onPress={() => _onDetail(item.planLocationId)} style={styles.detailButton}>
-              <Text style={{color: "#fff"}}>Chi tiết</Text>
-            </Pressable>
+            <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 15}}>
+              <View style={styles.outsidePriceTag}>
+              <Ionicons name="pricetag" size={20} color="#17a1fa" />
+                <Text style={{color: "#000", fontSize: 14}}>500.000 đ</Text>
+              </View>
+              <Pressable onPress={() => _onDetail(item.planLocationId)} style={styles.detailButton}>
+                <Text style={{color: "#fff"}}>Chi tiết</Text>
+              </Pressable>
+            </View>
+            
             <Pressable onPress={() => onDelete(item.planLocationId) } style={styles.deleteButton}>
               <Ionicons name="close-circle-outline" size={23} color="#ff6188" />
             </Pressable>
@@ -160,11 +167,19 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 10,
-    marginTop: 30,
-    alignItems: "center",
-    alignSelf: "flex-end",
+    // marginTop: 30,
+  
     width: 70,
-    
+  },
+  outsidePriceTag: {
+    flexDirection: "row",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    // marginTop: 30,
+    marginLeft: -10,
+    gap: 10,
+    alignItems: "center",
   }
 });
 

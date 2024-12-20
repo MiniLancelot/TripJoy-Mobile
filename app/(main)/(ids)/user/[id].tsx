@@ -40,6 +40,7 @@ import {
   revoke_friend_request,
   send_friend_request,
 } from "@/services/user/friend_request";
+import React from "react";
 // import { openChat } from "@/services/chat/chat";
 // import { useChatStore } from "@/utils/store";
 
@@ -409,7 +410,7 @@ const User = () => {
           // headerStyle: { backgroundColor: "#fff" },
           headerLeft: () => {
             return (
-              <View>
+              <>
                 <View style={styles.backBtnWrapper}>
                   <Pressable onPress={() => router.back()}>
                     <Animated.Text style={iconColorAnimatedStyle}>
@@ -436,7 +437,7 @@ const User = () => {
                     {user.userName}
                   </Animated.Text>
                 </Pressable>
-              </View>
+              </>
             );
           },
           headerBackground: () => (

@@ -291,11 +291,8 @@ const planLocations = () => {
           >
             <BottomSheetView style={{ flex: 1 }}>
               <Text>Bottom Sheet Content</Text>
-              {/* <Text>{chosenPlanLocation?.planId}</Text>
-              <Text>{chosenPlanLocation?.locationId}</Text> */}
               <Text>{chosenPlanLocation?.planLocationId}</Text>
               <Text>{chosenPlanLocation?.order}</Text>
-              {/* <Text>{chosenPlanLocation?.images}</Text> */}
               <Text>{chosenPlanLocation?.name}</Text>
               <Text>{chosenPlanLocation?.address}</Text>
               <Text>{chosenPlanLocation?.estimatedStartDate}</Text>
@@ -312,7 +309,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
-    padding: 10,
+    // padding: 10,
     backgroundColor: "#fff",
   },
   itemOuterContainer: {

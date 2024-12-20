@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderColor: "#bfbfbf",
     borderWidth: 1,
+    width: 100,
   },
   innerEditContainer: {
     flexDirection: "row",
