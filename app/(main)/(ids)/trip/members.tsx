@@ -62,19 +62,9 @@ const InviteFriends = () => {
           setIsEnd(true);
           // return;
         };
-        // setUsers((prev) => [...prev,
-        //   res.data.users == null
-        //     ? []
-        //     : res.data.users.data.map((item: any): FriendProps => {
-        //         return {
-        //           userId: item.userId,
-        //           name: item.userName,
-        //           avatar: item.avatar,
-        //           status: item.status,
-        //         };
-        //       })
-        //     ]);
-        setUsers(res.data.users == null
+        if(res.data.users.data.length == 0) return;
+        console.log(res.data.users.data);
+        if(_pageIndex == 0 )setUsers(res.data.users == null
           ? []
           : res.data.users.data.map((item: any): FriendProps => {
               return {
@@ -84,6 +74,17 @@ const InviteFriends = () => {
                 status: item.status,
               };
             }));
+        else setUsers((prev) => [...prev,
+           ...res.data.users.data.map((item: any): FriendProps => {
+                return {
+                  userId: item.userId,
+                  name: item.userName,
+                  avatar: item.avatar,
+                  status: item.status,
+                };
+              })
+            ]);
+
         console.log(
           "Invite friend request: ",
           res.data.users == null

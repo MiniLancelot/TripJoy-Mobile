@@ -1,21 +1,6 @@
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  TextInput,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, FlatList, Pressable, TextInput, StyleSheet } from "react-native";
 import { useEffect, useLayoutEffect, useState } from "react";
-import {
-  router,
-  Stack,
-  useLocalSearchParams,
-  useNavigation,
-} from "expo-router";
+import { router, Stack, useLocalSearchParams, useNavigation } from "expo-router";
 import {
   getMessagesByRoomId,
   openChat,
@@ -29,12 +14,7 @@ import User from "../user/[id]";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image } from "expo-image";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
-import { FontAwesome } from "@expo/vector-icons";
+
 
 interface UserProps {
   userId: string;
@@ -42,7 +22,7 @@ interface UserProps {
   avatarUrl: string;
 }
 
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+
 
 const chat = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -57,16 +37,14 @@ const chat = () => {
     userName: "",
     avatarUrl: "",
   });
+  
 
   const [pageIndex, setPageIndex] = useState<number>(0);
   const navigation = useNavigation();
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
-  const nameBorderColor = useSharedValue("#e7e8ee");
 
-  const [currentAvatar, setCurrentAvatar] = useState(
-    user.avatarUrl || tempAvatar
-  );
+  const [currentAvatar, setCurrentAvatar] = useState(user.avatarUrl || tempAvatar);
 
   const _createRoom = async () => {
     try {
@@ -85,7 +63,7 @@ const chat = () => {
 
   const fetchUserByUserId = async () => {
     try {
-      const response = await getUserById(session.userToken.accessToken, id);
+      const response = await getUserById(session.userToken.accessToken, id,);
       if (response) {
         console.log(response.data);
         setUser({
@@ -96,6 +74,7 @@ const chat = () => {
               ? tempAvatar
               : response.data.user.avatar.url,
         });
+        
       }
     } catch (error) {
       console.log(error);
@@ -103,8 +82,8 @@ const chat = () => {
   };
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: user.userName });
-  }, [user.userName]);
+      navigation.setOptions({ title: user.userName });
+    }, [user.userName]);
 
   useEffect(() => {
     if (_roomId != "") {
@@ -161,10 +140,7 @@ const chat = () => {
       if (pageIndex == 0) {
         setMessages(response.data.messages.data);
       } else {
-        setMessages((prevState: any) => [
-          ...prevState,
-          ...response.data.messages.data,
-        ]);
+        setMessages((prevState: any) => [...prevState, ...response.data.messages.data]);
       }
     } catch (error) {
       console.info("Fetch message err:" + error);
@@ -183,13 +159,7 @@ const chat = () => {
       if (response) {
         console.log(response.data);
         // await _connection?.invoke("SendMessage", {UserId: user.userId, Message: message, UserName: user.userName, Avatar: user.avatarUrl});
-        await _connection?.invoke(
-          "SendMessage",
-          user.userId,
-          message,
-          user.userName,
-          user.avatarUrl
-        );
+        await _connection?.invoke("SendMessage", user.userId, message, user.userName, user.avatarUrl);
         setMessage("");
         setPageIndex(0);
         setReloading(true);
@@ -199,30 +169,8 @@ const chat = () => {
     }
   };
 
-  const handleFocus = (borderColor: { value: string }) => {
-    borderColor.value = withTiming("#657ef8", { duration: 250 });
-  };
-  const handleBlur = (borderColor: { value: string }) => {
-    borderColor.value = withTiming("#e7e8ee", { duration: 250 });
-  };
-  const animatedBorderStyle = (borderColor: { value: any }) =>
-    useAnimatedStyle(() => ({
-      borderColor: borderColor.value,
-    }));
-
   return (
-    <KeyboardAvoidingView
-      style={{
-        flex: 1,
-        width: "100%",
-        height: "100%",
-        padding: 10,
-        paddingTop: 0,
-        backgroundColor: "#fff",
-      }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={-200} // Adjust this value as needed
-    >
+    <View style={{ flex: 1, width: "100%", height: "100%", padding: 10, backgroundColor: "#fff" }}>
       <Stack.Screen
         options={{
           // headerTransparent: true,
@@ -234,15 +182,12 @@ const chat = () => {
                 <View style={styles.backBtnWrapper}>
                   <Pressable onPress={() => router.back()}>
                     <Text>
-                      <Ionicons
-                        name="arrow-back-outline"
-                        size={25}
-                        color={"#b3b3b3"}
-                      />
+                      <Ionicons name="arrow-back-outline" size={25} color={"#b3b3b3"} />
                     </Text>
                   </Pressable>
                 </View>
-                <View style={styles.headerAvatarNameConatainer}>
+                <View
+                  style={styles.headerAvatarNameConatainer}>
                   <Image
                     source={{ uri: user.avatarUrl }}
                     style={styles.headerAvatar}
@@ -250,106 +195,59 @@ const chat = () => {
                       console.log("Error loading image");
                       setCurrentAvatar(tempAvatar);
                     }}
+                    
                   />
-                  <Text style={styles.headerName}>{user.userName}</Text>
+                  <Text
+                    style={styles.headerName}
+                  >
+                    {user.userName}
+                  </Text>
                 </View>
               </>
             );
           },
           headerBackground: () => (
-            <View
-              style={{
-                height: 90,
-                backgroundColor: "#defff6",
-                // borderRadius: 30,
-              }}
-            />
+            <View style={{height: 90, backgroundColor: "#defff6", borderRadius: 30}} />
           ),
         }}
       />
-      <FlatList
+      <FlashList
         data={messages}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }: { item: any }) => {
           if (item.postedByUser == user.userId)
             return (
-              <View style={{ alignItems: "flex-start" }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <Image
-                    source={{ uri: user.avatarUrl }}
-                    style={styles.chatAvatar}
-                    onError={() => {
-                      console.log("Error loading image");
-                      setCurrentAvatar(tempAvatar);
-                    }}
-                  />
-                  {/* <Text>{user.userName + ": "}</Text> */}
-                  <View style={{ flexDirection: "column", maxWidth: "70%" }}>
-                    <Text style={styles.chatName}>{user.userName}</Text>
-                    <>
-                      <Text style={styles.selfMessage}>{item.message}</Text>
-                    </>
-                  </View>
-                </View>
+              <View style={{ alignItems: "flex-start",}}>
+                {/* <Text>{user.userName + ": "}</Text> */}
+                <Text style={{ backgroundColor: "#14bdeb", borderRadius: 10, padding: 15, margin: 15, fontSize: 30, maxWidth: "70%"}}>{item.message}</Text>
               </View>
             );
           else
             return (
-              <View style={{ alignItems: "flex-end" }}>
+              <View style={{ alignItems: "flex-end", }}>
                 {/* <Text>{"Tôi: "}</Text> */}
-                <Text style={styles.otherMessage}>{item.message}</Text>
+                <Text style={{backgroundColor: "#C1DFF0", borderRadius: 10, padding: 15, margin: 15, fontSize: 30,  maxWidth: "70%"}}>{item.message}</Text>
               </View>
             );
         }}
-        // estimatedItemSize={20}
+        estimatedItemSize={20}
         inverted={true}
         onEndReached={() => setPageIndex((prev) => prev + 1)}
         onEndReachedThreshold={0.1}
       />
-
-      <View>
-        <AnimatedTextInput
-          placeholder="Nhắn tin"
-          value={message}
-          onChangeText={(text) => setMessage(text)}
-          style={[
-            animatedBorderStyle(nameBorderColor),
-            {
-              borderWidth: 1,
-              // borderColor: "#b3b3b3",
-              borderRadius: 40,
-              backgroundColor: "#f5f7fa",
-              padding: 10,
-              paddingLeft: 20,
-              margin: 10,
-            },
-          ]}
-          onFocus={() => handleFocus(nameBorderColor)}
-          onBlur={() => handleBlur(nameBorderColor)}
-        />
-        <TouchableOpacity onPress={_sendMessage} style={styles.sendBtn}>
-          <FontAwesome
-            name="paper-plane"
-            size={20}
-            color={message.length === 0 ? "#808080" : "#26d7fe"}
-          />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+      <TextInput
+        placeholder="Type your message"
+        value={message}
+        onChangeText={(text) => setMessage(text)}
+      />
+      <Pressable onPress={_sendMessage}>
+        <Text>Send</Text>
+      </Pressable>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  sendBtn: {
-    position: "absolute",
-    right: 30,
-    bottom: 25
-  },
   backBtnWrapper: {
     alignItems: "center",
     justifyContent: "center",
@@ -366,44 +264,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
   },
-  chatAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
   headerName: {
     color: "#000",
     marginLeft: 10,
     fontSize: 20,
     fontWeight: "700",
   },
-  chatName: {
-    color: "#ccd0d5",
-    marginLeft: 10,
-    fontSize: 16,
-    fontWeight: "500",
-    width: "100%",
-  },
-  otherMessage: {
-    backgroundColor: "#ff8b4a",
-    borderRadius: 12,
-    padding: 15,
-    margin: 5,
-    fontSize: 16,
-    fontWeight: "500",
-    maxWidth: "70%",
-    color: "#fff",
-  },
-  selfMessage: {
-    backgroundColor: "#ffd666",
-    borderRadius: 12,
-    padding: 15,
-    margin: 5,
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#575656",
-    // maxWidth: "70%",
-  },
-});
+})
 
 export default chat;

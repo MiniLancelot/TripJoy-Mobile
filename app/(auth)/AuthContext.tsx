@@ -16,6 +16,8 @@ interface AuthProps {
         userInfo: any | null;
     };
     _onlineFriends: any[];
+    _connection: HubConnection | null;
+    receiveMessage: MessageProps;
     // forget_password_url?: string;
     login?: (data: any) => Promise<any>;
     logout?: (data: any) => Promise<any>;
@@ -24,6 +26,13 @@ interface AuthProps {
     send_otp_forget_password?: (data: any) => Promise<any>;
     verify_otp_forget_password?: (data: any) => Promise<any>;
     change_password?: (data: any) => Promise<any>;
+}
+
+type MessageProps = {
+  userId: string;
+  message: string;
+  userName: string;
+  avatarUrl: string | null;
 }
 
 const AuthContext = createContext<AuthProps | undefined>(undefined);
@@ -40,14 +49,22 @@ export const AuthProvider = ({ children }: any) => {
     const [userToken, setUserToken] = useState<any>(null);
     const [userInfo, setUserInfo] = useState<any>(null);
     const [url, setUrl] = useState<string>("");
+    const [receiveMessage, setReceiveMessage] = useState<MessageProps>({
+        userId: "",
+        message: "",
+        userName: "",
+        avatarUrl: null,
+      });
 
     useEffect(() => {
         const loadUser = async () => {
             // AsyncStorage.clear();
             const storedUser = await AsyncStorage.getItem("user");
             const storedUserInfo = await AsyncStorage.getItem("user_info");
+            
             // console.log("User access token: ", storedUser);
             if (storedUser && storedUserInfo) {
+                initializeSocketConnection(JSON.parse(storedUserInfo).user.profile.id);
                 setUserToken(JSON.parse(storedUser));
                 setUserInfo(JSON.parse(storedUserInfo));
             } else {setUserToken(null); setUserInfo(null);}
@@ -112,6 +129,15 @@ export const AuthProvider = ({ children }: any) => {
         hubConnection.on("FriendOffline", (friend: any) => {
             setOnlineFriends((prevFriends) => prevFriends.filter((f) => f !== friend));
         });
+
+        hubConnection.on("ReceiveMessage", (_message: any) => {
+            console.log("Receive message: ", _message);
+            setReceiveMessage({
+                userId: _message.userId,
+                message:_message.message,
+                userName: _message.userName,
+                avatarUrl: _message.avatar,
+            })})
 
         // Kết nối và gửi ID người dùng lên server
         try {
@@ -278,6 +304,8 @@ export const AuthProvider = ({ children }: any) => {
         change_password: change_password,
         session: {userToken, userInfo},
         _onlineFriends: onlineFriends,
+        _connection: connection,
+        receiveMessage: receiveMessage,
     };
 
     return (

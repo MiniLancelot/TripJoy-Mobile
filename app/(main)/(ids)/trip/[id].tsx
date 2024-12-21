@@ -851,7 +851,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     justifyContent: "flex-start",
     alignItems: "flex-start",
-    // marginLeft: -160,
+    alignSelf: "flex-start",
   },
 
   btsLocationName: {
@@ -870,7 +870,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
     width: "100%",
-    marginTop: 25,
+    bottom: -50,
   },
   innerLoginButtonContainer: {
     padding: 10,

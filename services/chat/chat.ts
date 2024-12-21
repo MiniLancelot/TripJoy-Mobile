@@ -22,7 +22,7 @@ const openChat = async (userId: string, accessToken: any) => {
 
 const getMessagesByRoomId = async (roomId: string, pageIndex: number, accessToken: any) => {
   try {
-    const response = await chat(`/rooms/${roomId}/messages?pageIndex=${pageIndex}`, {
+    const response = await chat(`/rooms/${roomId}/messages?pageIndex=${pageIndex}&pageSize=20`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
