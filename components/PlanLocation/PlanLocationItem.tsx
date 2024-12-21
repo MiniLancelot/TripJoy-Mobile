@@ -17,6 +17,7 @@ type PlanLocationsProps = {
   name: string;
   address: string;
   estimatedStartDate: string;
+  amount: number | null;
 };
 
 type PlanLocationItemProps = {
@@ -24,7 +25,7 @@ type PlanLocationItemProps = {
   item: PlanLocationsProps;
   drag: () => void;
   onDelete: (id: string) => void;
-  onDeleteImage: (id: string, imageUrl: string) => void;
+  onDeleteImage?: (id: string, imageUrl: string) => void;
   onDetail: (id: string) => void;
   _onDetail: (id: string) => void;
   tempAvatar: string;
@@ -85,7 +86,7 @@ const PlanLocationItem = ({
             <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 15}}>
               <View style={styles.outsidePriceTag}>
               <Ionicons name="pricetag" size={20} color="#17a1fa" />
-                <Text style={{color: "#000", fontSize: 14}}>500.000 đ</Text>
+                <Text style={{color: "#000", fontSize: 14}}>{item.amount == null ? 0 : item.amount}đ</Text>
               </View>
               <Pressable onPress={() => _onDetail(item.planLocationId)} style={styles.detailButton}>
                 <Text style={{color: "#fff"}}>Chi tiết</Text>

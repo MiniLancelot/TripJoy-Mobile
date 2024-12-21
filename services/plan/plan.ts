@@ -180,4 +180,40 @@ const getPlanInvitations = async (accessToken: any) => {
   }
 }
 
-export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId, getPlanInvitations };
+const putExpense = async (data: any, accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/planLocations/${id}/expense`, {
+      method: "PUT",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const patchNote = async (data: any, accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/planLocations/${id}/note`, {
+      method: "PATCH",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, 
+  getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId, 
+  getPlanInvitations, putExpense, patchNote };
