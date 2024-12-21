@@ -1,18 +1,17 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import React from "react";
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { BarChart, LineChart, PieChart, PopulationPyramid } from "react-native-gifted-charts";
-
+import { ProgressChart } from "react-native-chart-kit";
 
 const TripBudget = () => {
-  const data = [
-    {value: 54, color: '#177AD5'},
-    {value: 40, color: '#79D2DE'},
-    {value: 20, color: '#ED6665', shiftX: 28, shiftY: -18}
-];
+  const chartData = {
+    labels: ["Đã chi"], // optional
+    data: [0.8],
+  };
+
   return (
-    <View style={{ flex: 1, }}>
+    <View style={{ flex: 1 }}>
       <Stack.Screen
         options={{
           headerRight: () => {
@@ -31,18 +30,43 @@ const TripBudget = () => {
           },
         }}
       />
-      <Text>trip-budget</Text>
-      <PieChart
-    data={data}
-    showText
-    textColor="black"
-    radius={150}
-    textSize={20}
-    focusOnPress
-    showValuesAsLabels
-    showTextBackground
-    textBackgroundRadius={26}
-  />
+      <Text style={styles.title}>Trip Budget</Text>
+      <View>
+        <ProgressChart
+          data={chartData}
+          width={Dimensions.get("window").width} // from react-native
+          height={220}
+          strokeWidth={16}
+          radius={80}
+          chartConfig={{
+            backgroundColor: "#e26a00",
+            backgroundGradientFrom: "#fb8c00",
+            backgroundGradientTo: "#ffa726",
+            decimalPlaces: 2, // optional, defaults to 2dp
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            style: {
+              borderRadius: 16,
+            },
+            propsForDots: {
+              r: "6",
+              strokeWidth: "2",
+              stroke: "#ffa726",
+            },
+          }}
+          style={{
+            marginVertical: 8,
+            borderRadius: 16,
+          }}
+          hideLegend={true} // Hide default legend
+        />
+      </View>
+      
+      {/* Custom Legend */}
+      <View style={styles.legendContainer}>
+        <Text style={styles.legendText}>Đã chi</Text>
+        <Text style={styles.legendText}>Legend value: 80%</Text>
+      </View>
     </View>
   );
 };
@@ -50,6 +74,23 @@ const TripBudget = () => {
 const styles = StyleSheet.create({
   settingButton: {
     marginRight: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 20,
+  },
+  legendContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  legendText: {
+    fontSize: 18, // Set the font size here
+    marginHorizontal: 10,
+    color: "black",
   },
 });
 

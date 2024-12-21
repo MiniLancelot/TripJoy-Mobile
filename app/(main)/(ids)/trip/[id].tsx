@@ -348,7 +348,7 @@ const ChosenTrip = () => {
     // );
   };
 
-  const snapPoints = useMemo(() => ["33%"], []);
+  const snapPoints = useMemo(() => ["36%"], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   // const handleOpen = () => bottomSheetRef.current?.expand();
   // const handleSheetChanges = useCallback((index: number) => {
