@@ -348,7 +348,7 @@ const ChosenTrip = () => {
     // );
   };
 
-  const snapPoints = useMemo(() => ["36%"], []);
+  const snapPoints = useMemo(() => ["33%"], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   // const handleOpen = () => bottomSheetRef.current?.expand();
   // const handleSheetChanges = useCallback((index: number) => {
@@ -463,11 +463,60 @@ const ChosenTrip = () => {
             />
           </View>
           {searchQuery.length > 0 && (
-            <TouchableOpacity style={{ position: "absolute", right: 20, top: 11 }} onPress={() => clearText(setSearchQuery)}>
+            <TouchableOpacity
+              style={{ position: "absolute", right: 20, top: 11 }}
+              onPress={() => clearText(setSearchQuery)}
+            >
               <Ionicons name="close-circle-outline" size={24} color="#9FB7B9" />
             </TouchableOpacity>
           )}
         </View>
+        <TouchableOpacity
+      style={styles.focusFirstButton}
+      onPress={() => {
+        if (planLocations.length > 0) {
+          const firstLocation = [
+            planLocations[0].longitude,
+            planLocations[0].latitude,
+          ];
+          cameraRef.current?.setCamera({
+            centerCoordinate: firstLocation,
+            zoomLevel: 15,
+            duration: 1000,
+          });
+        } else {
+          Alert.alert(
+            "Không có địa điểm",
+            "Chưa có địa điểm nào được thêm vào lộ trình."
+          );
+        }
+      }}
+    >
+      <Ionicons name="flag" size={20} color="#ffffff" />
+    </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.focusButton}
+          onPress={() => {
+            if (userLocation) {
+              cameraRef.current?.setCamera({
+                centerCoordinate: [
+                  userLocation.longitude,
+                  userLocation.latitude,
+                ],
+                zoomLevel: 15,
+                duration: 1000,
+              });
+            } else {
+              Alert.alert(
+                "Location not available",
+                "User location is unavailable."
+              );
+            }
+          }}
+        >
+          <Ionicons name="navigate-circle" size={20} color="#ffffff" />
+        </TouchableOpacity>
 
         {searchQuery.trim() && searchResults.length > 0 && (
           <FlatList
@@ -870,7 +919,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
     width: "100%",
-    bottom: -50,
+    bottom: -40,
   },
   innerLoginButtonContainer: {
     padding: 10,
@@ -888,6 +937,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#e7e8ee",
     color: "#b9bcc6",
   },
+  focusButton: {
+    position: "absolute",
+    backgroundColor: "#13c892",
+    padding: 6,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+    right: 20,
+    top: 90,
+  },
+  focusFirstButton: {
+    position: "absolute",
+    backgroundColor: "#13c892",
+    padding: 6,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+    right: 20,
+    top: 140,
+  }
 });
 
 export default ChosenTrip;
