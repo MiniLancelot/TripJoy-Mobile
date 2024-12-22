@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
+import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import getPronvinces from "@/services/plan/getProvinces";
+// import getPronvinces from "@/services/plan/getProvinces";
 import { is } from "date-fns/locale";
 import { Province } from "@/constants/Provinces";
+import { Member } from "@/constants/Member";
+import getMembers from "@/services/plan/member";
+import { UserSpender } from "@/constants/UserSpender";
 // import debounce from "@/services/debounce";
 
 interface DataProps {
@@ -12,27 +15,30 @@ interface DataProps {
   value: string;
 }
 
-interface ProvinceDropdownProps {
-  _value: Province;
-  setValue: (value: Province) => void;
+interface MemberMultiselectProps {
+  planId: string;
+  _data?: UserSpender[];
+  _values: Member[];
+  setValues: (value: Member[]) => void;
   bearer: string;
   placeholder?: string;
 }
 
-const ProvinceDropdown = ({
-  _value,
-  setValue,
+const MemberMultiselect = ({
+  planId,
+  _values,
+  setValues,
   bearer,
   placeholder,
-}: ProvinceDropdownProps) => {
-  const [province, setProvince] = useState<string>("");
+}: MemberMultiselectProps) => {
+  // const [member, setMember] = useState<string>("");
   const [isFocus, setIsFocus] = useState(false);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [allItemsLoaded, setAllItemsLoaded] = useState(false);
   const [searchState, setSearchState] = useState(false);
   const [data, setData] = useState<DataProps[]>([]);
-  const [provinceName, setProvinceName] = useState<string>("");
+  // const [memberName, setMemberName] = useState<string>("");
 
   // Fetch provinces with pagination
   const fetchMoreData = async () => {
@@ -40,16 +46,16 @@ const ProvinceDropdown = ({
 
     setLoading(true);
     try {
-      const response = await getPronvinces(bearer, {
+      const response = await getMembers(bearer, planId, {
         pageIndex: page,
         pageSize: 10,
       });
 
-      if (!response?.data?.provinces) throw new Error("Invalid data structure");
+      if (!response?.data?.members) throw new Error("Invalid data structure");
 
-      const newData = response.data.provinces.data.map((item: any) => ({
+      const newData = response.data.members.data.map((item: any) => ({
         label: item.name,
-        value: item.id,
+        value: item.userId,
       }));
 
       if (newData.length < 10) {
@@ -66,30 +72,30 @@ const ProvinceDropdown = ({
   };
 
   // Debounced search logic
-  const searchProvince = async (searchText: string) => {
-    setLoading(true);
-    setPage(0);
-    setAllItemsLoaded(false);
-    try {
-      const response = await getPronvinces(bearer, {
-        pageIndex: 0,
-        pageSize: 10,
-        name: searchText.replaceAll(" ", "+"),
-      });
+  // const searchProvince = async (searchText: string) => {
+  //   setLoading(true);
+  //   setPage(0);
+  //   setAllItemsLoaded(false);
+  //   try {
+  //     const response = await getPronvinces(bearer, {
+  //       pageIndex: 0,
+  //       pageSize: 10,
+  //       name: searchText.replaceAll(" ", "+"),
+  //     });
 
-      if (response?.data?.provinces) {
-        const searchedData = response.data.provinces.data.map((item: any) => ({
-          label: item.name,
-          value: item.id,
-        }));
-        setData(searchedData);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (response?.data?.provinces) {
+  //       const searchedData = response.data.provinces.data.map((item: any) => ({
+  //         label: item.name,
+  //         value: item.id,
+  //       }));
+  //       setData(searchedData);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Trigger initial load or fetch more on scroll
   const loadMoreItems = () => {
@@ -97,18 +103,18 @@ const ProvinceDropdown = ({
   };
 
   // Watch for search input changes
-  useEffect(() => {
-    if (province) {
-      setSearchState(true);
-      searchProvince(province);
-    } else {
-      setSearchState(false);
-      // setData([]);
-      setPage(0);
-      setAllItemsLoaded(false);
-      fetchMoreData();
-    }
-  }, [province]);
+  // useEffect(() => {
+  //   if (province) {
+  //     setSearchState(true);
+  //     searchProvince(province);
+  //   } else {
+  //     setSearchState(false);
+  //     // setData([]);
+  //     setPage(0);
+  //     setAllItemsLoaded(false);
+  //     fetchMoreData();
+  //   }
+  // }, [province]);
 
   // Initial fetch on mount
   useEffect(() => {
@@ -116,7 +122,7 @@ const ProvinceDropdown = ({
   }, [page, searchState]);
 
   const renderLabel = () => {
-    if (_value == null || isFocus) {
+    if (_values == null || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: "blue" }]}>
           {placeholder}
@@ -129,16 +135,16 @@ const ProvinceDropdown = ({
   return (
     <View style={styles.container}>
       {renderLabel()}
-      <Dropdown
+      <MultiSelect
         style={[styles.dropdown, isFocus && { borderColor: "#657ef8" }]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
         data={data}
-        search
+        // search
         maxHeight={300}
-        onChangeText={(text) => setProvince(text)}
+        // onChangeText={(text) => setMember(text)}
         flatListProps={{
           onEndReached: loadMoreItems,
           onEndReachedThreshold: 0.5,
@@ -146,20 +152,28 @@ const ProvinceDropdown = ({
         labelField="label"
         valueField="value"
         placeholder={
+          // !isFocus ?
+          //   memberName || "Tỉnh/thành phố"
+          //   : "..."
           !isFocus ?
-            provinceName || "Tỉnh/thành phố"
+            placeholder
             : "..."
         }
         searchPlaceholder="Search..."
-        value={_value.provinceId}
+        selectedStyle={styles.selectedStyle}
+        value={_values.map((item) => item.userId)}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(item) => {
-          setValue({ provinceId: item.value, provinceName: item.label });
-          console.info(item.label);
-          setProvinceName(item.label);
+        onChange={(items) => {
+          const selectedItems = items.map((value: string) => {
+            return data.find(item => item.value === value) as DataProps;
+          });
+          setValues(selectedItems.map((item): Member => ({ userId: item.value, name: item.label })));
+          // console.info(item.label);
+          // setProvinceName(item.label);
           setIsFocus(false);
           setSearchState(false);
+          
         }}
         renderLeftIcon={() => (
           <AntDesign
@@ -174,13 +188,13 @@ const ProvinceDropdown = ({
   );
 };
 
-export default ProvinceDropdown;
+export default MemberMultiselect;
 
 const styles = StyleSheet.create({
   container: {
-    width: "49%",
+    width: "60%",
     backgroundColor: "white",
-    padding: 16,
+    // padding: 16,
     paddingHorizontal: 0,
   },
   dropdown: {
@@ -189,6 +203,9 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
+  },
+  selectedStyle: {
+    borderRadius: 12,
   },
   icon: {
     marginRight: 5,
@@ -201,6 +218,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 8,
     fontSize: 14,
+    borderRadius: 8,
   },
   placeholderStyle: {
     fontSize: 16,

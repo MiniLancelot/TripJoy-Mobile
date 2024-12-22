@@ -130,7 +130,7 @@ const StarRailChar2 = () => {
       return "32.5%";
     };
 
-    const displayImages = chars.slice(0, 2);
+    const displayImages = chars.slice(0, 3);
     // console.log(displayImages.map(char => char.name));
 
     return (

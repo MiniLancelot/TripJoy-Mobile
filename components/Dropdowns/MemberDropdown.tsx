@@ -2,24 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { Member } from '@/constants/Member';
 
-const data = [
-  { label: 'Item 1', value: '1' },
-  { label: 'Item 2', value: '2' },
-  { label: 'Item 3', value: '3' },
-  { label: 'Item 4', value: '4' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
-];
+// const data = [
+//   { label: 'Item 1', value: '1' },
+//   { label: 'Item 2', value: '2' },
+//   { label: 'Item 3', value: '3' },
+//   { label: 'Item 4', value: '4' },
+//   { label: 'Item 5', value: '5' },
+//   { label: 'Item 6', value: '6' },
+//   { label: 'Item 7', value: '7' },
+//   { label: 'Item 8', value: '8' },
+// ];
 
-const DropdownComponent = () => {
-  const [value, setValue] = useState<string>('');
+interface MemberDropdownProps {
+  planId?: string;
+  data: Member[];
+  value: Member;
+  setValue: (item: Member) => void;
+  bearer?: string;
+  placeholder?: string;
+}
+
+const MemberDropdown = ({planId, data, value, setValue, bearer, placeholder}: MemberDropdownProps) => {
+  // const [value, setValue] = useState<string>('');
   const [isFocus, setIsFocus] = useState(false);
 
   const renderLabel = () => {
-    if (value != '' || isFocus) {
+    if (value != null || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: 'blue' }]}>
           Dropdown label
@@ -48,20 +58,20 @@ const DropdownComponent = () => {
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={data}
+        data={data.map((item) => ({ label: item.name, value: item.userId }))}
         search
         maxHeight={300}
         labelField="label"
         valueField="value"
         placeholder={!isFocus
-          ? data.find((item) => item.value === value)?.label || "Tỉnh/thành phố"
+          ? "Thành viên"
           : "..."}
         searchPlaceholder="Search..."
-        value={value}
+        value={{ label: value.name, value: value.userId }}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
-          setValue(item.value);
+          setValue({ userId: item.value, name: item.label });
           setIsFocus(false);
         }}
         renderLeftIcon={() => (
@@ -77,12 +87,14 @@ const DropdownComponent = () => {
   );
 };
 
-export default DropdownComponent;
+export default MemberDropdown;
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     padding: 16,
+    width: "67%",
+    marginLeft: 15,
   },
   dropdown: {
     height: 50,

@@ -11,11 +11,31 @@ import Friend from "@/components/Friend/Friend";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { get_friends, remove_friend } from "@/services/user/friend_request";
 import { FlashList } from "@shopify/flash-list";
+import { set } from "date-fns";
+import { router } from "expo-router";
 
+interface FriendProps {
+  userId: string;
+  name: string;
+  avatar: any;
+  status: boolean;
+}
+const handleCreateChatRoom = (id: string) => {
+  // try {
+  //   const response = await openChat(user.id, session.userToken.accessToken);
+  //   if (response) {
+  //     console.log(response.data);
+  //     router.push(`/chat/${response.data.room.roomId}`);
+  //   }
+  // } catch (err: any) {
+  //   console.info("chat err: " + err.message);
+  // }
+  router.push(`/chat/${id}`);
+};
 
 const FriendList = () => {
-  const { session } = useAuth();
-  const [users, setUsers] = useState<any>(null);
+  const { session, _onlineFriends } = useAuth();
+  const [users, setUsers] = useState<FriendProps[]>([]);
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
@@ -56,10 +76,17 @@ const FriendList = () => {
       setLoading(true);
       const res = await get_friends(session.userToken.accessToken);
       if (res && res.status == 200) {
-        setUsers(res.data.users == null ? [] : res.data.users);
+        setUsers(res.data.users == null ? [] : res.data.users.data.map((item: any): FriendProps => {
+          return {
+            userId: item.id,
+            name: item.userName,
+            avatar: item.avatar,
+            status: _onlineFriends.includes(item.id),
+          };
+        }));
         console.log(
           "Friend request: ",
-          res.data.users == null ? [] : res.data.users
+          res.data.users == null ? [] : res.data.users.data.map((item: any) => item.id)
         );
       }
     } catch (e) {
@@ -73,6 +100,13 @@ const FriendList = () => {
     // fetch
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchData();
+    }, 1000);
+    return () => {clearTimeout(handler)};
+  }, [_onlineFriends])
 
   useEffect(() => {
     if (isSuccess) {
@@ -105,21 +139,23 @@ const FriendList = () => {
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* <Text>FriendInvitation</Text> */}
-      {users != null && users.data != null ? (
+      {users != null && users.length != 0 ? (
         <FlashList
-          data={users.data}
+          data={users}
           refreshing={loading}
           onRefresh={refreshHandler}
           estimatedItemSize={65}
-          renderItem={({ item }: { item: { avatar: any; id: string; userName: string } }) => (
+          renderItem={({ item }: { item: FriendProps }) => (
             <Friend
-              avatar={item.avatar.url}
-              id={item.id}
-              name={item.userName}
+              avatar={item.avatar == null ? null : item.avatar.url}
+              id={item.userId}
+              name={item.name}
               _onClick={handleRemoveFriend}
+              _status={item.status}
+              _onOpenChat={handleCreateChatRoom}
             />
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.userId}
         />
       ) : (
         <Text>No Friends ?</Text>

@@ -8,12 +8,16 @@ import _register from "@/services/identity/register";
 import _forgotPassword from "@/services/identity/forgotPassword";
 import Toast from "react-native-toast-message";
 import get_user_profile from "@/services/user/userProfile";
-
+import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { socketURL } from "@/utils/baseUrl";
 interface AuthProps {
     session: {
         userToken: any | null;
         userInfo: any | null;
     };
+    _onlineFriends: any[];
+    _connection: HubConnection | null;
+    receiveMessage: MessageProps;
     // forget_password_url?: string;
     login?: (data: any) => Promise<any>;
     logout?: (data: any) => Promise<any>;
@@ -22,6 +26,13 @@ interface AuthProps {
     send_otp_forget_password?: (data: any) => Promise<any>;
     verify_otp_forget_password?: (data: any) => Promise<any>;
     change_password?: (data: any) => Promise<any>;
+}
+
+type MessageProps = {
+  userId: string;
+  message: string;
+  userName: string;
+  avatarUrl: string | null;
 }
 
 const AuthContext = createContext<AuthProps | undefined>(undefined);
@@ -38,14 +49,22 @@ export const AuthProvider = ({ children }: any) => {
     const [userToken, setUserToken] = useState<any>(null);
     const [userInfo, setUserInfo] = useState<any>(null);
     const [url, setUrl] = useState<string>("");
+    const [receiveMessage, setReceiveMessage] = useState<MessageProps>({
+        userId: "",
+        message: "",
+        userName: "",
+        avatarUrl: null,
+      });
 
     useEffect(() => {
         const loadUser = async () => {
             // AsyncStorage.clear();
             const storedUser = await AsyncStorage.getItem("user");
             const storedUserInfo = await AsyncStorage.getItem("user_info");
+            
             // console.log("User access token: ", storedUser);
             if (storedUser && storedUserInfo) {
+                initializeSocketConnection(JSON.parse(storedUserInfo).user.profile.id);
                 setUserToken(JSON.parse(storedUser));
                 setUserInfo(JSON.parse(storedUserInfo));
             } else {setUserToken(null); setUserInfo(null);}
@@ -68,6 +87,7 @@ export const AuthProvider = ({ children }: any) => {
                         refreshToken: result.data.refreshToken,
                     })
                 );
+                initializeSocketConnection(result.data.user.userId);
                 get_user_profile(result.data.accessToken).then((result) => {
                     if (result && result.status == 200) {
                         setUserInfo(result.data);
@@ -77,6 +97,55 @@ export const AuthProvider = ({ children }: any) => {
             }
         } catch (error: any) {
             throw error;
+        }
+    };
+
+    const [connection, setConnection] = useState<HubConnection | null>(null);
+    const [onlineFriends, setOnlineFriends] = useState<any[]>([]);
+
+    // Hàm khởi tạo kết nối Socket
+    const initializeSocketConnection = async (userInfo: any) => {
+        const hubConnection: HubConnection = new HubConnectionBuilder()
+            .withUrl(`${socketURL}/notification-hub`, { withCredentials: true }) // URL SignalR server
+            .withAutomaticReconnect()
+            .build();
+
+        // Nhận danh sách bạn bè đang online
+        hubConnection.on("OnlineFriends", (friends: any[]) => {
+            setOnlineFriends(friends);
+        });
+
+        // Sự kiện bạn bè online
+        hubConnection.on("FriendOnline", (friend: any) => {
+            setOnlineFriends((prevFriends) => {
+                if (!prevFriends.includes(friend)) {
+                    return [...prevFriends, friend];
+                }
+                return prevFriends;
+            });
+        });
+
+        // Sự kiện bạn bè offline
+        hubConnection.on("FriendOffline", (friend: any) => {
+            setOnlineFriends((prevFriends) => prevFriends.filter((f) => f !== friend));
+        });
+
+        hubConnection.on("ReceiveMessage", (_message: any) => {
+            console.log("Receive message: ", _message);
+            setReceiveMessage({
+                userId: _message.userId,
+                message:_message.message,
+                userName: _message.userName,
+                avatarUrl: _message.avatar,
+            })})
+
+        // Kết nối và gửi ID người dùng lên server
+        try {
+            await hubConnection.start();
+            await hubConnection.invoke("AddNewUser", userInfo);
+            setConnection(hubConnection);
+        } catch (err) {
+            console.error("SignalR connection failed:", err);
         }
     };
 
@@ -117,6 +186,10 @@ export const AuthProvider = ({ children }: any) => {
                 setUserToken(null);
                 setUserInfo(null);
                 AsyncStorage.removeItem("user");
+            }
+            if (connection) {
+                connection.stop();
+                setConnection(null);
             }
         });
     };
@@ -230,6 +303,9 @@ export const AuthProvider = ({ children }: any) => {
         verify_otp_forget_password: verify_otp_forget_password,
         change_password: change_password,
         session: {userToken, userInfo},
+        _onlineFriends: onlineFriends,
+        _connection: connection,
+        receiveMessage: receiveMessage,
     };
 
     return (

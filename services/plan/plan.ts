@@ -133,4 +133,87 @@ const addPlanLocationImage = async (data: any, accessToken: any, id: any) => {
   }
 }
 
-export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage };
+const deletePlanLocationImage = async (data: any, accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/planLocations/${id}/images/remove`, {
+      method: "PATCH",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const deletePlanLocationByPlanLocationId = async (accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/planLocations/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const getPlanInvitations = async (accessToken: any) => {
+  try {
+    const result = await plan(`/planInvitations`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },  
+    });
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const putExpense = async (data: any, accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/planLocations/${id}/expense`, {
+      method: "PUT",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const patchNote = async (data: any, accessToken: any, id: any) => {
+  try {
+    const result = await plan(`/planLocations/${id}/note`, {
+      method: "PATCH",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, 
+  getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId, 
+  getPlanInvitations, putExpense, patchNote };

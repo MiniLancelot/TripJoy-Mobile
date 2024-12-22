@@ -10,6 +10,7 @@ import { ParamListBase, TabNavigationState } from "@react-navigation/native";
 import FriendInvitation from "@/app/(main)/(tabs)/(HomeTabs)/(FriendTabs)/FriendInvitation";
 import FriendList from "@/app/(main)/(tabs)/(HomeTabs)/(FriendTabs)/FriendList";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useAuth } from "@/app/(auth)/AuthContext";
 
 const MaterialTopTabs = createMaterialTopTabNavigator();
 
