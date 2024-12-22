@@ -13,7 +13,7 @@
 // export default NewsfeedScreen
 
 import StarRailChar from "@/components/Others/StarRailChar";
-import StarRailChar2 from "@/components/Others/StarRailChar2";
+import StarRailChar2 from "@/components/Others/StarRailChar3";
 import TextCarousel from "@/components/Others/TextCarousel";
 import { Style } from "@rnmapbox/maps";
 import React, { useState, useEffect } from "react";

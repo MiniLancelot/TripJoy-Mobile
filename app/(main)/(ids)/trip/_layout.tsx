@@ -48,23 +48,45 @@ const _layout = () => {
       />
       <Tabs.Screen
         name="trip-budget"
-        options={{ title: "Chi tiêu", headerShown: true, tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons
-            name={focused ? "cash" : "cash-outline"}
-            size={size}
-            color={color}
-          />
-        ), }}
+        options={{
+          title: "Chi tiêu",
+          headerShown: true,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "cash" : "cash-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
       />
       <Tabs.Screen
         name="members"
-        options={{ title: "Thành viên", headerShown: true, tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons
-            name={focused ? "people" : "people-outline"}
-            size={size}
-            color={color}
-          />
-        ), }}
+        options={{
+          title: "Thành viên",
+          headerShown: true,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "people" : "people-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="update-plan"
+        options={{
+          title: "Cập nhật",
+          headerShown: true,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "settings" : "settings-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
       />
     </Tabs>
   );

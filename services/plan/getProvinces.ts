@@ -1,10 +1,11 @@
+import { Params } from "@/constants/QueryParams";
 import { plan } from "@/utils/request";
 
-type Params = {
-  pageIndex?: number;
-  pageSize?: number;
-  name?: string;
-}
+// type Params = {
+//   pageIndex?: number;
+//   pageSize?: number;
+//   name?: string;
+// }
 
 const getPronvinces = async (bearer: string, params: Params) => {
   try {
