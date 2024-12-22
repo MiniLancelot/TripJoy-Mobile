@@ -1,3 +1,4 @@
+import { Params } from "@/constants/QueryParams";
 import {user} from "@/utils/request";
 
 const get_friends_request = async (token: string) => {
@@ -105,9 +106,15 @@ const sent_friend_requests = async (token: string, page: number, size: number) =
     }
 }
 
-const get_friends = async (token: string) => {
+const get_friends = async (token: string, params?: Params) => {
     try {
-        const res = await user.get("/users/friends/friends", {
+        const query = params == undefined ? "" : new URLSearchParams(
+            Object.entries(params).reduce((acc, [key, value]) => {
+                acc[key] = String(value); // Chuyển mọi giá trị sang string
+                return acc;
+            }, {} as Record<string, string>)
+        ).toString();
+        const res = await user.get(`/users/friends/friends?${query}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

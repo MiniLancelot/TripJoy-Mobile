@@ -56,14 +56,11 @@ const Layout = () => {
 
   const renderBackDrop = useCallback(
     (props: any) => (
-      
       <BottomSheetBackdrop
         {...props}
         appearsOnIndex={0}
         disappearsOnIndex={-1}
-        
-      >
-      </BottomSheetBackdrop>
+      ></BottomSheetBackdrop>
     ),
     []
   );
@@ -204,35 +201,30 @@ const Layout = () => {
               index={-1}
               backdropComponent={renderBackDrop}
               enablePanDownToClose={true}
-              
             >
               <BottomSheetView style={styles.contentContainer}>
-                <Text style={{fontSize: 20, fontWeight: "500"}}>Tạo chuyến đi của bạn 🎉</Text>
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>
+                  Tạo chuyến đi của bạn 🎉
+                </Text>
                 <View style={{ flexDirection: "row", gap: 35, marginTop: 35 }}>
-                  <Pressable
-                    onPress={() => router.push("/Trip1")}
-                  >
+                  <Pressable onPress={() => router.push("/Trip1")}>
                     <Text>Tạo chuyến đi thủ công</Text>
                   </Pressable>
-                  <Pressable
-                    onPress={() => router.push("/Trip2")}
-                  >
+                  <Pressable onPress={() => router.push("/Trip2")}>
                     <Text>Tạo chuyến đi bằng AI</Text>
                   </Pressable>
-                  
                 </View>
                 <View style={{ flexDirection: "row", gap: 35, marginTop: 35 }}>
-                  <Pressable
-                    onPress={() => router.push("/Trip3")}
-                  >
+                  <Pressable onPress={() => router.push("/Trip3")}>
                     <Text>Test</Text>
                   </Pressable>
-                  <Pressable
-                    onPress={() => router.push("/Trip4")}
-                  >
+                  <Pressable onPress={() => router.push("/Trip4")}>
                     <Text>Test2</Text>
                   </Pressable>
-                  </View>
+                  <Pressable onPress={() => router.push("/CreatePost")}>
+                    <Text>Post</Text>
+                  </Pressable>
+                </View>
               </BottomSheetView>
             </BottomSheet>
           </BottomSheetModalProvider>
@@ -249,8 +241,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: "white",
-
-    
   },
   contentContainer: {
     flex: 1,
