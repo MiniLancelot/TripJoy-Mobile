@@ -21,7 +21,6 @@
     "@react-navigation/native": "^6.1.18",
     "@rnmapbox/maps": "^10.1.33",
     "@shopify/flash-list": "1.6.4",
-    "@shopify/react-native-skia": "^1.7.6",
     "@types/react-native-snap-carousel": "^3.8.11",
     "axios": "^1.7.9",
     "date-fns": "^4.1.0",
