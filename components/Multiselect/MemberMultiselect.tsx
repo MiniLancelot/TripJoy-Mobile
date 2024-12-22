@@ -160,6 +160,7 @@ const MemberMultiselect = ({
             : "..."
         }
         searchPlaceholder="Search..."
+        selectedStyle={styles.selectedStyle}
         value={_values.map((item) => item.userId)}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
@@ -172,6 +173,7 @@ const MemberMultiselect = ({
           // setProvinceName(item.label);
           setIsFocus(false);
           setSearchState(false);
+          
         }}
         renderLeftIcon={() => (
           <AntDesign
@@ -190,9 +192,9 @@ export default MemberMultiselect;
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
+    width: "60%",
     backgroundColor: "white",
-    padding: 16,
+    // padding: 16,
     paddingHorizontal: 0,
   },
   dropdown: {
@@ -201,6 +203,9 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
+  },
+  selectedStyle: {
+    borderRadius: 12,
   },
   icon: {
     marginRight: 5,
@@ -213,6 +218,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 8,
     fontSize: 14,
+    borderRadius: 8,
   },
   placeholderStyle: {
     fontSize: 16,

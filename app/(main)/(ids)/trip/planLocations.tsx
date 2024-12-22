@@ -7,8 +7,9 @@ import {
   Image,
   Alert,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTabStore } from "@/utils/store";
 import {
   addPlanLocationImage,
@@ -23,12 +24,13 @@ import {
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { set } from "date-fns";
 import { FlashList } from "@shopify/flash-list";
+import { NativeViewGestureHandler } from "react-native-gesture-handler";
 import {
   GestureHandlerRootView,
   TextInput,
 } from "react-native-gesture-handler";
 import DraggableFlatList from "react-native-draggable-flatlist";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import PlanLocationItem from "@/components/PlanLocation/PlanLocationItem";
 import BottomSheet, {
@@ -41,6 +43,7 @@ import MemberMultiselect from "@/components/Multiselect/MemberMultiselect";
 import { Member } from "@/constants/Member";
 import MemberDropdown from "@/components/Dropdowns/MemberDropdown";
 import * as ImagePicker from "expo-image-picker";
+import AnimationTextInput from "@/components/TextInput/MyTextInput";
 
 type PlanLocationsProps = {
   planId: string;
@@ -65,6 +68,7 @@ const planLocations = () => {
     PlanLocationsProps | undefined
   >(undefined);
   const [loading, setLoading] = useState(false);
+  const [isUpdateLoading, setIsUpdateLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -72,10 +76,15 @@ const planLocations = () => {
   const [payer, setPayer] = useState<Member>({ userId: "", name: "" });
   const [amount, setAmount] = useState<number>(0);
   const [note, setNote] = useState<string>("");
+  const snapPoints = useMemo(() => ["30%", "50%"], []);
+
+  const isUpdateDisabled = amount.toString().length === 0;
 
   const tempAvatar =
     "https://icons-for-free.com/iff/png/512/mountains+photo+photos+placeholder+sun+icon-1320165661388177228.png";
 
+  const tempImage =
+    "https://eadn-wc04-920528.nxedge.io/wp-content/uploads/2023/02/placeholder-726.png";
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -147,6 +156,7 @@ const planLocations = () => {
     );
     setChosenPlanLocation(_chosenPlanLocation);
     setNote(_chosenPlanLocation?.note!);
+    setAmount(_chosenPlanLocation?.amount! ?? 0);
     bottomSheetRef.current?.expand();
   };
   const handleSheetChanges = useCallback((index: number) => {
@@ -249,6 +259,7 @@ const planLocations = () => {
 
   const handleAddExpense = async (id: string) => {
     try {
+      console.log(`Plan location id: ${id}`);
       const data = {
         planLocationExpense: {
           // userSpenderIds: [
@@ -290,13 +301,21 @@ const planLocations = () => {
     }
   };
 
+  const handleUpdatePlanLocation = async (id: string) => {
+    await handleAddExpense(id);
+    await handlePatchNote(id);
+  }
+
   const renderImage = ({ item }: { item: string }) => (
-    <TouchableOpacity
+    <View
       style={styles.imageContainer}
-      onLongPress={() => _deletePlanLocationImage(item)}
+      // onLongPress={() => _deletePlanLocationImage(item)}
     >
-      <Image source={{ uri: item }} style={styles.image} />
-    </TouchableOpacity>
+      <Pressable onPress={() => _deletePlanLocationImage(item)} style={styles.deleteButton}>
+                    <Ionicons name="close-circle-outline" size={23} color="#ff6188" />
+                  </Pressable>
+      <Image source={{ uri: item }} style={styles.btsImage} />
+    </View>
   );
 
   const pickImage = async () => {
@@ -318,11 +337,15 @@ const planLocations = () => {
         uri: result.assets[0].uri,
         name: fileName,
         type: "image/jpeg",
-      }
+      };
       const _formData = new FormData();
       _formData.append("image", file);
       try {
-        const response = await addPlanLocationImage(_formData, session.userToken.accessToken, chosenPlanLocation!.planLocationId);
+        const response = await addPlanLocationImage(
+          _formData,
+          session.userToken.accessToken,
+          chosenPlanLocation!.planLocationId
+        );
         if (response) {
           console.log("Response: ", response.data);
           setIsRefreshing(true);
@@ -365,6 +388,15 @@ const planLocations = () => {
       </View>
     );
   }
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
 
   return (
     <View style={styles.container}>
@@ -423,55 +455,180 @@ const planLocations = () => {
           <BottomSheet
             ref={bottomSheetRef}
             onChange={handleSheetChanges}
-            snapPoints={["70%"]}
+            snapPoints={snapPoints}
             index={-1}
             backdropComponent={renderBackDrop}
             enablePanDownToClose={true}
           >
-            <BottomSheetScrollView style={{ flex: 1 }}>
-              <Text>Bottom Sheet Content</Text>
-              <Text>{chosenPlanLocation?.planLocationId}</Text>
-              <Text>{chosenPlanLocation?.order}</Text>
-              <Text>{chosenPlanLocation?.name}</Text>
-              <Text>{chosenPlanLocation?.address}</Text>
-              <Text>{chosenPlanLocation?.estimatedStartDate}</Text>
-              <Text>Tham gia: </Text>
-              <MemberMultiselect
-                planId={sharedId!}
-                _values={members}
-                setValues={setMembers}
-                bearer={session.userToken.accessToken}
-                placeholder="Chọn thành viên"
-              />
-              <Text>Người trả: </Text>
-              {members.length != 0 ? (
-                <MemberDropdown
+            <BottomSheetScrollView
+              style={{ flex: 1, paddingBottom: 30, paddingHorizontal: 10 }}
+            >
+              {/* <Text style={styles.btsTitle}>{chosenPlanLocation?.planLocationId}</Text> */}
+              <Text style={styles.btsTitle}>{chosenPlanLocation?.name}</Text>
+              <Text style={styles.btsAddress}>
+                {chosenPlanLocation?.address}
+              </Text>
+              <Text style={styles.btsAddress}>
+                Ngày bắt đầu dự kiến:{" "}
+                {chosenPlanLocation?.estimatedStartDate
+                  ? formatDate(chosenPlanLocation.estimatedStartDate)
+                  : ""}
+              </Text>
+
+              <View style={styles.sectionContainer}>
+                <View style={styles.sectionTitleContainer}>
+                  <Ionicons name="people" size={24} color={"#46e8a5"} />
+                  <Text style={styles.btsSectionText}>Tham gia</Text>
+                </View>
+
+                <MemberMultiselect
                   planId={sharedId!}
-                  data={members}
-                  value={payer}
-                  setValue={setPayer}
+                  _values={members}
+                  setValues={setMembers}
                   bearer={session.userToken.accessToken}
-                  placeholder="Chọn người trả"
+                  placeholder="Chọn thành viên"
                 />
+              </View>
+
+              <View style={[styles.sectionContainer, { marginTop: 10 }]}>
+                <View style={styles.sectionTitleContainer}>
+                  <Ionicons name="pricetag" size={24} color={"#17a1fa"} />
+                  <Text style={styles.btsSectionText}>Giá</Text>
+                </View>
+                <AnimationTextInput
+                  placeholder="Số tiền"
+                  style={styles.usernameInput}
+                  keyboardType="phone-pad"
+                  maxLength={30}
+                  value={amount.toString()}
+                  onChangeText={(text) => {
+                    const numericValue = text.replace(/[^0-9]/g, "");
+                    setAmount(numericValue ? Number(numericValue) : 0);
+                  }}
+                />
+              </View>
+
+              <View style={[styles.sectionContainer]}>
+                <View style={[styles.sectionTitleContainer, { marginTop: 20 }]}>
+                  <FontAwesome6
+                    name="hand-holding-dollar"
+                    size={24}
+                    color={"#17a1fa"}
+                  />
+                  <Text style={styles.btsSectionText}>Người trả</Text>
+                </View>
+                {members.length != 0 ? (
+                  <MemberDropdown
+                    planId={sharedId!}
+                    data={members}
+                    value={payer}
+                    setValue={setPayer}
+                    bearer={session.userToken.accessToken}
+                    placeholder="Chọn người trả"
+                  />
+                ) : (
+                  <View style={styles.textWrapper}>
+                    <Text>Chưa có người tham gia</Text>
+                  </View>
+                )}
+              </View>
+              <View style={styles.bottomSections}>
+                <View style={styles.botSection}>
+                  <View
+                    style={[
+                      styles.sectionTitleContainer,
+                      { marginTop: 20, justifyContent: "flex-start" },
+                    ]}
+                  >
+                    <FontAwesome6
+                      name="sticky-note"
+                      size={24}
+                      color={"#D45985"}
+                    />
+                    <Text style={styles.btsSectionText}>Ghi chú</Text>
+                  </View>
+                  <TextInput
+                    value={note}
+                    onChangeText={(text) => setNote(text)}
+                    placeholder="Ghi chú"
+                    multiline
+                    numberOfLines={4}
+                    style={styles.noteContainer}
+                  />
+                </View>
+                <View style={styles.botSection}>
+                  <Pressable
+                    onPress={pickImage}
+                    style={[
+                      styles.sectionTitleContainer,
+                      { marginTop: 20, justifyContent: "flex-start" },
+                    ]}
+                  >
+                    <FontAwesome6 name="images" size={24} color={"#46e8a5"} />
+                    <Text style={styles.btsSectionText}>Thêm ảnh</Text>
+                  </Pressable>
+                </View>
+              </View>
+              {/* <View style={styles.imagesContainer}> */}
+              {chosenPlanLocation?.images.length != 0 ? (
+                <NativeViewGestureHandler disallowInterruption={true}>
+                  <FlatList
+                    data={chosenPlanLocation?.images}
+                    renderItem={renderImage}
+                    // estimatedItemSize={100}
+                    style={{ flex: 1, marginBottom:0 }}
+                    scrollEnabled={true}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                  />
+                </NativeViewGestureHandler>
               ) : (
-                <Text>Chưa có người tham gia</Text>
+                <Image
+                  source={{ uri: tempImage }}
+                  style={[styles.btsImage, { marginBottom: 20 }]}
+                />
               )}
-              <TextInput
-                // style={styles.input}
-                keyboardType="numeric"
-                value={amount.toString()}
-                onChangeText={(text) => {
-                  const numericValue = text.replace(/[^0-9]/g, "");
-                  setAmount(parseFloat(numericValue));
-                }}
-                placeholder="Số tiền"
-              />
-              <TextInput
+              {/* </View> */}
+
+              <View style={styles.loginButtonContainer}>
+                <Pressable
+                onPress={() =>
+                  handleAddExpense(chosenPlanLocation!.planLocationId)
+                }
+                  disabled={isUpdateDisabled || isUpdateLoading}
+                  android_ripple={
+                    isUpdateDisabled ? null : { color: "#b9bcc6" }
+                  }
+                  // android_ripple={{ color: "gray" }}
+                >
+                  <View
+                    style={[
+                      styles.innerLoginButtonContainer,
+                      isUpdateDisabled && styles.loginButtonDisabled,
+                    ]}
+                  >
+                    {isUpdateLoading ? (
+                      <ActivityIndicator color="#fff" size={28} />
+                    ) : (
+                      <Text
+                        style={[
+                          styles.loginButtonText,
+                          { color: isUpdateDisabled ? "#b9bcc6" : "#fff" },
+                        ]}
+                      >
+                        Hoàn thành
+                      </Text>
+                    )}
+                  </View>
+                </Pressable>
+              </View>
+
+              {/* <TextInput
                 value={note}
                 onChangeText={(text) => setNote(text)}
                 placeholder="Ghi chú"
-              />
-              <Pressable
+              /> */}
+              {/* <Pressable
                 onPress={() =>
                   handleAddExpense(chosenPlanLocation!.planLocationId)
                 }
@@ -484,20 +641,10 @@ const planLocations = () => {
                 }
               >
                 <Text>Thêm ghi chú</Text>
-              </Pressable>
-              <Pressable onPress={pickImage}>
+              </Pressable> */}
+              {/* <Pressable onPress={pickImage}>
                 <Text>Thêm hình ảnh</Text>
-              </Pressable>
-              {chosenPlanLocation?.images.length != 0 ? (
-                <FlashList
-                  data={chosenPlanLocation?.images}
-                  renderItem={renderImage}
-                  estimatedItemSize={100}
-                  horizontal
-                />
-              ) : (
-                <Text>No images</Text>
-              )}
+              </Pressable> */}
             </BottomSheetScrollView>
           </BottomSheet>
         </BottomSheetModalProvider>
@@ -546,6 +693,12 @@ const styles = StyleSheet.create({
     width: 280,
     height: 220,
     borderRadius: 30,
+  },
+  btsImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    marginHorizontal: 5,
   },
   avatar2: {
     width: 250,
@@ -628,6 +781,120 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontSize: 13,
     color: "#626262",
+  },
+
+  btsTitle: {
+    fontSize: 19,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+  },
+  btsAddress: {
+    fontSize: 15,
+    color: "#333",
+    marginBottom: 10,
+  },
+  btsSectionText: {
+    fontSize: 17,
+    color: "#333",
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  usernameInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+
+    padding: 10,
+
+    justifyContent: "center",
+    alignItems: "center",
+    width: "60%",
+    fontSize: 17,
+    lineHeight: 24,
+    paddingRight: 30,
+    fontWeight: "500",
+  },
+  sectionContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+  },
+  sectionTitleContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
+    paddingLeft: 15,
+    marginTop: 15,
+  },
+  textWrapper: {
+    marginTop: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderColor: "#e7e8ee",
+    padding: 5,
+    fontSize: 18,
+    lineHeight: 28,
+    fontWeight: "600",
+    width: "50%",
+    borderWidth: 1.2,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  bottomSections: {
+    // justifyContent: "space-between",
+    // alignItems: "center",
+  },
+  botSection: {},
+  noteContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderColor: "#e7e8ee",
+    padding: 10,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "400",
+    width: "100%",
+    borderWidth: 1.2,
+    textAlignVertical: "top",
+    textAlign: "left",
+  },
+  imagesContainer: {
+    marginBottom: 20,
+  },
+  loginButtonContainer: {
+    backgroundColor: "#13c892",
+    borderRadius: 12,
+    overflow: "hidden",
+    margin: 10,
+    width: "95%",
+    marginTop: 20
+  },
+  innerLoginButtonContainer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginButtonText: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: "semibold",
+    lineHeight: 28,
+  },
+  loginButtonDisabled: {
+    backgroundColor: "#e7e8ee",
+    color: "#b9bcc6",
+  },
+  deleteButton: {
+    position: "absolute",
+    top: -5,
+    right: 0,
+    backgroundColor: "#ffffff",
+    borderRadius: 50,
+    zIndex: 4
   },
 });
 
