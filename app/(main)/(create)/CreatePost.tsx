@@ -14,6 +14,7 @@ import { set } from "date-fns";
 import { FriendProps } from "@/constants/Friend";
 import FriendDropdown from "@/components/Dropdowns/FriendDropdown";
 import { createPost } from "@/services/post/post";
+import { router } from "expo-router";
 
 // interface CreatePostProps {
 //   content: string,
@@ -79,6 +80,7 @@ const CreatePost = () => {
     const response = await createPost(data, session.userToken.accessToken);
     if (response) {
       console.log("Create post success");
+      router.back();
     } else {
       console.log("Create post failed");
     }

@@ -98,6 +98,7 @@ const ChosenTrip = () => {
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(today);
   const [planLocations, setPlanLocations] = useState<PlanLocationProps[]>([]);
+  const [plan, setPlan] = useState<TripProps | null>(null);
 
   const [planLocation, setPlanLocation] = useState<PlanLocationProps>({
     name: "",
@@ -172,6 +173,20 @@ const ChosenTrip = () => {
             })
           )
         );
+        setPlan({
+          id: response.data.plan.planId,
+          title: response.data.plan.title,
+          estimatedStartDate: response.data.plan.estimatedStartDate.split("T")[0],
+          estimatedEndDate: response.data.plan.estimatedEndDate.split("T")[0],
+          provinceStart: {
+            provinceId: response.data.plan.provinceStart.provinceId,
+            provinceName: response.data.plan.provinceStart.provinceName,
+          },
+          provinceEnd: {
+            provinceId: response.data.plan.provinceEnd.provinceId,
+            provinceName: response.data.plan.provinceEnd.provinceName,
+          },
+        });
         console.log("Plan locations: ", planLocations);
         setIsLoading(false);
       }
@@ -727,6 +742,8 @@ const ChosenTrip = () => {
             <Calendar
               current={selectedDate} // Default value if no date is selected
               onDayPress={handleDayPress}
+              minDate={plan?.estimatedStartDate}
+              maxDate={plan?.estimatedEndDate}
               markedDates={
                 selectedDate
                   ? {

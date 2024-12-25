@@ -1,18 +1,14 @@
+import { Params } from "@/constants/QueryParams";
 import { post } from "@/utils/request";
 import showError from "@/utils/showError";
-import { Params } from "@/constants/QueryParams2";
 
-// interface _Params extends Params {
-//   userId?: string;
-// }
-
-const createPost = async (data: any, accessToken: string) => {
+const postComment = async (data: any, accessToken: string, postId: string) => {
   try {
-    const response = await post("/posts", {
+    const response = await post(`/posts/${postId}/comments`, {
       method: "POST",
       data: data,
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
     });
@@ -23,7 +19,11 @@ const createPost = async (data: any, accessToken: string) => {
   }
 };
 
-const getPostsHomeFeed = async (accessToken: string, params: Params) => {
+const getCommentsByPostId = async (
+  postId: string,
+  params: Params,
+  accessToken: string
+) => {
   try {
     const query = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
@@ -31,8 +31,7 @@ const getPostsHomeFeed = async (accessToken: string, params: Params) => {
         return acc;
       }, {} as Record<string, string>)
     ).toString();
-
-    const response = await post(`/posts/homefeed?${query}`, {
+    const response = await post(`/posts/${postId}/comments?${query}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -40,13 +39,29 @@ const getPostsHomeFeed = async (accessToken: string, params: Params) => {
     });
     return response;
   } catch (error: any) {
-    console.log("get post Error: ", error);
     showError(error);
     throw error;
   }
 };
 
-const getPostsByUserId = async (accessToken: string, userId: String, params: Params) => {
+const postReply = async (data: any, accessToken: string, commentId: string) => {
+  try {
+    const response = await post(`/comments/${commentId}/reply`, {
+      method: "POST",
+      data: data,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+};
+
+const getRepliesByCommentId = async (commentId: string, accessToken: string, params: Params) => {
   try {
     const query = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
@@ -55,7 +70,7 @@ const getPostsByUserId = async (accessToken: string, userId: String, params: Par
       }, {} as Record<string, string>)
     ).toString();
 
-    const response = await post(`/posts/users/${userId}?${query}`, {
+    const response = await post(`/comments/${commentId}/reply?${query}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -63,15 +78,14 @@ const getPostsByUserId = async (accessToken: string, userId: String, params: Par
     });
     return response;
   } catch (error: any) {
-    console.log("get post Error: ", error);
     showError(error);
     throw error;
   }
-}
+};
 
-const deletePost = async (postId: string, accessToken: string) => {
+const deleteComment = async (commentId: string, accessToken: string) => {
   try {
-    const response = await post(`/posts/${postId}`, {
+    const response = await post(`/comments/${commentId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -84,4 +98,4 @@ const deletePost = async (postId: string, accessToken: string) => {
   }
 }
 
-export { createPost, getPostsHomeFeed, getPostsByUserId, deletePost };
+export { postComment, getCommentsByPostId, postReply, getRepliesByCommentId, deleteComment };
