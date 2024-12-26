@@ -14,7 +14,7 @@ import { useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ReadMoreText from "./ReadMoreText";
-import AntDesign from "@expo/vector-icons/AntDesign";
+// import AntDesign from "@expo/vector-icons/AntDesign";
 import {
   deletePost,
   getPostById,
@@ -259,12 +259,12 @@ const StarRailChar2 = ({ userId }: Params) => {
 
     const getImageWidth = (numImages: number) => {
       if (numImages === 1) return "100%";
-      if (numImages === 2) return "49.2%";
+      if (numImages === 2) return "49.5%";
       if (numImages === 3) return "32.5%";
       return "32.5%";
     };
 
-    const displayImages = chars.slice(0, 3);
+    const displayImages = item.images.slice(0, 2);
     // console.log(displayImages.map(char => char.name));
 
     return (

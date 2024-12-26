@@ -10,7 +10,6 @@ import { useState } from "react";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import PostStatusDropdown from "@/components/Dropdowns/PostStatusDropdown";
 import * as ImagePicker from "expo-image-picker";
-import { set } from "date-fns";
 import { FriendProps } from "@/constants/Friend";
 import FriendDropdown from "@/components/Dropdowns/FriendDropdown";
 import { createPost } from "@/services/post/post";
@@ -80,7 +79,7 @@ const CreatePost = () => {
     const response = await createPost(data, session.userToken.accessToken);
     if (response) {
       console.log("Create post success");
-      router.back();
+      router.replace("/home")
     } else {
       console.log("Create post failed");
     }
