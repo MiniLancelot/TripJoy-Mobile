@@ -570,6 +570,7 @@ const ChosenTrip = () => {
           <MapView
             style={styles.map}
             styleURL="mapbox://styles/mapbox/streets-v12"
+            scaleBarEnabled={false}
           >
             {userLocation && (
               <Camera

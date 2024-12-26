@@ -224,6 +224,9 @@ const Layout = () => {
                   <Pressable onPress={() => router.push("/CreatePost")}>
                     <Text>Post</Text>
                   </Pressable>
+                  <Pressable onPress={() => router.push("/(create-ai-plan)/AiStep1")}>
+                    <Text>Plan AI</Text>
+                  </Pressable>
                 </View>
               </BottomSheetView>
             </BottomSheet>

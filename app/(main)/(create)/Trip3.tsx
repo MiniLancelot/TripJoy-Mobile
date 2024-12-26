@@ -447,6 +447,7 @@ const Trip3 = () => {
               <View style={{ marginBottom: 10 }}>
                 <Calendar
                   minDate={format(new Date(), "yyyy-MM-dd")}
+                  maxDate = {"2024-12-29"}
                   markingType={"period"}
                   markedDates={{
                     [data.startDate]: { startingDay: true, color: "#71d7c7" },
