@@ -119,7 +119,7 @@ const FriendInvitation = () => {
             <FriendItem
               id={item.id}
               name={item.userName}
-              avatar = {item.avatar.url}
+              avatar = {item.avatar}
               _onClick={handleFriendRequest}
             />
           )}

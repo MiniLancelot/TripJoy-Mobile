@@ -31,7 +31,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import MyProfileModal from "@/components/Modals/MyProfileModal";
-import StarRailChar2 from "@/components/Others/StarRailChar2";
+import StarRailChar2 from "@/components/Others/StarRailChar3";
 import get_user_profile from "@/services/user/userProfile";
 
 const { width } = Dimensions.get("window");
@@ -402,7 +402,7 @@ const profile = () => {
                 </Text>
               </Pressable>
               <View key={refreshKey}>
-                <StarRailChar2 />
+                <StarRailChar2 userId={session.userInfo.user.profile.id}/>
               </View>
             </View>
           </View>

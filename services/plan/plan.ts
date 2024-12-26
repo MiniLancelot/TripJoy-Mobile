@@ -1,3 +1,4 @@
+import { Params } from "@/constants/QueryParams";
 import { plan } from "@/utils/request";
 import showError from "@/utils/showError";
 import { getAccessToken } from "@rnmapbox/maps";
@@ -233,6 +234,64 @@ const patchNote = async (data: any, accessToken: any, id: any) => {
   }
 }
 
+const getExpensesByPlanId = async (accessToken: any, planId: any, params: Params) => {
+  try {
+    const query = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        acc[key] = String(value);
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
+    const result = await plan(`/plans/${planId}/expense?${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const getPlanExpenseMembersByPlanId = async (accessToken: any, planId: any, params: Params) => {
+  try {
+    const query = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        acc[key] = String(value);
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
+    const result = await plan(`/plans/${planId}/expense/members?${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const getPlanExpenseMemberByPlanId = async (accessToken: any, planId: any, userId: any) => {
+  try {
+    const result = await plan(`/plans/${planId}/expense/members/${userId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
 export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, 
   getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId, 
-  getPlanInvitations, putExpense, patchNote, updatePlan };
+  getPlanInvitations, putExpense, patchNote, updatePlan, getExpensesByPlanId,
+  getPlanExpenseMembersByPlanId, getPlanExpenseMemberByPlanId };
