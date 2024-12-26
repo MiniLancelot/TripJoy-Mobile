@@ -6,7 +6,7 @@ import { Member } from "@/constants/Member";
 import getMembers from "@/services/plan/member";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlashList } from "@shopify/flash-list";
-import { changePermission } from "@/services/plan/invitePeople";
+import { changePermission, removeMember } from "@/services/plan/invitePeople";
 import { it } from "date-fns/locale";
 
 const PAGE_SIZE = 10;
@@ -84,7 +84,23 @@ const permission = () => {
   }, []);
 
   const _changePermission = async (userId: string) => {
-    const response = await changePermission(sharedId, userId, session.userToken.accessToken);
+    const response = await changePermission(
+      sharedId,
+      userId,
+      session.userToken.accessToken
+    );
+    if (response.status === 200) {
+      setPageIndex(0); // Reset to reload comments from page 1
+      fetchMembers(false);
+    }
+  };
+
+  const leaveGroup = async (userId: string) => {
+    const response = await removeMember(
+      sharedId,
+      userId,
+      session.userToken.accessToken
+    );
     if (response.status === 200) {
       setPageIndex(0); // Reset to reload comments from page 1
       fetchMembers(false);
@@ -121,10 +137,17 @@ const permission = () => {
                   default:
                     return null;
                 }
-                return <Pressable onPress={() => _changePermission(item.userId)}>
-                  <Text>{role}</Text>
-                </Pressable>;
+                return item.role == Role.OWNER ? (
+                  <Pressable onPress={() => _changePermission(item.userId)}>
+                    <Text>{role}</Text>
+                  </Pressable>
+                ) : null;
               })()}
+              {item.userId == session.userInfo.user.profile.id ? (
+                <Pressable onPress={() => leaveGroup(item.userId)}>
+                  <Text>Rời nhóm</Text>
+                </Pressable>
+              ) : null}
             </View>
           )}
           estimatedItemSize={100}

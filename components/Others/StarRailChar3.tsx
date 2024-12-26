@@ -17,11 +17,14 @@ import ReadMoreText from "./ReadMoreText";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
   deletePost,
+  getPostById,
   getPostsByUserId,
   getPostsHomeFeed,
+  likePost,
+  unlikePost,
 } from "@/services/post/post";
 import { useAuth } from "@/app/(auth)/AuthContext";
-import { post, user } from "@/utils/request";
+import { plan, post, user } from "@/utils/request";
 import { Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -56,6 +59,7 @@ type PostProps = {
   content: string;
   images: string[];
   // location: string;
+  planPost: any;
   createdAt: string;
   isLiked: any; //test like
   liked: number;
@@ -64,6 +68,14 @@ type PostProps = {
 
 interface Params {
   userId?: string;
+}
+
+enum Vehicle {
+  MOTORBIKE = 0,
+  CAR = 1,
+  TRAIN = 2,
+  BOAT = 3,
+  AIRPLANE = 4,
 }
 
 const PAGE_SIZE = 10;
@@ -78,12 +90,6 @@ const StarRailChar2 = ({ userId }: Params) => {
   const [error, setError] = useState(null);
   const router = useRouter();
   // const [chosenPost, setChosenPost] = useState<PostProps | null>(null);
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["30%", "50%"], []);
-
-  const tempTextContent =
-    "Đà Nẵng, với vẻ đẹp thiên nhiên tuyệt vời và sự phát triển vượt bậc, xứng đáng là một trong những điểm đến hấp dẫn nhất Việt Nam. Thành phố này không chỉ sở hữu đường bờ biển dài với cát trắng mịn màng, làn nước trong xanh mà còn có những hòn đảo hoang sơ, những ngọn núi hùng vĩ và các khu rừng nguyên sinh đa dạng.\n Bà Nà Hills, Cầu Rồng, bãi biển Mỹ Khê chỉ là một vài trong số những điểm đến nổi tiếng mà Đà Nẵng mang đến cho du khách.\n Với sự phát triển mạnh mẽ của ngành du lịch, Đà Nẵng đã và đang trở thành một điểm đến không thể bỏ qua cho những ai yêu thích khám phá và trải nghiệm. Du lịch Đà Nẵng tự túc thì nên chuẩn bị những gì? Có địa điểm du lịch Đà Nẵng nào đang được hội cuồng chân săn đón? Cùng tìm hiểu nhé!";
-  const tempTitle = "2 ngày 1 đêm ở Bà Nà";
 
   useEffect(() => {
     fetchChars();
@@ -118,8 +124,9 @@ const StarRailChar2 = ({ userId }: Params) => {
           userId: _item.userPosted.userId,
           content: _item.content,
           images: _item.postImages.map((image: any) => image.url),
+          planPost: _item.planPost,
           createdAt: _item.createdAt.split("T")[0],
-          isLiked: _item.emotionByMe ?? false,
+          isLiked: _item.emotionByMe,
           liked: _item.likeCount, // Initialize liked property
           username: _item.userPosted.userName,
           avatar: _item.userPosted.avatar,
@@ -160,6 +167,12 @@ const StarRailChar2 = ({ userId }: Params) => {
     );
   }
 
+  const handleChangeItem = (item: PostProps, _index: number) => {
+    setChars((prev) =>
+      prev.map((char, i) => (i === _index ? { ...char, ...item } : char))
+    );
+  };
+
   if (error) {
     return (
       <View>
@@ -169,35 +182,80 @@ const StarRailChar2 = ({ userId }: Params) => {
   }
 
   const RenderItem = ({
+    _key,
     item,
     _onDelete,
+    _onChangeItem,
   }: {
+    _key: number;
     item: PostProps;
     _onDelete?: any;
+    _onChangeItem?: (item: PostProps, _index: number) => void;
   }) => {
-    const [itemIsLiked, setItemIsLiked] = useState(item.isLiked);
-    const [likeQuantity, setLikeQuantity] = useState(item.liked);
+    // const [itemIsLiked, setItemIsLiked] = useState(item.isLiked != null);
+    const [currentReaction, setCurrentReaction] = useState<number | null>(
+      item.isLiked
+    );
+    // const [likeQuantity, setLikeQuantity] = useState(item.liked);
 
     const tempAvatar =
       "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
     const avatarUri = item.avatar == null ? tempAvatar : item.avatar;
 
-    const toggleLike = () => {
-      if (!itemIsLiked) {
-        setItemIsLiked(!itemIsLiked);
-        setLikeQuantity(likeQuantity + 1);
-        console.log(itemIsLiked);
-        console.log("Like clicked");
-      } else {
-        setItemIsLiked(!itemIsLiked);
-        setLikeQuantity(likeQuantity - 1);
-        console.log(itemIsLiked);
-        console.log("Unlike clicked");
+    const handleReaction = async (reaction: number | null) => {
+      try {
+        // Cập nhật ngay trên giao diện
+        console.log("Reaction: ", reaction);
+        setCurrentReaction(reaction);
+        // setLikeQuantity(
+        //   reaction === null ? likeQuantity - 1 : likeQuantity + 1
+        // );
+        let response = null;
+        // Gọi API cập nhật trạng thái
+        if (reaction === null) {
+          response = await unlikePost(session.userToken.accessToken, item.postId);
+        } else {
+          response = await likePost(
+            { LikePost: { Emotion: reaction } },
+            session.userToken.accessToken,
+            item.postId
+          );
+        }
+        if (response.data.isSuccess){
+          // Lấy dữ liệu mới nhất của post (nếu cần)
+        const _newItem = await getPostById(
+          session.userToken.accessToken,
+          item.postId
+        );
+        _onChangeItem &&
+          _onChangeItem(
+            {
+              postId: _newItem.data.post.postId,
+              userId: _newItem.data.post.userPosted.userId,
+              content: _newItem.data.post.content,
+              images: _newItem.data.post.postImages.map(
+                (image: any) => image.url
+              ),
+              planPost: _newItem.data.post.planPost,
+              createdAt: _newItem.data.post.createdAt.split("T")[0],
+              isLiked: _newItem.data.post.emotionByMe,
+              liked: _newItem.data.post.likeCount,
+              username: _newItem.data.post.userPosted.userName,
+              avatar: _newItem.data.post.userPosted.avatar,
+              commnentCount: _newItem.data.post.commentCount,
+            },
+            _key
+          );
+        }
+        
+      } catch (error) {
+        console.error("Error updating reaction:", error);
       }
-
-      // console.log(itemIsLiked);
-      // console.log("Like clicked");
     };
+
+    useEffect(() => {
+      console.log("Current reaction: ", currentReaction);
+    }, [currentReaction]);
 
     const getImageWidth = (numImages: number) => {
       if (numImages === 1) return "100%";
@@ -232,6 +290,60 @@ const StarRailChar2 = ({ userId }: Params) => {
               isExpanded={expandedItems[item.id] || false} // Get expanded state from parent
               toggleExpand={() => toggleExpand(item.id)} // Pass toggle function to child
             /> */}
+            {item.planPost != null && (
+              <View>
+                <Text style={styles.title}>
+                  Ngày bắt đầu: {item.planPost.planStartDate.split("T")[0]}
+                </Text>
+                <Text style={styles.title}>
+                  Ngày kết thúc: {item.planPost.planEndDate.split("T")[0]}
+                </Text>
+                <Text style={styles.title}>
+                  Địa điểm: {item.planPost.provinceStart.provinceName} -{" "}
+                  {item.planPost.provinceEnd.provinceName}
+                </Text>
+                <Text style={styles.title}>
+                  Kinh phí: {item.planPost.budget}
+                </Text>
+                {(() => {
+                  let vehicle = "";
+                  switch (item.planPost.vehicle) {
+                    case Vehicle.MOTORBIKE:
+                      vehicle = "Xe máy";
+                      break;
+                    case Vehicle.CAR:
+                      vehicle = "Ô tô";
+                      break;
+                    case Vehicle.TRAIN:
+                      vehicle = "Tàu hỏa";
+                      break;
+                    case Vehicle.BOAT:
+                      vehicle = "Tàu thuyền";
+                      break;
+                    case Vehicle.AIRPLANE:
+                      vehicle = "Máy bay";
+                      break;
+                    default:
+                      return null;
+                  }
+                  return (
+                    <Text style={styles.title}>Phương tiện: {vehicle}</Text>
+                  );
+                })()}
+                <Text style={styles.title}>Lộ trình</Text>
+                <View style={{ marginLeft: 10 }}>
+                  {item.planPost.postPlanLocations.map(
+                    (location: any, index: any) => (
+                      <View key={index}>
+                        <Text>{location.name}</Text>
+                        <Text>{location.address}</Text>
+                        <Text>{location.estimatedStartDate.split("T")[0]}</Text>
+                      </View>
+                    )
+                  )}
+                </View>
+              </View>
+            )}
           </View>
           {userId != undefined && (
             <TouchableOpacity
@@ -256,6 +368,15 @@ const StarRailChar2 = ({ userId }: Params) => {
             ))}
           </View>
           <View style={styles.interactionBar}>
+            {item.planPost != null && (
+              <Pressable
+                onPress={() => {
+                  console.log("Plan clicked: " + item.postId);
+                }}
+              >
+                <Text>Xin gia nhập</Text>
+              </Pressable>
+            )}
             <TouchableOpacity
               style={styles.likeContainer}
               onPress={() => {
@@ -268,7 +389,7 @@ const StarRailChar2 = ({ userId }: Params) => {
               <Text style={styles.like}>{item.commnentCount}</Text>
             </TouchableOpacity>
             <View style={styles.likeContainer}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={toggleLike}
                 style={{ alignItems: "center", justifyContent: "center" }}
               >
@@ -277,13 +398,16 @@ const StarRailChar2 = ({ userId }: Params) => {
                   size={22}
                   color={itemIsLiked ? "#E85D75" : "#626262"}
                 />
-              </TouchableOpacity>
-              {/* <FacebookReaction /> */}
-              {/* <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ReactionBox />
-              </View> */}
+              </TouchableOpacity> */}
 
-              <Text style={styles.like}>{likeQuantity}</Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ReactionBox
+                  _current={currentReaction}
+                  _setCurrent={(reaction) => handleReaction(reaction)}
+                />
+              </View>
+
+              <Text style={styles.like}>{item.liked}</Text>
             </View>
           </View>
         </View>
@@ -314,8 +438,13 @@ const StarRailChar2 = ({ userId }: Params) => {
           <FlashList
             data={chars}
             // renderItem={renderItem}
-            renderItem={({ item }: { item: PostProps }) => (
-              <RenderItem item={item} _onDelete={_deletePost} />
+            renderItem={({ item, index }) => (
+              <RenderItem
+                _key={index}
+                item={item}
+                _onDelete={_deletePost}
+                _onChangeItem={handleChangeItem}
+              />
             )}
             keyExtractor={(item) => item.postId}
             //   contentContainerStyle={{ paddingBottom:  80 }}
@@ -430,7 +559,7 @@ const styles = StyleSheet.create({
   interactionBar: {
     width: "100%",
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "flex-start",
     paddingHorizontal: 10,
     marginTop: 15,
     gap: 40,

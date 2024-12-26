@@ -23,6 +23,23 @@ const createPost = async (data: any, accessToken: string) => {
   }
 };
 
+const createPostPlan = async (data: any, accessToken: string) => {
+  try {
+    const response = await post("/posts/plan", {
+      method: "POST",
+      data: data,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+};
+
 const getPostsHomeFeed = async (accessToken: string, params: Params) => {
   try {
     const query = new URLSearchParams(
@@ -46,7 +63,11 @@ const getPostsHomeFeed = async (accessToken: string, params: Params) => {
   }
 };
 
-const getPostsByUserId = async (accessToken: string, userId: String, params: Params) => {
+const getPostsByUserId = async (
+  accessToken: string,
+  userId: String,
+  params: Params
+) => {
   try {
     const query = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
@@ -67,7 +88,7 @@ const getPostsByUserId = async (accessToken: string, userId: String, params: Par
     showError(error);
     throw error;
   }
-}
+};
 
 const deletePost = async (postId: string, accessToken: string) => {
   try {
@@ -82,6 +103,63 @@ const deletePost = async (postId: string, accessToken: string) => {
     showError(error);
     throw error;
   }
-}
+};
 
-export { createPost, getPostsHomeFeed, getPostsByUserId, deletePost };
+const likePost = async (data: any, accessToken: string, postId: any) => {
+  try {
+    const response = await post(`/posts/${postId}/like`, {
+      method: "POST",
+      data: data,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+};
+
+const getPostById = async (accessToken: string, postId: any) => {
+  try {
+    const response = await post(`/posts/${postId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+};
+
+const unlikePost = async (accessToken: string, postId: any) => {
+  try {
+    const response = await post(`/posts/${postId}/revokeLike`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+};
+
+export {
+  createPost,
+  createPostPlan,
+  getPostsHomeFeed,
+  getPostsByUserId,
+  deletePost,
+  likePost,
+  unlikePost,
+  getPostById,
+};
