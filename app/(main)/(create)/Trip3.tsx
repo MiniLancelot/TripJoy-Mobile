@@ -108,7 +108,7 @@ const Trip3 = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const tempAvatar =
-    "https://icons-for-free.com/iff/png/512/mountains+photo+photos+placeholder+sun+icon-1320165661388177228.png";
+    "https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE=";
 
   // useEffect(() => {
   //   const handler = setTimeout(() => {
