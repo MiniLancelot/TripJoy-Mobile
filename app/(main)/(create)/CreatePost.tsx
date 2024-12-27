@@ -138,7 +138,7 @@ const CreatePost = () => {
         <Pressable onPress={() => pickImage(1)}>
           <Image
             source={{
-              uri: images[0] == null ? tempAvatar : images[1],
+              uri: images[1] == null ? tempAvatar : images[1],
             }}
             style={styles.image}
           />

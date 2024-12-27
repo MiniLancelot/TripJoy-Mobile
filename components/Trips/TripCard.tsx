@@ -187,7 +187,10 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
                   />
                 ))}
                 <TouchableOpacity
-                  onPress={() => router.push(`/trip/${item.id}`)}
+                  onPress={() => {
+                    
+                    router.push(`/trip/${item.id}`);
+                  }}
                   style={{ marginLeft: 120 }}
                 >
                   <Text
