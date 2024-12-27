@@ -8,7 +8,13 @@ import {
   Dimensions,
   Pressable,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
@@ -17,42 +23,186 @@ import { Trips } from "@/constants/Trip";
 import Carousel from "react-native-reanimated-carousel";
 import TripCarousel from "@/components/Trips/TripCarousel";
 import { router } from "expo-router";
-import { getAllPlan, getPlanLocationById } from "@/services/plan/plan";
+import {
+  getAllPlan,
+  getPlanAvailableToJoin,
+  getPlanLocationById,
+  postJoinRequest,
+  putChangeJoinStatusPlan,
+  revokeJoinRequest,
+} from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
+import { Province } from "@/constants/Provinces";
+import SuggestedTripCarousel from "@/components/Trips/SuggestedTripCarousel";
+import { TripProps } from "@/constants/TripProps";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetModalProvider,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
+import { ca } from "date-fns/locale";
 
 const { width } = Dimensions.get("window");
 const IMG_HEIGHT = 200;
 
-type TripProps = {
-  title: string;
-  subtitle: string;
-  illustration: string;
-  id: string,
-};
+// type TripProps = {
+//   title: string;
+//   // subtitle: string;
+//   // illustration: string;
+//   id: string,
+//   avatar: string,
+//   startDate: string,
+//   endDate: string,
+//   provinceStart: Province,
+//   provinceEnd: Province,
+//   joinStatus?: number,
+//   applyStatus?: boolean,
+// };
 
 const Trip = () => {
   const { session, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TripProps[]>([]);
+  const [suggestData, setSuggestData] = useState<TripProps[]>([]);
+  const [chosenPlan, setChosenPlan] = useState<string>();
+  const [content, setContent] = useState<string>("");
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isStatusChanged, setIsStatusChanged] = useState<boolean>(false);
+  const snapPoints = useMemo(() => ["30%", "50%"], []);
   useEffect(() => {
-    setData(Trips);
+    // setData(Trips);
     fetchPlans();
+    fetchSuggestPlans();
   }, []);
 
   const fetchPlans = async () => {
     try {
       const response = await getAllPlan(session.userToken.accessToken);
       if (response) {
-        console.log(response.data.plans.data);
+        console.log(response.data.plans.data.map((item: any): TripProps => {
+          return {
+            id: item.id,
+            title: item.title,
+            avatar: item.avatar,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            provinceStart: item.provinceStart,
+            provinceEnd: item.provinceEnd,
+            joinStatus: item.joinStatus,
+            applyStatus: item.applyStatus,
+          };
+        }));
         setData(response.data.plans.data);
         setIsLoading(false);
       }
-
-    }catch (err: any) {
+    } catch (err: any) {
       setError(err.message);
     }
-  }
+  };
+
+  const fetchSuggestPlans = async () => {
+    try {
+      const _response = await getPlanAvailableToJoin(
+        session.userToken.accessToken
+      );
+      if (_response) {
+        console.log(_response.data.plans.data);
+        setSuggestData(_response.data.plans.data);
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const _handleOpen = (id: string) => {
+    console.log("Open bottom sheet with id: ", id);
+    setChosenPlan(id);
+    bottomSheetRef.current?.expand();
+  };
+
+  const handleJoinRequest = async () => {
+    try {
+      const response = await postJoinRequest(
+        {
+          Introduction: content,
+        },
+        session.userToken.accessToken,
+        chosenPlan
+      );
+      if (response) {
+        console.log(response.data);
+        setContent("");
+        bottomSheetRef.current?.close();
+        setIsSuccess(true);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const handleRevokeRequest = async (id: string) => {
+    try {
+      const response = await revokeJoinRequest(
+        session.userToken.accessToken,
+        id
+      );
+      if (response) {
+        console.log(response.data);
+        setIsSuccess(true);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+    const _changeJoinStatus = async (id: string) => {
+      try {
+        const response = await putChangeJoinStatusPlan(
+          session.userToken.accessToken,
+          id
+        );
+        if (response) {
+          console.log(response.data);
+          setIsStatusChanged(true);
+        }
+      } catch (err: any) {
+        console.log(err.message);
+      }
+    }
+
+  useEffect(() => {
+    if (isSuccess) {
+      fetchSuggestPlans();
+      setIsSuccess(false);
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (isStatusChanged) {
+      fetchPlans();
+      setIsStatusChanged(false);
+    }
+  }, [isStatusChanged]);
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+
+  const renderBackDrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      ></BottomSheetBackdrop>
+    ),
+    []
+  );
 
   const bannerImage =
     "https://mangdendiscovery.vn/wp-content/uploads/2023/02/1-5.jpg";
@@ -60,50 +210,98 @@ const Trip = () => {
     "https://image.kkday.com/v2/image/get/w_1920,h_1080,c_fit,q_55,wm_auto/s1.kkday.com/product_151787/20230909161736_apd0T/jpg";
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.bannerContainer}>
-        <Image source={bannerImage} style={styles.image} />
-        <LinearGradient
-          colors={["rgba(0,0,0,0.25)", "transparent"]}
-          style={styles.gradient}
-        />
-        <View style={styles.bannerInnerContainer}>
-          <View style={styles.bannerIcon}>
-            <Ionicons name="location-outline" size={40} color={"#fff"} />
-            <Text style={styles.bannerText1}>Đà Nẵng</Text>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BottomSheetModalProvider>
+        <ScrollView style={styles.container}>
+          <View style={styles.bannerContainer}>
+            <Image source={bannerImage} style={styles.image} />
+            <LinearGradient
+              colors={["rgba(0,0,0,0.25)", "transparent"]}
+              style={styles.gradient}
+            />
+            <View style={styles.bannerInnerContainer}>
+              <View style={styles.bannerIcon}>
+                <Ionicons name="location-outline" size={40} color={"#fff"} />
+                <Text style={styles.bannerText1}>Đà Nẵng</Text>
+              </View>
+              <Text style={styles.bannerText2}>Chuyến đi của tôi</Text>
+            </View>
           </View>
-          <Text style={styles.bannerText2}>Chuyến đi của tôi</Text>
-        </View>
-      </View>
-      <View style={styles.mainContainer}>
-        <Text style={styles.mainText1}>Hiện tại</Text>
-        <View style={styles.main1Container}>
-          <CurrentTripCard
-            name={"Lủng Cú"}
-            startTime={"20/12"}
-            endTime={"25/12"}
-            isTravelling={true}
-            count={3}
-            image={currentImage}
-          />
-          <Pressable style={styles.addBtn} onPress={() => router.push("/Trip3")}>
-            <FontAwesome6 name="add" size={28} color={"#fff"} />
-            <Text style={{ fontSize: 16, fontWeight: "500", color: "#fff" }}>
-              Tạo mới
-            </Text>
-          </Pressable>
-        </View>
-        <View style={{flexDirection: "row", gap : 226}}>
-        <Text style={styles.mainText2}>Đã đi</Text>
-        <Text style={styles.seeMore}>Tất cả</Text>
-        </View>
-        
-      </View>
-      {/* <Carousel width={width} /> */}
-      <View style={{paddingBottom: 50}}>
-        <TripCarousel data={data} />
-      </View>
-    </ScrollView>
+          <View style={styles.mainContainer}>
+            <Text style={styles.mainText1}>Hiện tại</Text>
+            <View style={styles.main1Container}>
+              <CurrentTripCard
+                name={"Lủng Cú"}
+                startTime={"20/12"}
+                endTime={"25/12"}
+                isTravelling={true}
+                count={3}
+                image={currentImage}
+              />
+              <Pressable
+                style={styles.addBtn}
+                onPress={() => router.push("/Trip3")}
+              >
+                <FontAwesome6 name="add" size={28} color={"#fff"} />
+                <Text
+                  style={{ fontSize: 16, fontWeight: "500", color: "#fff" }}
+                >
+                  Tạo mới
+                </Text>
+              </Pressable>
+            </View>
+            <View style={{ flexDirection: "row", gap: 226 }}>
+              <Text style={styles.mainText2}>Đã đi</Text>
+              <Text style={styles.seeMore}>Tất cả</Text>
+            </View>
+          </View>
+          {/* <Carousel width={width} /> */}
+          <View style={{ paddingBottom: 50 }}>
+            <TripCarousel data={data} _changeJoinStatus={_changeJoinStatus}/>
+            <Text style={styles.mainText2}>Gợi ý</Text>
+            <SuggestedTripCarousel
+              data={suggestData}
+              _JoinRequest={_handleOpen}
+              _RevokeRequest={handleRevokeRequest}
+            />
+          </View>
+        </ScrollView>
+        <BottomSheet
+          ref={bottomSheetRef}
+          onChange={handleSheetChanges}
+          snapPoints={snapPoints}
+          index={-1}
+          backdropComponent={renderBackDrop}
+          enablePanDownToClose={true}
+        >
+          <BottomSheetScrollView
+            style={{ flex: 1, paddingBottom: 30, paddingHorizontal: 10 }}
+          >
+            <Text style={{ fontSize: 20, fontWeight: "500" }}>Nội dung</Text>
+            <TextInput
+              placeholder="Nội dung"
+              value={content}
+              multiline
+              numberOfLines={5}
+              maxLength={300}
+              onChangeText={setContent}
+              style={{
+                borderWidth: 1,
+                borderColor: "#e6e6e6",
+                padding: 10,
+                borderRadius: 10,
+                marginTop: 10,
+                textAlignVertical: "top",
+                maxHeight: 200,
+              }}
+            />
+            <Pressable onPress={handleJoinRequest}>
+              <Text>Gửi yêu cầu</Text>
+            </Pressable>
+          </BottomSheetScrollView>
+        </BottomSheet>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
 };
 

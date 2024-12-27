@@ -402,7 +402,7 @@ const profile = () => {
                 </Text>
               </Pressable>
               <View key={refreshKey}>
-                <StarRailChar2 userId={session.userInfo.user.profile.id}/>
+                <StarRailChar2 _userId={session.userInfo.user.profile.id}/>
               </View>
             </View>
           </View>

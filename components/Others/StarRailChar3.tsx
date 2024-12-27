@@ -67,7 +67,7 @@ type PostProps = {
 };
 
 interface Params {
-  userId?: string;
+  _userId?: string;
 }
 
 enum Vehicle {
@@ -80,7 +80,7 @@ enum Vehicle {
 
 const PAGE_SIZE = 10;
 
-const StarRailChar2 = ({ userId }: Params) => {
+const StarRailChar2 = ({ _userId }: Params) => {
   const { session } = useAuth();
   const [chars, setChars] = useState<PostProps[]>([]);
   const [loading, setLoading] = useState(false);
@@ -109,12 +109,12 @@ const StarRailChar2 = ({ userId }: Params) => {
       // console.log(`${testRes[0].name}:` , testRes[0] );
 
       const _response =
-        userId == undefined
+        _userId == undefined
           ? await getPostsHomeFeed(session.userToken.accessToken, {
               pageIndex: pageIndex,
               pageSize: PAGE_SIZE,
             })
-          : await getPostsByUserId(session.userToken.accessToken, userId, {
+          : await getPostsByUserId(session.userToken.accessToken, _userId, {
               pageIndex: pageIndex,
               pageSize: PAGE_SIZE,
             });
@@ -345,7 +345,7 @@ const StarRailChar2 = ({ userId }: Params) => {
               </View>
             )}
           </View>
-          {userId != undefined && (
+          {_userId != null &&_userId == session.userInfo.user.profile.id && (
             <TouchableOpacity
               onPress={() => {
                 console.log("Delete clicked: " + item.postId);
@@ -368,7 +368,7 @@ const StarRailChar2 = ({ userId }: Params) => {
             ))}
           </View>
           <View style={styles.interactionBar}>
-            {item.planPost != null && (
+            {item.planPost != null && item.userId != session.userInfo.user.profile.id && (
               <Pressable
                 onPress={() => {
                   console.log("Plan clicked: " + item.postId);

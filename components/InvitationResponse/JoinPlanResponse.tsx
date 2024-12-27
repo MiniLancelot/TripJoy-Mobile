@@ -3,40 +3,37 @@ import React from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 interface PlanInvitation {
-  planId: string;
-  inviterId: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  inviterName: string;
-  inviterAvatar: string;
-  _onClick: any;
+  userId: string;
+  userName: string;
+  avatar: string;
+  appliedAt: string;
+  introduction: string;
 }
 
-const InvitationResponse = ({ planId, inviterId, title, startDate, endDate, inviterName, inviterAvatar, _onClick }: PlanInvitation) => {
+
+const JoinPlanResponse = ({ item, _onClick }: {item: PlanInvitation; _onClick: any}) => {
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
-  const avatarUri = inviterAvatar == null ? tempAvatar : inviterAvatar;
+  const avatarUri = item.avatar == null ? tempAvatar : item.avatar;
 
   return (
     <View style={styles.container}>
       <Pressable
         style={styles.itemContainer}
-        onPress={() => router.push(`/user/${inviterId}`)}
+        onPress={() => router.push(`/user/${item.userId}`)}
       >
         <View style={styles.avatarContainer}>
           <Image source={{ uri: avatarUri }} style={styles.avatar} />
         </View>
         <View>
-          <Text>{inviterName} muốn mời bạn vào {title}</Text>
-          <Text>{startDate} đến {endDate}</Text>
+          <Text>{item.userName}: {item.introduction}</Text>
         </View>
       </Pressable>
       <View style={styles.invitationContainer}>
         <View style={styles.invitationOuterEditContainer}>
           <View style={styles.editContainer}>
             <Pressable
-              onPress={() => _onClick(planId, true)}
+              onPress={() => _onClick(item.userId, true)}
               style={styles.innerEditContainer}
             >
               {/* <Ionicons
@@ -52,7 +49,7 @@ const InvitationResponse = ({ planId, inviterId, title, startDate, endDate, invi
         <View style={styles.invitationOuterEditContainer}>
           <View style={styles.editContainer}>
             <Pressable
-              onPress={() => _onClick(planId, false)}
+              onPress={() => _onClick(item, false)}
               style={styles.innerEditContainer}
             >
               {/* <Ionicons
@@ -133,4 +130,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InvitationResponse;
+export default JoinPlanResponse;

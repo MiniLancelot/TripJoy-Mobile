@@ -15,11 +15,10 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
-import { getPlanLocationById, putChangeJoinStatusPlan } from "@/services/plan/plan";
+import { getPlanLocationById } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { router } from "expo-router";
 import { TripProps } from "@/constants/TripProps";
-import { is } from "date-fns/locale";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;
@@ -29,10 +28,22 @@ type TProps = {
   id: number;
   total: number;
   item: TripProps;
-  _changeJoinStatus?: (id: string) => void;
+  _JoinRequest?: (planId: string) => void;
+  _RevokeRequest?: (planId: string) => void;
 };
 
+// type Province = {
+//   provinceId: string;
+//   provinceName: string;
+// };
 
+// type TripProps = {
+//   title: string;
+//   estimatedStartDate: string;
+//   estimatedEndDate: string;
+//   provinceStart: Province;
+//   provinceEnd: Province;
+// };
 
 const catImages = [
   "https://i.pinimg.com/736x/d1/7c/c7/d17cc7bf0e13fcdf975dd682d5df792f.jpg",
@@ -42,13 +53,12 @@ const catImages = [
 
 const tempImage =
   "https://farm7.staticflickr.com/6014/5904905173_7fc1c39880_o.jpg";
-const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
+const SuggestedTripCard = ({ item, scrollX, id, total, _JoinRequest, _RevokeRequest }: TProps) => {
   const { session } = useAuth();
   // const [planData, setPlanData] = useState<TripProps>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentImage, setCurrentImage] = useState(item.avatar || tempImage);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const inputRange = [
     (id - 1) * ITEM_WIDTH,
@@ -100,13 +110,8 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
   //       item.id
   //     );
   //     if (response) {
-  //       const _responseData = response.data.plan;
-  //       setPlanData(_responseData);
-  //       setPlanData({
-  //         ..._responseData,
-  //         startDate: _responseData.estimatedStartDate.split("T")[0],
-  //         endDate: _responseData.estimatedEndDate.split("T")[0],
-  //       });
+  //       console.log(response.data.plan);
+  //       setPlanData(response.data.plan);
   //       setIsLoading(false);
   //     }
   //   } catch (err: any) {
@@ -115,17 +120,11 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
   //   }
   // };
   // useEffect(() => {
-  //   fetchPlan();
-  // }, []);
-
-
-
-  // useEffect(() => {
-  //   if (isSuccess) {
+  //   const timer = setTimeout(() => {
   //     fetchPlan();
-  //     setIsSuccess(false);
-  //   }
-  // }, [isSuccess]);
+  //   }, 3000);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -176,14 +175,6 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
                     ? formatDate(item.endDate)
                     : ""}
                 </Text>
-                {item?.leadUserId == session.userInfo.user.profile.id && (
-                  <Pressable onPress={() => _changeJoinStatus && _changeJoinStatus(item.id)}>
-                    <Text>{item?.joinStatus == 1 ? "Công khai" : "Hủy công khai"}</Text>
-                  </Pressable>
-                )}
-                <Pressable onPress={() => router.push(`/post/plan/${item.id}`)}>
-                  <Text>Chia sẻ</Text>
-                </Pressable>
               </View>
             </View>
             <View style={style.bottomContainer}>
@@ -195,23 +186,39 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
                     style={style.teammateImage}
                   />
                 ))}
-                <TouchableOpacity
-                  onPress={() => {
-                    
-                    router.push(`/trip/${item.id}`);
-                  }}
-                  style={{ marginLeft: 120 }}
-                >
-                  <Text
-                    style={{
-                      color: "#ff7324",
-                      fontWeight: "700",
-                      fontSize: 20,
-                    }}
+                {!item.applyStatus ? (
+                  <TouchableOpacity
+                    //onPress={() => router.push(`/trip/${item.id}`)}
+                    onPress={() => _JoinRequest && _JoinRequest(item.id)}
+                    style={{ marginLeft: 120 }}
                   >
-                    Chi tiết
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={{
+                        color: "#ff7324",
+                        fontWeight: "700",
+                        fontSize: 20,
+                      }}
+                    >
+                      Gửi yêu cầu tham gia
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    //onPress={() => router.push(`/trip/${item.id}`)}
+                    onPress={() => _RevokeRequest && _RevokeRequest(item.id)}
+                    style={{ marginLeft: 120 }}
+                  >
+                    <Text
+                      style={{
+                        color: "#ff7324",
+                        fontWeight: "700",
+                        fontSize: 20,
+                      }}
+                    >
+                      Hủy yêu cầu
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </Animated.View>
@@ -221,7 +228,7 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
   );
 };
 
-export default TripCard;
+export default SuggestedTripCard;
 const style = StyleSheet.create({
   imageBackgroundStyle: {
     resizeMode: "cover",
