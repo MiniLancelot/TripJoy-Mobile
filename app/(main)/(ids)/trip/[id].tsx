@@ -83,7 +83,7 @@ type MemberLocationProps = {
   latitude: number;
   longtitude: number;
   avatarUrl: string;
-}
+};
 
 interface Location {
   latitude: number;
@@ -96,7 +96,7 @@ Mapbox.setAccessToken(accessToken);
 const ChosenTrip = () => {
   const { id } = useLocalSearchParams<SearchParams>();
   const setSharedId = useTabStore((state) => state.setSharedId);
-  const { session } = useAuth();
+  const { session, _connection, memberLocations } = useAuth();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -138,11 +138,14 @@ const ChosenTrip = () => {
   const router = useRouter();
   const pinIcon = require("@/assets/images/others/pin.png");
   const camIcon = require("@/assets/images/others/avatarTest.webp");
-  const memberIcon = require("@/assets/images/others/memberIcon.webp");
-  
-  // const [memberLocations, setMemberLocations] = useState<MemberLocationProps[]>([]);
-  const [memberLocations, setMemberLocations] = useState<MemberLocationProps[]>(Locations);
+  // const memberIcon = require("@/assets/images/others/memberIcon.webp");
 
+  const memberIcon = "https://hyl-static-res-prod.hoyolab.com/avatar/avatar30057.png?x-oss-process=image%2Fresize%2Cs_600%2Fauto-orient%2C0%2Finterlace%2C1%2Fformat%2Cwebp%2Fquality%2Cq_70";
+
+  // const [memberLocations, setMemberLocations] = useState<MemberLocationProps[]>(
+  //   []
+  // );
+  // const [memberLocations, setMemberLocations] = useState<MemberLocationProps[]>(Locations);
 
   const fetchPlan = async () => {
     try {
@@ -482,37 +485,36 @@ const ChosenTrip = () => {
   // }));
   // const memberLocationFeature = featureCollection(memberLocationPoints);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMemberLocations((prevLocations) =>
-        prevLocations.map((loc) => ({
-          ...loc,
-          latitude: loc.latitude + (Math.random() - 0.5) * 0.001, // Small random shift
-          longtitude: loc.longtitude + (Math.random() - 0.5) * 0.001,
-        }))
-      );
-    }, 2000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setMemberLocations((prevLocations) =>
+  //       prevLocations.map((loc) => ({
+  //         ...loc,
+  //         latitude: loc.latitude + (Math.random() - 0.5) * 0.001, // Small random shift
+  //         longtitude: loc.longtitude + (Math.random() - 0.5) * 0.001,
+  //       }))
+  //     );
+  //   }, 2000);
 
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, []);
-
+  //   return () => clearInterval(interval); // Cleanup on unmount
+  // }, []);
 
   const { memberLocationFeature, iconImages } = useMemo(() => {
     const features = memberLocations.map((location, index) => ({
       type: "Feature",
       geometry: {
         type: "Point",
-        coordinates: [location.longtitude, location.latitude],
+        coordinates: [location.longitude, location.latitude],
       },
       properties: {
-        iconKey: `icon-${location.id}`, // Unique key for each icon
+        iconKey: `icon-${location.userId}`, // Unique key for each icon
         // label: `${index + 1}. ${location.name}`,
-        label: `${location.name}`,
+        label: `${location.userName}`,
       },
     }));
 
     const images = memberLocations.reduce((acc, location) => {
-      acc[`icon-${location.id}`] = { uri: location.avatarUrl };
+      acc[`icon-${location.userId}`] = { uri: location.avatar };
       return acc;
     }, {});
 
@@ -529,10 +531,22 @@ const ChosenTrip = () => {
     const fetchUserLocation = async () => {
       try {
         const location = await Location.getCurrentPositionAsync({});
-        console.log("User Location:", {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
+        // console.log("User Location:", {
+        //   latitude: location.coords.latitude,
+        //   longitude: location.coords.longitude,
+        // });
+        //console.log("bản thân: ",session.userInfo.user.profile)
+        _connection!.invoke(
+          "SendCoordinates",
+          session.userInfo.user.profile.id,
+          id,
+          location.coords.longitude,
+          location.coords.latitude,
+          session.userInfo.user.profile.userName,
+          session.userInfo.user.profile.avatar == null
+            ? memberIcon
+            : session.userInfo.user.profile.avatar.url
+        );
         setUserLocation({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
@@ -541,9 +555,9 @@ const ChosenTrip = () => {
         console.error("Error fetching user location:", error);
       }
     };
-  
+
     const locationInterval = setInterval(fetchUserLocation, 5000);
-  
+
     return () => {
       clearInterval(locationInterval);
     };
@@ -556,7 +570,16 @@ const ChosenTrip = () => {
           {/* <BottomSheetModalProvider> */}
           <View style={styles.topContainer}>
             <View style={styles.backBtnWrapper}>
-              <TouchableOpacity onPress={() => router.replace("/(tabs)/trip")}>
+              <TouchableOpacity
+                onPress={() => {
+                  router.replace("/(tabs)/trip");
+                  _connection!.invoke(
+                    "LeavePlan",
+                    session.userInfo.user.profile.id,
+                    id
+                  );
+                }}
+              >
                 <Ionicons name="arrow-back-outline" size={25} color="#4a4d52" />
               </TouchableOpacity>
             </View>
@@ -694,7 +717,7 @@ const ChosenTrip = () => {
                 <Camera
                   ref={cameraRef}
                   followUserLocation={false}
-                  zoomLevel={15}
+                  // zoomLevel={15}
                   centerCoordinate={
                     currentLocation || [
                       userLocation.longitude,
@@ -738,7 +761,7 @@ const ChosenTrip = () => {
                     textColor: "#000",
                   }}
                 />
-                <Images images={iconImages} />
+                <Images images={iconImages}  />
               </ShapeSource>
 
               {/* Route rendering */}

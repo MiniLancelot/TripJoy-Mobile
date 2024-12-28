@@ -43,7 +43,7 @@ const catImages = [
 const tempImage =
   "https://farm7.staticflickr.com/6014/5904905173_7fc1c39880_o.jpg";
 const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
-  const { session } = useAuth();
+  const { session, _connection } = useAuth();
   // const [planData, setPlanData] = useState<TripProps>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -197,7 +197,7 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
                 ))}
                 <TouchableOpacity
                   onPress={() => {
-                    
+                    _connection!.invoke("JoinPlan", session.userInfo.user.profile.id, item.id);
                     router.push(`/trip/${item.id}`);
                   }}
                   style={{ marginLeft: 120 }}
