@@ -14,6 +14,7 @@ enum InviteStatus {
   SELF = 2,
   JOINED = 1,
   NOT_INVITED = 3,
+  APPLIED = 4
 }
 
 const InviteFriend = ({ id, name, _onClick, avatar, _status }: FriendProps) => {
@@ -82,6 +83,19 @@ const InviteFriend = ({ id, name, _onClick, avatar, _status }: FriendProps) => {
                       style={styles.innerEditContainer}
                     >
                       <Text style={styles.editText}>Chưa mời</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              );
+            case InviteStatus.APPLIED:
+              return (
+                <View style={styles.outerEditContainer}>
+                  <View style={styles.editContainer}>
+                    <Pressable
+                      onPress={() => _onClick(id, InviteStatus.APPLIED)}
+                      style={styles.innerEditContainer}
+                    >
+                      <Text style={styles.editText}>Chấp nhận tham gia</Text>
                     </Pressable>
                   </View>
                 </View>

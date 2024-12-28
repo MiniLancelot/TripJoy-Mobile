@@ -44,6 +44,8 @@ const Layout = () => {
     "(HomeTabs)/PersonalScreen",
     "(HomeTabs)/(FriendTabs)/FriendList",
     "(HomeTabs)/(FriendTabs)/FriendInvitation",
+    // "(NotificationTabs)/PlanInvitationScreen",
+    // "(NotificationTabs)/PlanJoinRequestScreen",
     // "(HomeTabs)/(FriendTabs)/[id]",
     // "(HomeTabs)/(FriendTabs)/TripInvitationResponse",
     // "(CreateTabs)",
@@ -144,9 +146,9 @@ const Layout = () => {
                 }}
               />
               <Tabs.Screen
-                name="budget"
+                name="notification"
                 options={{
-                  title: "Budget",
+                  title: "Notification",
                   tabBarIcon: ({ color, size, focused }) => (
                     <Ionicons
                       name={focused ? "mail" : "mail-outline"}
@@ -223,6 +225,9 @@ const Layout = () => {
                   </Pressable>
                   <Pressable onPress={() => router.push("/CreatePost")}>
                     <Text>Post</Text>
+                  </Pressable>
+                  <Pressable onPress={() => router.push("/(create-ai-plan)/AiStep1")}>
+                    <Text>Plan AI</Text>
                   </Pressable>
                 </View>
               </BottomSheetView>

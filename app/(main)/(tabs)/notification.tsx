@@ -1,10 +1,19 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import ColorList from "@/components/Others/ColorList";
-import PlanInvitation from "../(ids)/members/InvitationResponses";
+import PlanInvitation from "../(ids)/members/PlanInvitation";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-const budget = () => {
 
+import {
+  createMaterialTopTabNavigator,
+  MaterialTopTabNavigationOptions,
+  MaterialTopTabNavigationEventMap,
+} from "@react-navigation/material-top-tabs";
+
+const MaterialTopTabs = createMaterialTopTabNavigator();
+
+const Notification = () => {
   return (
     <View style={styles.container}>
       {/* <ColorList color="#787169" /> */}
@@ -20,5 +29,4 @@ const styles = StyleSheet.create({
     paddingTop: 25,
   },
 });
-
-export default budget;
+export default Notification;

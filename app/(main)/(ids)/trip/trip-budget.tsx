@@ -3,6 +3,9 @@ import React from "react";
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ProgressChart } from "react-native-chart-kit";
+import ExpenseMembers from "@/components/Expenses/ExpenseMembers";
+import ExpenseLocations from "@/components/Expenses/ExpenseLocation";
+import SeparateLine from "@/components/Others/SeparateLine";
 
 const TripBudget = () => {
   const chartData = {
@@ -60,6 +63,7 @@ const TripBudget = () => {
           }}
           hideLegend={true} // Hide default legend
         />
+        
       </View>
       
       {/* Custom Legend */}
@@ -67,6 +71,9 @@ const TripBudget = () => {
         <Text style={styles.legendText}>Đã chi</Text>
         <Text style={styles.legendText}>Legend value: 80%</Text>
       </View>
+      <ExpenseLocations />
+      <SeparateLine text=""/>
+      <ExpenseMembers />
     </View>
   );
 };

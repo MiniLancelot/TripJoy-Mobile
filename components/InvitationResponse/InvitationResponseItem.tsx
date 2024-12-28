@@ -2,7 +2,6 @@ import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import React from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { plan } from "@/utils/request";
 interface PlanInvitation {
   planId: string;
   inviterId: string;
@@ -53,7 +52,7 @@ const InvitationResponse = ({ planId, inviterId, title, startDate, endDate, invi
         <View style={styles.invitationOuterEditContainer}>
           <View style={styles.editContainer}>
             <Pressable
-              onPress={() => _onClick(plan, false)}
+              onPress={() => _onClick(planId, false)}
               style={styles.innerEditContainer}
             >
               {/* <Ionicons

@@ -1,5 +1,4 @@
 export const Trips = [
-    
     {
       id: "1",
       title: 'Gia Lai',

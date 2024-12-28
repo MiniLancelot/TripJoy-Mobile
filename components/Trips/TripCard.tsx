@@ -15,9 +15,11 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
-import { getPlanLocationById } from "@/services/plan/plan";
+import { getPlanLocationById, putChangeJoinStatusPlan } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { router } from "expo-router";
+import { TripProps } from "@/constants/TripProps";
+import { is } from "date-fns/locale";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;
@@ -26,21 +28,11 @@ type TProps = {
   scrollX: SharedValue<number>;
   id: number;
   total: number;
-  item: any;
+  item: TripProps;
+  _changeJoinStatus?: (id: string) => void;
 };
 
-type Province = {
-  provinceId: string;
-  provinceName: string;
-};
 
-type TripProps = {
-  title: string;
-  estimatedStartDate: string;
-  estimatedEndDate: string;
-  provinceStart: Province;
-  provinceEnd: Province;
-};
 
 const catImages = [
   "https://i.pinimg.com/736x/d1/7c/c7/d17cc7bf0e13fcdf975dd682d5df792f.jpg",
@@ -50,12 +42,13 @@ const catImages = [
 
 const tempImage =
   "https://farm7.staticflickr.com/6014/5904905173_7fc1c39880_o.jpg";
-const TripCard = ({ item, scrollX, id, total }: TProps) => {
-  const { session } = useAuth();
-  const [planData, setPlanData] = useState<TripProps>();
+const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
+  const { session, _connection } = useAuth();
+  // const [planData, setPlanData] = useState<TripProps>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentImage, setCurrentImage] = useState(item.avatar || tempImage);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const inputRange = [
     (id - 1) * ITEM_WIDTH,
@@ -99,29 +92,40 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
   // const problematicImageUrl = "https://movieticketbooking.s3.amazonaws.com/e98b58e0-2435-4b7b-8650-b94afa374ac4.png";
   // const imageUrl = item.avatar === problematicImageUrl ? tempImage : item.avatar ? item.avatar : tempImage;
 
-  const fetchPlan = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getPlanLocationById(
-        session.userToken.accessToken,
-        item.id
-      );
-      if (response) {
-        console.log(response.data.plan);
-        setPlanData(response.data.plan);
-        setIsLoading(false);
-      }
-    } catch (err: any) {
-      setError(err.message);
-      console.log("fail");
-    }
-  };
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchPlan();
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  // const fetchPlan = async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await getPlanLocationById(
+  //       session.userToken.accessToken,
+  //       item.id
+  //     );
+  //     if (response) {
+  //       const _responseData = response.data.plan;
+  //       setPlanData(_responseData);
+  //       setPlanData({
+  //         ..._responseData,
+  //         startDate: _responseData.estimatedStartDate.split("T")[0],
+  //         endDate: _responseData.estimatedEndDate.split("T")[0],
+  //       });
+  //       setIsLoading(false);
+  //     }
+  //   } catch (err: any) {
+  //     setError(err.message);
+  //     console.log("fail");
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchPlan();
+  // }, []);
+
+
+
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     fetchPlan();
+  //     setIsSuccess(false);
+  //   }
+  // }, [isSuccess]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -160,21 +164,26 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
             <View style={style.userImageView}>
               {/* <Image source={item.icon} style={style.userImage} /> */}
               <View style={style.titleCardView}>
-                <TouchableOpacity onLongPress={fetchPlan}>
+                <TouchableOpacity>
                   <Text style={style.titleStyle}>{item?.title}</Text>
                 </TouchableOpacity>
                 <Text style={style.descriptionStyle}>
-                  {planData?.estimatedStartDate
-                    ? formatDate(planData.estimatedStartDate)
+                  {item?.startDate
+                    ? formatDate(item.startDate)
                     : ""}{" "}
                   đến{" "}
-                  {planData?.estimatedEndDate
-                    ? formatDate(planData.estimatedEndDate)
+                  {item?.endDate
+                    ? formatDate(item.endDate)
                     : ""}
                 </Text>
-                {/* <Pressable onPress={() => router.push(`/members/${item.id}`)}>
-                  <Text>Mời</Text>
-                </Pressable> */}
+                {item?.leadUserId == session.userInfo.user.profile.id && (
+                  <Pressable onPress={() => _changeJoinStatus && _changeJoinStatus(item.id)}>
+                    <Text>{item?.joinStatus == 1 ? "Công khai" : "Hủy công khai"}</Text>
+                  </Pressable>
+                )}
+                <Pressable onPress={() => router.push(`/post/plan/${item.id}`)}>
+                  <Text>Chia sẻ</Text>
+                </Pressable>
               </View>
             </View>
             <View style={style.bottomContainer}>
@@ -187,7 +196,10 @@ const TripCard = ({ item, scrollX, id, total }: TProps) => {
                   />
                 ))}
                 <TouchableOpacity
-                  onPress={() => router.push(`/trip/${item.id}`)}
+                  onPress={() => {
+                    _connection!.invoke("JoinPlan", session.userInfo.user.profile.id, item.id);
+                    router.push(`/trip/${item.id}`);
+                  }}
                   style={{ marginLeft: 120 }}
                 >
                   <Text

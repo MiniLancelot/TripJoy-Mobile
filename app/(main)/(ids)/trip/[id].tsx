@@ -77,6 +77,14 @@ type PlanLocationProps = {
   estimatedStartDate: string;
 };
 
+type MemberLocationProps = {
+  id: string;
+  name: string;
+  latitude: number;
+  longtitude: number;
+  avatarUrl: string;
+};
+
 interface Location {
   latitude: number;
   longitude: number;
@@ -88,7 +96,7 @@ Mapbox.setAccessToken(accessToken);
 const ChosenTrip = () => {
   const { id } = useLocalSearchParams<SearchParams>();
   const setSharedId = useTabStore((state) => state.setSharedId);
-  const { session } = useAuth();
+  const { session, _connection, memberLocations } = useAuth();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -98,6 +106,7 @@ const ChosenTrip = () => {
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(today);
   const [planLocations, setPlanLocations] = useState<PlanLocationProps[]>([]);
+  const [plan, setPlan] = useState<TripProps | null>(null);
 
   const [planLocation, setPlanLocation] = useState<PlanLocationProps>({
     name: "",
@@ -129,6 +138,14 @@ const ChosenTrip = () => {
   const router = useRouter();
   const pinIcon = require("@/assets/images/others/pin.png");
   const camIcon = require("@/assets/images/others/avatarTest.webp");
+  // const memberIcon = require("@/assets/images/others/memberIcon.webp");
+
+  const memberIcon = "https://hyl-static-res-prod.hoyolab.com/avatar/avatar30057.png?x-oss-process=image%2Fresize%2Cs_600%2Fauto-orient%2C0%2Finterlace%2C1%2Fformat%2Cwebp%2Fquality%2Cq_70";
+
+  // const [memberLocations, setMemberLocations] = useState<MemberLocationProps[]>(
+  //   []
+  // );
+  // const [memberLocations, setMemberLocations] = useState<MemberLocationProps[]>(Locations);
 
   const fetchPlan = async () => {
     try {
@@ -172,6 +189,21 @@ const ChosenTrip = () => {
             })
           )
         );
+        setPlan({
+          id: response.data.plan.planId,
+          title: response.data.plan.title,
+          estimatedStartDate:
+            response.data.plan.estimatedStartDate.split("T")[0],
+          estimatedEndDate: response.data.plan.estimatedEndDate.split("T")[0],
+          provinceStart: {
+            provinceId: response.data.plan.provinceStart.provinceId,
+            provinceName: response.data.plan.provinceStart.provinceName,
+          },
+          provinceEnd: {
+            provinceId: response.data.plan.provinceEnd.provinceId,
+            provinceName: response.data.plan.provinceEnd.provinceName,
+          },
+        });
         console.log("Plan locations: ", planLocations);
         setIsLoading(false);
       }
@@ -340,7 +372,8 @@ const ChosenTrip = () => {
 
     setSearchResults([]); // Clear results after selection
     setSearchQuery("");
-    setSearchQuery(location.display_name); // Update search box with the selected place name
+    setSearchQuery(location.display_name);
+    handleOpen(); // Update search box with the selected place name
 
     // Alert.alert(
     //   "Selected Location",
@@ -350,6 +383,7 @@ const ChosenTrip = () => {
 
   const snapPoints = useMemo(() => ["36%"], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const handleOpen = () => bottomSheetRef.current?.expand();
   // const handleOpen = () => bottomSheetRef.current?.expand();
   // const handleSheetChanges = useCallback((index: number) => {
   //   console.log("handleSheetChanges", index);
@@ -443,311 +477,437 @@ const ChosenTrip = () => {
     setText("");
   };
 
+  // const memberLocationPoints = Locations.map((location, index) => ({
+  //   ...point([location.longtitude, location.latitude]),
+  //   properties: {
+  //     label: `${index + 1}. ${location.name}`,
+  //   },
+  // }));
+  // const memberLocationFeature = featureCollection(memberLocationPoints);
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setMemberLocations((prevLocations) =>
+  //       prevLocations.map((loc) => ({
+  //         ...loc,
+  //         latitude: loc.latitude + (Math.random() - 0.5) * 0.001, // Small random shift
+  //         longtitude: loc.longtitude + (Math.random() - 0.5) * 0.001,
+  //       }))
+  //     );
+  //   }, 2000);
+
+  //   return () => clearInterval(interval); // Cleanup on unmount
+  // }, []);
+
+  const { memberLocationFeature, iconImages } = useMemo(() => {
+    const features = memberLocations.map((location, index) => ({
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [location.longitude, location.latitude],
+      },
+      properties: {
+        iconKey: `icon-${location.userId}`, // Unique key for each icon
+        // label: `${index + 1}. ${location.name}`,
+        label: `${location.userName}`,
+      },
+    }));
+
+    const images = memberLocations.reduce((acc, location) => {
+      acc[`icon-${location.userId}`] = { uri: location.avatar };
+      return acc;
+    }, {});
+
+    return {
+      memberLocationFeature: {
+        type: "FeatureCollection",
+        features,
+      },
+      iconImages: images,
+    };
+  }, [memberLocations]);
+
+  useEffect(() => {
+    const fetchUserLocation = async () => {
+      try {
+        const location = await Location.getCurrentPositionAsync({});
+        // console.log("User Location:", {
+        //   latitude: location.coords.latitude,
+        //   longitude: location.coords.longitude,
+        // });
+        //console.log("bản thân: ",session.userInfo.user.profile)
+        _connection!.invoke(
+          "SendCoordinates",
+          session.userInfo.user.profile.id,
+          id,
+          location.coords.longitude,
+          location.coords.latitude,
+          session.userInfo.user.profile.userName,
+          session.userInfo.user.profile.avatar == null
+            ? memberIcon
+            : session.userInfo.user.profile.avatar.url
+        );
+        setUserLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+      } catch (error) {
+        console.error("Error fetching user location:", error);
+      }
+    };
+
+    const locationInterval = setInterval(fetchUserLocation, 5000);
+
+    return () => {
+      clearInterval(locationInterval);
+    };
+  }, []);
+
   return (
     <KeyboardAvoidingView style={styles.container}>
       <GestureHandlerRootView>
-        {/* <BottomSheetModalProvider> */}
-        <View style={styles.topContainer}>
-          <View style={styles.backBtnWrapper}>
-            <TouchableOpacity onPress={() => router.replace("/(tabs)/trip")}>
-              <Ionicons name="arrow-back-outline" size={25} color="#4a4d52" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.searchBoxContainer}>
-            <TextInput
-              autoFocus
-              style={styles.searchBar}
-              placeholder="Tìm kiếm"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-          {searchQuery.length > 0 && (
-            <TouchableOpacity
-              style={{ position: "absolute", right: 20, top: 11 }}
-              onPress={() => clearText(setSearchQuery)}
-            >
-              <Ionicons name="close-circle-outline" size={24} color="#9FB7B9" />
-            </TouchableOpacity>
-          )}
-        </View>
-        <TouchableOpacity
-      style={styles.focusFirstButton}
-      onPress={() => {
-        if (planLocations.length > 0) {
-          const firstLocation = [
-            planLocations[0].longitude,
-            planLocations[0].latitude,
-          ];
-          cameraRef.current?.setCamera({
-            centerCoordinate: firstLocation,
-            zoomLevel: 15,
-            duration: 1000,
-          });
-        } else {
-          Alert.alert(
-            "Không có địa điểm",
-            "Chưa có địa điểm nào được thêm vào lộ trình."
-          );
-        }
-      }}
-    >
-      <Ionicons name="flag" size={20} color="#ffffff" />
-    </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.focusButton}
-          onPress={() => {
-            if (userLocation) {
-              cameraRef.current?.setCamera({
-                centerCoordinate: [
-                  userLocation.longitude,
-                  userLocation.latitude,
-                ],
-                zoomLevel: 15,
-                duration: 1000,
-              });
-            } else {
-              Alert.alert(
-                "Location not available",
-                "User location is unavailable."
-              );
-            }
-          }}
-        >
-          <Ionicons name="navigate-circle" size={20} color="#ffffff" />
-        </TouchableOpacity>
-
-        {searchQuery.trim() && searchResults.length > 0 && (
-          <FlatList
-            data={searchResults}
-            keyExtractor={(item, index) => `${item.place_id}-${index}`}
-            ListHeaderComponent={<View style={{ height: 40 }} />}
-            ListFooterComponent={<View style={{ height: 10 }} />}
-            style={styles.resultsOverlay}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            renderItem={({ item }) => (
+        <BottomSheetModalProvider>
+          {/* <BottomSheetModalProvider> */}
+          <View style={styles.topContainer}>
+            <View style={styles.backBtnWrapper}>
               <TouchableOpacity
-                style={styles.resultItem}
-                onPress={() => handleSelectLocation(item)}
+                onPress={() => {
+                  router.replace("/(tabs)/trip");
+                  _connection!.invoke(
+                    "LeavePlan",
+                    session.userInfo.user.profile.id,
+                    id
+                  );
+                }}
               >
-                <View>
-                  <Ionicons
-                    name="location-outline"
-                    size={25}
-                    color="#4a4d52"
-                    style={styles.locationIcon}
-                  />
-                </View>
-                <View
-                  style={{
-                    borderBottomWidth: 1,
-                    paddingBottom: 10,
-                    borderBottomColor: "#eee",
-                    gap: 5,
-                    alignItems: "flex-start",
-                    width: 300,
-                    transform: [{ translateX: -15 }],
-                  }}
-                >
-                  <Text style={styles.resultText}>
-                    {getFirstPart(item.display_name)}
-                  </Text>
-                  <Text style={{ fontSize: 12 }}>
-                    {getRestPart(item.display_name)}
-                  </Text>
-                </View>
+                <Ionicons name="arrow-back-outline" size={25} color="#4a4d52" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.searchBoxContainer}>
+              <TextInput
+                autoFocus
+                style={styles.searchBar}
+                placeholder="Tìm kiếm"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
+            {searchQuery.length > 0 && (
+              <TouchableOpacity
+                style={{ position: "absolute", right: 20, top: 11 }}
+                onPress={() => clearText(setSearchQuery)}
+              >
+                <Ionicons
+                  name="close-circle-outline"
+                  size={24}
+                  color="#9FB7B9"
+                />
               </TouchableOpacity>
             )}
-          />
-        )}
-
-        <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            styleURL="mapbox://styles/mapbox/streets-v12"
-          >
-            {userLocation && (
-              <Camera
-                ref={cameraRef}
-                followUserLocation={false}
-                zoomLevel={15}
-                centerCoordinate={
-                  currentLocation || [
+          </View>
+          <TouchableOpacity
+            style={styles.focusButton}
+            onPress={() => {
+              if (userLocation) {
+                cameraRef.current?.setCamera({
+                  centerCoordinate: [
                     userLocation.longitude,
                     userLocation.latitude,
-                  ]
-                }
-              />
-            )}
+                  ],
+                  zoomLevel: 15,
+                  duration: 1000,
+                });
+              } else {
+                Alert.alert(
+                  "Location not available",
+                  "User location is unavailable."
+                );
+              }
+            }}
+          >
+            <Ionicons name="navigate-circle" size={20} color="#ffffff" />
+          </TouchableOpacity>
 
-            <LocationPuck
-              pulsing={{ isEnabled: true }}
-              puckBearingEnabled
-              puckBearing="heading"
+          <TouchableOpacity
+            style={styles.focusFirstButton}
+            onPress={() => {
+              if (planLocations.length > 0) {
+                const firstLocation = [
+                  planLocations[0].longitude,
+                  planLocations[0].latitude,
+                ];
+                cameraRef.current?.setCamera({
+                  centerCoordinate: firstLocation,
+                  zoomLevel: 15,
+                  duration: 1000,
+                });
+              } else {
+                Alert.alert(
+                  "Không có địa điểm",
+                  "Chưa có địa điểm nào được thêm vào lộ trình."
+                );
+              }
+            }}
+          >
+            <Ionicons name="flag" size={20} color="#ffffff" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.focusButton, { top: 190 }]}
+            onPress={handleOpen}
+          >
+            <Ionicons name="add-outline" size={20} color="#ffffff" />
+          </TouchableOpacity>
+
+          {searchQuery.trim() && searchResults.length > 0 && (
+            <FlatList
+              data={searchResults}
+              keyExtractor={(item, index) => `${item.place_id}-${index}`}
+              ListHeaderComponent={<View style={{ height: 40 }} />}
+              ListFooterComponent={<View style={{ height: 10 }} />}
+              style={styles.resultsOverlay}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.resultItem}
+                  onPress={() => handleSelectLocation(item)}
+                >
+                  <View>
+                    <Ionicons
+                      name="location-outline"
+                      size={25}
+                      color="#4a4d52"
+                      style={styles.locationIcon}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      borderBottomWidth: 1,
+                      paddingBottom: 10,
+                      borderBottomColor: "#eee",
+                      gap: 5,
+                      alignItems: "flex-start",
+                      width: 300,
+                      transform: [{ translateX: -15 }],
+                    }}
+                  >
+                    <Text style={styles.resultText}>
+                      {getFirstPart(item.display_name)}
+                    </Text>
+                    <Text style={{ fontSize: 12 }}>
+                      {getRestPart(item.display_name)}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
             />
+          )}
 
-            {/* Render all locations */}
-            <ShapeSource id="allLocations" shape={myLocationFeature}>
-              <SymbolLayer
-                id="location-markers"
-                style={{
-                  iconImage: "pinIcon",
-                  iconSize: 0.5,
-                  textField: ["get", "label"],
-                  textSize: 12,
-                  textOffset: [0, 2],
-                  textColor: "#000",
-                }}
+          <View style={styles.mapContainer}>
+            <MapView
+              style={styles.map}
+              styleURL="mapbox://styles/mapbox/streets-v12"
+              scaleBarEnabled={false}
+            >
+              {userLocation && (
+                <Camera
+                  ref={cameraRef}
+                  followUserLocation={false}
+                  // zoomLevel={15}
+                  centerCoordinate={
+                    currentLocation || [
+                      userLocation.longitude,
+                      userLocation.latitude,
+                    ]
+                  }
+                />
+              )}
+
+              <LocationPuck
+                pulsing={{ isEnabled: true }}
+                puckBearingEnabled
+                puckBearing="heading"
               />
-              <Images images={{ pinIcon }} />
-            </ShapeSource>
 
-            {/* Route rendering */}
-            {route && (
-              <ShapeSource
-                id="routeSource"
-                shape={lineString(route.coordinates)}
-              >
-                <LineLayer
-                  id="routeLayer"
-                  style={{
-                    lineColor: "#13c892",
-                    lineWidth: 3,
-                    lineDasharray: [2, 2],
-                    lineCap: "round",
-                    lineJoin: "round",
-                  }}
-                />
-              </ShapeSource>
-            )}
-
-            {/* Selected location marker */}
-            {cameraFeature && (
-              <ShapeSource id="cameraLocation" shape={cameraFeature}>
+              {/* Render all locations */}
+              <ShapeSource id="allLocations" shape={myLocationFeature}>
                 <SymbolLayer
-                  id="selected-location-pin"
+                  id="location-markers"
                   style={{
-                    iconImage: "camIcon",
-                    iconSize: 0.2,
+                    iconImage: "pinIcon",
+                    iconSize: 0.5,
+                    textField: ["get", "label"],
+                    textSize: 12,
+                    textOffset: [0, 2],
+                    textColor: "#000",
                   }}
                 />
-                <Images images={{ camIcon }} />
+                <Images images={{ pinIcon }} />
               </ShapeSource>
-            )}
-          </MapView>
-        </View>
-        <BottomSheet
-          ref={bottomSheetRef}
-          // onChange={handleSheetChanges}
-          index={0}
-          snapPoints={snapPoints}
-          enablePanDownToClose={false}
-        >
-          <BottomSheetView style={styles.contentContainer}>
-            <Pressable onPress={() => setIsAdding(true)}>
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: "500",
-                  alignItems: "center",
-                }}
-              >
-                Thêm địa điểm trên chuyến đi 🎉
-              </Text>
-            </Pressable>
-            <View style={styles.bottomSheetInnerContainer}>
-              <Text style={styles.btsLocationName}>
-                {planLocation.name ? planLocation.name : "Tên địa điểm"}
-              </Text>
-              <Text style={styles.btsOtherFields}>
-                {planLocation.address ? planLocation.address : "Địa chỉ"}
-              </Text>
-              {/* <Text>Long: {planLocation.longitude}</Text>
-              <Text>Lat : {planLocation.latitude}</Text> */}
-              <TouchableOpacity onPress={() => setIsModalOpen(true)}>
-                <Text style={styles.btsOtherFields}>
-                  Ngày khởi hành:{" "}
-                  {planLocation.estimatedStartDate
-                    ? planLocation.estimatedStartDate
-                    : ""}
-                </Text>
-              </TouchableOpacity>
 
-              {/* <TouchableOpacity
+              <ShapeSource id="memberLocations" shape={memberLocationFeature}>
+                <SymbolLayer
+                  id="member-location-icons"
+                  style={{
+                    iconImage: ["get", "iconKey"], // Dynamically get icon from feature properties
+                    iconSize: 0.2,
+                    textField: ["get", "label"], // Show location name if needed
+                    textSize: 12,
+                    textOffset: [0, 2],
+                    textColor: "#000",
+                  }}
+                />
+                <Images images={iconImages}  />
+              </ShapeSource>
+
+              {/* Route rendering */}
+              {route && (
+                <ShapeSource
+                  id="routeSource"
+                  shape={lineString(route.coordinates)}
+                >
+                  <LineLayer
+                    id="routeLayer"
+                    style={{
+                      lineColor: "#13c892",
+                      lineWidth: 3,
+                      lineDasharray: [2, 2],
+                      lineCap: "round",
+                      lineJoin: "round",
+                    }}
+                  />
+                </ShapeSource>
+              )}
+
+              {/* Selected location marker */}
+              {cameraFeature && (
+                <ShapeSource id="cameraLocation" shape={cameraFeature}>
+                  <SymbolLayer
+                    id="selected-location-pin"
+                    style={{
+                      iconImage: "camIcon",
+                      iconSize: 0.2,
+                    }}
+                  />
+                  <Images images={{ camIcon }} />
+                </ShapeSource>
+              )}
+            </MapView>
+          </View>
+          <BottomSheet
+            ref={bottomSheetRef}
+            // onChange={handleSheetChanges}
+            index={-1}
+            snapPoints={snapPoints}
+            enablePanDownToClose={true}
+          >
+            <BottomSheetView style={styles.contentContainer}>
+              <Pressable onPress={() => setIsAdding(true)}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: "500",
+                    alignItems: "center",
+                  }}
+                >
+                  Thêm địa điểm trên chuyến đi 🎉
+                </Text>
+              </Pressable>
+              <View style={styles.bottomSheetInnerContainer}>
+                <Text style={styles.btsLocationName}>
+                  {planLocation.name ? planLocation.name : "Tên địa điểm"}
+                </Text>
+                <Text style={styles.btsOtherFields}>
+                  {planLocation.address ? planLocation.address : "Địa chỉ"}
+                </Text>
+                {/* <Text>Long: {planLocation.longitude}</Text>
+              <Text>Lat : {planLocation.latitude}</Text> */}
+                <TouchableOpacity onPress={() => setIsModalOpen(true)}>
+                  <Text style={styles.btsOtherFields}>
+                    Ngày khởi hành:{" "}
+                    {planLocation.estimatedStartDate
+                      ? planLocation.estimatedStartDate
+                      : ""}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* <TouchableOpacity
                 style={{ marginTop: 10 }}
                 onPress={handleAddLocation}
               >
                 <Text>Thêm địa điểm vào lộ trình</Text>
               </TouchableOpacity> */}
-            </View>
-            <View>
-              <View style={styles.loginButtonContainer}>
-                <Pressable
-                  onPress={handleAddLocation}
-                  disabled={isCreatingDisabled || isLoading}
-                  android_ripple={
-                    isCreatingDisabled ? null : { color: "#b9bcc6" }
-                  }
-                >
-                  <View
-                    style={[
-                      styles.innerLoginButtonContainer,
-                      isCreatingDisabled && styles.loginButtonDisabled,
-                    ]}
-                  >
-                    {isLoading ? (
-                      <ActivityIndicator color="#fff" size={28} />
-                    ) : (
-                      <Text
-                        style={[
-                          styles.loginButtonText,
-                          { color: isCreatingDisabled ? "#b9bcc6" : "#fff" },
-                        ]}
-                      >
-                        Tạo mới
-                      </Text>
-                    )}
-                  </View>
-                </Pressable>
               </View>
-            </View>
-          </BottomSheetView>
-        </BottomSheet>
-
-        <CalendarModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        >
-          <View style={styles.modalContainer}>
-            <Calendar
-              current={selectedDate} // Default value if no date is selected
-              onDayPress={handleDayPress}
-              markedDates={
-                selectedDate
-                  ? {
-                      [selectedDate]: {
-                        selected: true,
-                        disableTouchEvent: true,
-                        selectedColor: "#46e835",
-                      },
+              <View>
+                <View style={styles.loginButtonContainer}>
+                  <Pressable
+                    onPress={handleAddLocation}
+                    disabled={isCreatingDisabled || isLoading}
+                    android_ripple={
+                      isCreatingDisabled ? null : { color: "#b9bcc6" }
                     }
-                  : {}
-              }
-              theme={{
-                todayTextColor: "#46e835",
-                arrowColor: "#46e835",
-                selectedDayBackgroundColor: "#46e835",
-                dotColor: "#46e835",
-              }}
-            />
-          </View>
-        </CalendarModal>
-        {/* </BottomSheetModalProvider> */}
+                  >
+                    <View
+                      style={[
+                        styles.innerLoginButtonContainer,
+                        isCreatingDisabled && styles.loginButtonDisabled,
+                      ]}
+                    >
+                      {isLoading ? (
+                        <ActivityIndicator color="#fff" size={28} />
+                      ) : (
+                        <Text
+                          style={[
+                            styles.loginButtonText,
+                            { color: isCreatingDisabled ? "#b9bcc6" : "#fff" },
+                          ]}
+                        >
+                          Tạo mới
+                        </Text>
+                      )}
+                    </View>
+                  </Pressable>
+                </View>
+              </View>
+            </BottomSheetView>
+          </BottomSheet>
+
+          <CalendarModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          >
+            <View style={styles.modalContainer}>
+              <Calendar
+                current={selectedDate} // Default value if no date is selected
+                onDayPress={handleDayPress}
+                minDate={plan?.estimatedStartDate}
+                maxDate={plan?.estimatedEndDate}
+                markedDates={
+                  selectedDate
+                    ? {
+                        [selectedDate]: {
+                          selected: true,
+                          disableTouchEvent: true,
+                          selectedColor: "#46e835",
+                        },
+                      }
+                    : {}
+                }
+                theme={{
+                  todayTextColor: "#46e835",
+                  arrowColor: "#46e835",
+                  selectedDayBackgroundColor: "#46e835",
+                  dotColor: "#46e835",
+                }}
+              />
+            </View>
+          </CalendarModal>
+          {/* </BottomSheetModalProvider> */}
+        </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </KeyboardAvoidingView>
   );
@@ -958,7 +1118,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
     right: 20,
     top: 140,
-  }
+  },
 });
 
 export default ChosenTrip;

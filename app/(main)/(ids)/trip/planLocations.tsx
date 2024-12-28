@@ -54,9 +54,9 @@ type PlanLocationsProps = {
   name: string;
   address: string;
   estimatedStartDate: string;
-  userSpenderIds?: string[];
+  userSpender?: Member[];
   amount: number | null;
-  payerId?: string;
+  payer?: Member | null;
   note?: string;
 };
 
@@ -108,11 +108,21 @@ const planLocations = () => {
               name: _item.locationName,
               address: _item.locationAddress,
               estimatedStartDate: _item.estimatedStartDate.split("T")[0],
-              // userSpenderIds: _item.planLocationExpenses.map(
-              //   (item: any) => item.userId
-              // ),
               note: _item.note,
               amount: _item.amount,
+              userSpender: _item.userSpenders.map(
+                (item: any): Member => ({
+                  userId: item.userId,
+                  name: item.username,
+                })
+              ),
+              payer:
+                _item.userPayer == null
+                  ? { userId: "", name: "" }
+                  : {
+                      userId: _item.userPayer.userId,
+                      name: _item.userPayer.username,
+                    },
             })
           );
         console.log("Filtered Data: ", filteredData);
@@ -150,6 +160,7 @@ const planLocations = () => {
   }, [isRefreshing]);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
+
   const handleOpen = (planLocationId: string) => {
     const _chosenPlanLocation = plan.find(
       (item) => item.planLocationId === planLocationId
@@ -157,6 +168,8 @@ const planLocations = () => {
     setChosenPlanLocation(_chosenPlanLocation);
     setNote(_chosenPlanLocation?.note!);
     setAmount(_chosenPlanLocation?.amount! ?? 0);
+    setPayer(_chosenPlanLocation?.payer ?? { userId: "", name: "" });
+    setMembers(_chosenPlanLocation?.userSpender!);
     bottomSheetRef.current?.expand();
   };
   const handleSheetChanges = useCallback((index: number) => {
@@ -262,11 +275,6 @@ const planLocations = () => {
       console.log(`Plan location id: ${id}`);
       const data = {
         planLocationExpense: {
-          // userSpenderIds: [
-          //   {
-          //     userId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-          //   },
-          // ],
           userSpenderIds: members.map((item) => {
             return { userId: item.userId };
           }),
@@ -304,16 +312,19 @@ const planLocations = () => {
   const handleUpdatePlanLocation = async (id: string) => {
     await handleAddExpense(id);
     await handlePatchNote(id);
-  }
+  };
 
   const renderImage = ({ item }: { item: string }) => (
     <View
       style={styles.imageContainer}
       // onLongPress={() => _deletePlanLocationImage(item)}
     >
-      <Pressable onPress={() => _deletePlanLocationImage(item)} style={styles.deleteButton}>
-                    <Ionicons name="close-circle-outline" size={23} color="#ff6188" />
-                  </Pressable>
+      <Pressable
+        onPress={() => _deletePlanLocationImage(item)}
+        style={styles.deleteButton}
+      >
+        <Ionicons name="close-circle-outline" size={23} color="#ff6188" />
+      </Pressable>
       <Image source={{ uri: item }} style={styles.btsImage} />
     </View>
   );
@@ -576,7 +587,7 @@ const planLocations = () => {
                     data={chosenPlanLocation?.images}
                     renderItem={renderImage}
                     // estimatedItemSize={100}
-                    style={{ flex: 1, marginBottom:0 }}
+                    style={{ flex: 1, marginBottom: 0 }}
                     scrollEnabled={true}
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -592,9 +603,9 @@ const planLocations = () => {
 
               <View style={styles.loginButtonContainer}>
                 <Pressable
-                onPress={() =>
-                  handleAddExpense(chosenPlanLocation!.planLocationId)
-                }
+                  onPress={() =>
+                    handleUpdatePlanLocation(chosenPlanLocation!.planLocationId)
+                  }
                   disabled={isUpdateDisabled || isUpdateLoading}
                   android_ripple={
                     isUpdateDisabled ? null : { color: "#b9bcc6" }
@@ -871,7 +882,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     margin: 10,
     width: "95%",
-    marginTop: 20
+    marginTop: 20,
   },
   innerLoginButtonContainer: {
     padding: 10,
@@ -894,7 +905,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#ffffff",
     borderRadius: 50,
-    zIndex: 4
+    zIndex: 4,
   },
 });
 

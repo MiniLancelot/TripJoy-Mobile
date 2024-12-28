@@ -31,7 +31,6 @@ import Toast from "react-native-toast-message";
 import { vi } from "date-fns/locale";
 import { Province } from "@/constants/Provinces";
 
-
 type PlanProfileProps = {
   title: string | null;
   startDate: string;
@@ -86,8 +85,15 @@ LocaleConfig.locales["vi"] = {
   today: "Hôm nay",
 };
 
-const weekDaysVN = ["Chủ Nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
-
+const weekDaysVN = [
+  "Chủ Nhật",
+  "Thứ 2",
+  "Thứ 3",
+  "Thứ 4",
+  "Thứ 5",
+  "Thứ 6",
+  "Thứ 7",
+];
 
 // Set the default locale
 LocaleConfig.defaultLocale = "vi";
@@ -99,8 +105,8 @@ const Trip3 = () => {
     startDate: "",
     endDate: "",
     estimatedBudget: 0,
-    provinceStart: {provinceId: "", provinceName: ""},
-    provinceEnd: {provinceId: "", provinceName: ""},
+    provinceStart: { provinceId: "", provinceName: "" },
+    provinceEnd: { provinceId: "", provinceName: "" },
     method: 0,
     vehicle: 0,
     avatar: null,
@@ -108,7 +114,7 @@ const Trip3 = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const tempAvatar =
-    "https://icons-for-free.com/iff/png/512/mountains+photo+photos+placeholder+sun+icon-1320165661388177228.png";
+    "https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE=";
 
   // useEffect(() => {
   //   const handler = setTimeout(() => {
@@ -133,15 +139,15 @@ const Trip3 = () => {
     !data.endDate ||
     !data.estimatedBudget ||
     !data.provinceStart ||
-    !data.provinceEnd||
+    !data.provinceEnd ||
     data.vehicle < 0;
 
-    const renderCustomHeader = (date: string) => {
-      const currentMonth = format(new Date(date), "MMMM yyyy", { locale: vi });
-      return (
-        <Text style={{ fontSize: 16, fontWeight: "bold" }}>{currentMonth}</Text>
-      );
-    };
+  const renderCustomHeader = (date: string) => {
+    const currentMonth = format(new Date(date), "MMMM yyyy", { locale: vi });
+    return (
+      <Text style={{ fontSize: 16, fontWeight: "bold" }}>{currentMonth}</Text>
+    );
+  };
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const handleOpen = () => bottomSheetRef.current?.expand();
@@ -292,7 +298,7 @@ const Trip3 = () => {
                   </Pressable>
                 )}
               </View>
-              
+
               <Pressable
                 onPress={handleOpen}
                 style={{
@@ -447,6 +453,7 @@ const Trip3 = () => {
               <View style={{ marginBottom: 10 }}>
                 <Calendar
                   minDate={format(new Date(), "yyyy-MM-dd")}
+                  // maxDate = {"2024-12-29"}
                   markingType={"period"}
                   markedDates={{
                     [data.startDate]: { startingDay: true, color: "#71d7c7" },
@@ -463,9 +470,11 @@ const Trip3 = () => {
                   }}
                   onDayPress={handleDayPress}
                   renderHeader={renderCustomHeader}
-        firstDay={1} // Set Monday as the first day of the week
-        dayNames={weekDaysVN}
-        dayNamesShort={weekDaysVN.map((day) => day.replace("Thứ ", ""))}
+                  firstDay={1} // Set Monday as the first day of the week
+                  dayNames={weekDaysVN}
+                  dayNamesShort={weekDaysVN.map((day) =>
+                    day.replace("Thứ ", "")
+                  )}
                 />
               </View>
             </BottomSheetView>

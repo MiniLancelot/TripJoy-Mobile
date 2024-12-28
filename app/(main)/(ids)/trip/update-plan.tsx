@@ -283,7 +283,7 @@ const UpdatePlan = () => {
         <BottomSheetModalProvider>
           <Stack.Screen
             options={{
-              title: "Cập nhật chuyến đi",
+              title: "Cập nhật",
             }}
           />
           <ScrollView>
@@ -611,12 +611,15 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   loginButtonContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
     backgroundColor: "#13c892",
     borderRadius: 12,
     overflow: "hidden",
     margin: 10,
-    width: "95%",
-    marginTop: 75,
+    width: "90%",
+    marginTop: 15,
   },
   innerLoginButtonContainer: {
     padding: 10,

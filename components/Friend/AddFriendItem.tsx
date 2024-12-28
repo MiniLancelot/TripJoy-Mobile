@@ -5,14 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 interface FriendItemProps {
   id: string;
   name: string;
-  avatar: string;
+  avatar: any;
   _onClick: any;
 }
 
 const FriendItem = ({ id, name, _onClick, avatar }: FriendItemProps) => {
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
-  const avatarUri = avatar == null ? tempAvatar : avatar;
+  const avatarUri = avatar == null ? tempAvatar : avatar.url;
 
   return (
     // <View>

@@ -5,15 +5,19 @@ import {
   StyleSheet,
   Pressable,
   Image,
+  Touchable,
+  TouchableOpacity,
 } from "react-native";
 import { useState } from "react";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import PostStatusDropdown from "@/components/Dropdowns/PostStatusDropdown";
 import * as ImagePicker from "expo-image-picker";
-import { set } from "date-fns";
 import { FriendProps } from "@/constants/Friend";
 import FriendDropdown from "@/components/Dropdowns/FriendDropdown";
 import { createPost } from "@/services/post/post";
+import { router, Stack } from "expo-router";
+import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 
 // interface CreatePostProps {
 //   content: string,
@@ -25,15 +29,15 @@ import { createPost } from "@/services/post/post";
 const CreatePost = () => {
   const { session } = useAuth();
   const [content, setContent] = useState<string>("");
-  const [shareStatus, setShareStatus] = useState<string>("");
+  // const [shareStatus, setShareStatus] = useState<string>("");
   const [images, setImages] = useState<string[]>([]);
-  const [tagUsers, setTagUsers] = useState<FriendProps>({
-    userId: "",
-    name: "",
-  });
+  // const [tagUsers, setTagUsers] = useState<FriendProps>({
+  //   userId: "",
+  //   name: "",
+  // });
 
   const tempAvatar =
-    "https://icons-for-free.com/iff/png/512/mountains+photo+photos+placeholder+sun+icon-1320165661388177228.png";
+    "https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE=";
 
   const pickImage = async (index: number) => {
     // No permissions request is necessary for launching the image library
@@ -59,14 +63,10 @@ const CreatePost = () => {
   const _createPost = async () => {
     const data = new FormData();
     data.append("Post.Content", content);
-    data.append("Post.ShareStatus", shareStatus);
-    data.append("Post.TagUsers[0]", tagUsers.userId);
+    // data.append("Post.ShareStatus", shareStatus);
+    // data.append("Post.TagUsers[0]", tagUsers.userId);
+
     images.forEach((image, index) => {
-      // data.append("images", {
-      //   name: `image${index}`,
-      //   type: "image/jpeg",
-      //   uri: image,
-      // });
       const parts = image.split("/");
       const fileName = parts[parts.length - 1];
       const file: any = {
@@ -79,6 +79,7 @@ const CreatePost = () => {
     const response = await createPost(data, session.userToken.accessToken);
     if (response) {
       console.log("Create post success");
+      router.replace("/home");
     } else {
       console.log("Create post failed");
     }
@@ -86,17 +87,43 @@ const CreatePost = () => {
 
   return (
     <View style={styles.container}>
-      {/* <Text>CreatePost</Text> */}
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: "Tạo bài viết",
+          headerStyle: {
+            backgroundColor: "#defff6",
+          },
+        }}
+      />
+      <Text style={{ fontSize: 20, fontWeight: "500" }}>Nội dung</Text>
       <TextInput
         placeholder="Nội dung"
         value={content}
+        multiline
+        numberOfLines={5}
+        maxLength={300}
         onChangeText={setContent}
+        style={{
+          borderWidth: 1,
+          borderColor: "#e6e6e6",
+          padding: 10,
+          borderRadius: 10,
+          marginTop: 10,
+          textAlignVertical: "top",
+          maxHeight: 200,
+        }}
       />
-      <PostStatusDropdown
-        value={shareStatus}
-        setValue={setShareStatus}
-        placeholder="Chế độ chia sẻ"
-      />
+
+      <TouchableOpacity onPress={() => {}}>
+        <Ionicons
+          name="image-outline"
+          size={30}
+          color="black"
+          style={{ marginTop: 20 }}
+        />
+      </TouchableOpacity>
+
       <View style={styles.avatarContainer}>
         <Pressable onPress={() => pickImage(0)}>
           <Image
@@ -117,12 +144,12 @@ const CreatePost = () => {
           />
         </Pressable>
       </View>
-      <FriendDropdown
+      {/* <FriendDropdown
         _value={tagUsers}
         setValue={setTagUsers}
         bearer={session.userToken.accessToken}
         placeholder="Tag bạn bè"
-      />
+      /> */}
       <Pressable onPress={_createPost}>
         <Text>Post</Text>
       </Pressable>
@@ -135,13 +162,15 @@ export default CreatePost;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 16,
+    padding: 16,
     backgroundColor: "white",
   },
   avatarContainer: {
     alignItems: "center",
     marginVertical: 20,
     marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#000",
   },
   image: {
     width: 280,

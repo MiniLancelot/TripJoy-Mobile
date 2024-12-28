@@ -32,7 +32,7 @@ import Animated, {
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import StarRailChar2 from "@/components/Others/StarRailChar2";
+import StarRailChar2 from "@/components/Others/StarRailChar3";
 import {
   accept_friend_request,
   decline_friend_request,
@@ -691,7 +691,7 @@ const User = () => {
               >
                 Bài Viết
               </Text>
-              <StarRailChar2 />
+              <StarRailChar2 _userId={id.toString()}/>
             </View>
           </View>
         </View>

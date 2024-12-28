@@ -1,3 +1,4 @@
+import { Params } from "@/constants/QueryParams";
 import { plan } from "@/utils/request";
 import showError from "@/utils/showError";
 import { getAccessToken } from "@rnmapbox/maps";
@@ -233,6 +234,172 @@ const patchNote = async (data: any, accessToken: any, id: any) => {
   }
 }
 
+const getExpensesByPlanId = async (accessToken: any, planId: any, params: Params) => {
+  try {
+    const query = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        acc[key] = String(value);
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
+    const result = await plan(`/plans/${planId}/expense?${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const getPlanExpenseMembersByPlanId = async (accessToken: any, planId: any, params: Params) => {
+  try {
+    const query = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        acc[key] = String(value);
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
+    const result = await plan(`/plans/${planId}/expense/members?${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const getPlanExpenseMemberByPlanId = async (accessToken: any, planId: any, userId: any) => {
+  try {
+    const result = await plan(`/plans/${planId}/expense/members/${userId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const putChangeJoinStatusPlan = async (accessToken: any, planId: any) => {
+  try {
+    const result = await plan(`/plans/${planId}/change-join-status`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const postJoinRequest = async (data: any, accessToken: any, planId: any) => {
+  try {
+    const result = await plan(`/plans/${planId}/join-request`, {
+      method: "POST",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const revokeJoinRequest = async (accessToken: any, planId: any) => {
+  try {
+    const result = await plan(`/plans/${planId}/revoke-join-request`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const getPlanAvailableToJoin = async (accessToken: any) => {
+  try {
+    const result = await plan(`/plans/available-join`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const getJoinPlanRequests = async (accessToken: any, planId: string) => {
+  try {
+    const result = await plan(`/plans/${planId}/join-request`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const acceptJoinPlanRequest = async (accessToken: any, planId: string, userId: string) => {
+  try {
+    const result = await plan(`/plans/${planId}/join-request/accept/${userId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+const rejectJoinPlanRequest = async (accessToken: any, planId: string, userId: string) => {
+  try {
+    const result = await plan(`/plans/${planId}/join-request/decline/${userId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
 export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, 
   getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId, 
-  getPlanInvitations, putExpense, patchNote, updatePlan };
+  getPlanInvitations, putExpense, patchNote, updatePlan, getExpensesByPlanId,
+  getPlanExpenseMembersByPlanId, getPlanExpenseMemberByPlanId, putChangeJoinStatusPlan, postJoinRequest, revokeJoinRequest,
+  getPlanAvailableToJoin, getJoinPlanRequests, acceptJoinPlanRequest, rejectJoinPlanRequest};

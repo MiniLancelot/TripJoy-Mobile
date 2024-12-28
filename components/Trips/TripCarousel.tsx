@@ -5,11 +5,12 @@ import TripCard from './TripCard';
 
 import CarouselPagination from './CarouselPagination';
 import { Trips } from '@/constants/Trip';
+import { TripProps } from '@/constants/TripProps';
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get('window').width - OFFSET * 2;
 
-const TripCarousel = ({data} : any) => {
+const TripCarousel = ({data, _changeJoinStatus} : {data: TripProps[], _changeJoinStatus?: (id: string) => any}) => {
   const scrollX = useSharedValue(0);
 
   return (
@@ -32,6 +33,7 @@ const TripCarousel = ({data} : any) => {
             id = {id}
             scrollX={scrollX}
             total={data.length}
+            _changeJoinStatus={_changeJoinStatus}
           />
         ))}
       </Animated.ScrollView>
