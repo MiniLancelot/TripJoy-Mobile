@@ -18,6 +18,7 @@ import { createPost } from "@/services/post/post";
 import { router, Stack } from "expo-router";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { set } from "date-fns";
 
 // interface CreatePostProps {
 //   content: string,
@@ -39,7 +40,7 @@ const CreatePost = () => {
   const tempAvatar =
     "https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE=";
 
-  const pickImage = async (index: number) => {
+  const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -53,12 +54,15 @@ const CreatePost = () => {
     if (!result.canceled) {
       // setImage(result.assets[0].uri);
       // handleChangeProfileState("avatar", result.assets[0].uri);
-      setImages([
-        ...images.slice(0, index),
-        result.assets[0].uri,
-        ...images.slice(index + 1),
-      ]);
+      setImages([...images, result.assets[0].uri]);
     }
+  };
+
+  const getImageWidth = (numImages: number) => {
+    if (numImages === 1) return "100%";
+    if (numImages === 2) return "49.5%";
+    if (numImages === 3) return "32.5%";
+    return "32.5%";
   };
   const _createPost = async () => {
     const data = new FormData();
@@ -115,7 +119,7 @@ const CreatePost = () => {
         }}
       />
 
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity onPress={pickImage} disabled={images.length >= 2}>
         <Ionicons
           name="image-outline"
           size={30}
@@ -124,32 +128,37 @@ const CreatePost = () => {
         />
       </TouchableOpacity>
 
-      <View style={styles.avatarContainer}>
-        <Pressable onPress={() => pickImage(0)}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+      {images.map((image, index) => (
+        <View style={styles.avatarContainer}>
+          <Pressable
+            onPress={() =>
+              setImages((prev) => prev.filter((_, i) => i !== index))
+            }
+            style={styles.deleteButton}
+          >
+            <Ionicons name="close-circle-outline" size={23} color="#ff6188" />
+          </Pressable>
           <Image
             source={{
-              uri: images[0] == null ? tempAvatar : images[0],
+              uri: image == null ? tempAvatar : image,
             }}
-            style={styles.image}
+            style={[styles.image, { width: getImageWidth(images.length) }]}
           />
-        </Pressable>
+        </View>
+      ))}
       </View>
-      <View style={styles.avatarContainer}>
-        <Pressable onPress={() => pickImage(1)}>
+      {images.length == 0 && (
+        <View style={styles.avatarContainer}>
           <Image
             source={{
-              uri: images[1] == null ? tempAvatar : images[1],
+              uri: tempAvatar,
             }}
-            style={styles.image}
+            style={[styles.image, { width: getImageWidth(1) }]}
           />
-        </Pressable>
-      </View>
-      {/* <FriendDropdown
-        _value={tagUsers}
-        setValue={setTagUsers}
-        bearer={session.userToken.accessToken}
-        placeholder="Tag bạn bè"
-      /> */}
+        </View>
+      )}
+
       <Pressable onPress={_createPost}>
         <Text>Post</Text>
       </Pressable>
@@ -165,16 +174,31 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "white",
   },
+  // itemOuterContainer: {
+  //   padding: 15,
+  //   flex: 1,
+  //   flexDirection: "row",
+  //   borderBottomWidth: 1,
+  //   borderBottomColor: "#e7e8ee",
+  // },
   avatarContainer: {
     alignItems: "center",
-    marginVertical: 20,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: "#000",
+    marginTop: 5,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   image: {
-    width: 280,
-    height: 220,
-    borderRadius: 30,
+    // width: "100%",
+    height: 250,
+    borderRadius: 6,
+  },
+  deleteButton: {
+    position: "absolute",
+    top: -5,
+    right: 0,
+    backgroundColor: "#ffffff",
+    borderRadius: 50,
+    zIndex: 4,
   },
 });
