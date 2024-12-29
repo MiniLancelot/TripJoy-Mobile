@@ -40,7 +40,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import MemberMultiselect from "@/components/Multiselect/MemberMultiselect";
-import { Member } from "@/constants/Member";
+import { Member } from "@/utils/Member";
 import MemberDropdown from "@/components/Dropdowns/MemberDropdown";
 import * as ImagePicker from "expo-image-picker";
 import AnimationTextInput from "@/components/TextInput/MyTextInput";

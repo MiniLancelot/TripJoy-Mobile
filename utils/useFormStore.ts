@@ -1,5 +1,5 @@
 // stores/useFormStore.ts
-import { Province } from '@/constants/Provinces';
+import { Province } from '@/utils/Provinces';
 import { create } from 'zustand';
 
 interface FormState {

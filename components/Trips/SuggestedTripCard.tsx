@@ -18,7 +18,7 @@ import Animated, {
 import { getPlanLocationById } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { router } from "expo-router";
-import { TripProps } from "@/constants/TripProps";
+import { TripProps } from "@/utils/TripProps";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;

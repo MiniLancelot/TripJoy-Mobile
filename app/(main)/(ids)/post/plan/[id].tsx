@@ -1,7 +1,7 @@
 import { View, Text, TextInput, Pressable } from "react-native";
 import React from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { Province } from "@/constants/Provinces";
+import { Province } from "@/utils/Provinces";
 import { getPlanById } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { ca } from "date-fns/locale";

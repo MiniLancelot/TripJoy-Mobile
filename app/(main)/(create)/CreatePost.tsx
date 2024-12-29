@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import PostStatusDropdown from "@/components/Dropdowns/PostStatusDropdown";
 import * as ImagePicker from "expo-image-picker";
-import { FriendProps } from "@/constants/Friend";
+import { FriendProps } from "@/utils/Friend";
 import FriendDropdown from "@/components/Dropdowns/FriendDropdown";
 import { createPost } from "@/services/post/post";
 import { router, Stack } from "expo-router";

@@ -1,4 +1,4 @@
-import { Params } from "@/constants/QueryParams";
+import { Params } from "@/utils/QueryParams";
 import { post } from "@/utils/request";
 import showError from "@/utils/showError";
 

@@ -4,10 +4,10 @@ import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 // import getPronvinces from "@/services/plan/getProvinces";
 import { is } from "date-fns/locale";
-import { Province } from "@/constants/Provinces";
-import { Member } from "@/constants/Member";
+import { Province } from "@/utils/Provinces";
+import { Member } from "@/utils/Member";
 import getMembers from "@/services/plan/member";
-import { UserSpender } from "@/constants/UserSpender";
+import { UserSpender } from "@/utils/UserSpender";
 // import debounce from "@/services/debounce";
 
 interface DataProps {

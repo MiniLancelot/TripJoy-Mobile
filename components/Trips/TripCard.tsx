@@ -18,7 +18,7 @@ import Animated, {
 import { getPlanLocationById, putChangeJoinStatusPlan } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { router } from "expo-router";
-import { TripProps } from "@/constants/TripProps";
+import { TripProps } from "@/utils/TripProps";
 import { is } from "date-fns/locale";
 
 const OFFSET = 45;
@@ -89,43 +89,6 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
   });
 
   const imageUrl = item.avatar ? item.avatar : tempImage;
-  // const problematicImageUrl = "https://movieticketbooking.s3.amazonaws.com/e98b58e0-2435-4b7b-8650-b94afa374ac4.png";
-  // const imageUrl = item.avatar === problematicImageUrl ? tempImage : item.avatar ? item.avatar : tempImage;
-
-  // const fetchPlan = async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     const response = await getPlanLocationById(
-  //       session.userToken.accessToken,
-  //       item.id
-  //     );
-  //     if (response) {
-  //       const _responseData = response.data.plan;
-  //       setPlanData(_responseData);
-  //       setPlanData({
-  //         ..._responseData,
-  //         startDate: _responseData.estimatedStartDate.split("T")[0],
-  //         endDate: _responseData.estimatedEndDate.split("T")[0],
-  //       });
-  //       setIsLoading(false);
-  //     }
-  //   } catch (err: any) {
-  //     setError(err.message);
-  //     console.log("fail");
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchPlan();
-  // }, []);
-
-
-
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     fetchPlan();
-  //     setIsSuccess(false);
-  //   }
-  // }, [isSuccess]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -178,7 +141,7 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
                 </Text>
                 {item?.leadUserId == session.userInfo.user.profile.id && (
                   <Pressable onPress={() => _changeJoinStatus && _changeJoinStatus(item.id)}>
-                    <Text>{item?.joinStatus == 1 ? "Công khai" : "Hủy công khai"}</Text>
+                    <Text>{item?.joinStatus == 1 ? "Công khai chuyến đi" : "Hủy công khai"}</Text>
                   </Pressable>
                 )}
                 <Pressable onPress={() => router.push(`/post/plan/${item.id}`)}>

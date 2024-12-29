@@ -1,4 +1,4 @@
-import { Params } from "@/constants/QueryParams";
+import { Params } from "@/utils/QueryParams";
 import {user} from "@/utils/request";
 
 const get_friends_request = async (token: string) => {

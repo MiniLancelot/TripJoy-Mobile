@@ -535,7 +535,7 @@ const ChosenTrip = () => {
         //   latitude: location.coords.latitude,
         //   longitude: location.coords.longitude,
         // });
-        //console.log("bản thân: ",session.userInfo.user.profile)
+        console.log("bản thân: ",session.userInfo.user.profile)
         _connection!.invoke(
           "SendCoordinates",
           session.userInfo.user.profile.id,

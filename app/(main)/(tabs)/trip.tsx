@@ -32,9 +32,9 @@ import {
   revokeJoinRequest,
 } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
-import { Province } from "@/constants/Provinces";
+import { Province } from "@/utils/Provinces";
 import SuggestedTripCarousel from "@/components/Trips/SuggestedTripCarousel";
-import { TripProps } from "@/constants/TripProps";
+import { TripProps } from "@/utils/TripProps";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, {
   BottomSheetBackdrop,

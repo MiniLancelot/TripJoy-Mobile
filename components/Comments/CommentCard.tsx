@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
-import { Comment } from "@/constants/Comment";
+import { Comment } from "@/utils/Comment";
 import { getRepliesByCommentId } from "@/services/comment/comment";
 import { useAuth } from "@/app/(auth)/AuthContext";
 // import { TextInput } from "react-native-gesture-handler";

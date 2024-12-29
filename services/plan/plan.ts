@@ -1,4 +1,4 @@
-import { Params } from "@/constants/QueryParams";
+import { Params } from "@/utils/QueryParams";
 import { plan } from "@/utils/request";
 import showError from "@/utils/showError";
 import { getAccessToken } from "@rnmapbox/maps";
@@ -398,8 +398,25 @@ const rejectJoinPlanRequest = async (accessToken: any, planId: string, userId: s
   }
 }
 
+const postPlanByAI = async (data: any, accessToken: any) => {
+  try {
+    const result = await plan("/plans/AI", {
+      method: "POST",
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
 export { addPlan, getAllPlan, getPlanLocationById, getPlanById, addPlanLocation, 
   getPlanLocationsByPlanId, changeOrderPlanLocations, addPlanLocationImage, deletePlanLocationImage, deletePlanLocationByPlanLocationId, 
   getPlanInvitations, putExpense, patchNote, updatePlan, getExpensesByPlanId,
   getPlanExpenseMembersByPlanId, getPlanExpenseMemberByPlanId, putChangeJoinStatusPlan, postJoinRequest, revokeJoinRequest,
-  getPlanAvailableToJoin, getJoinPlanRequests, acceptJoinPlanRequest, rejectJoinPlanRequest};
+  getPlanAvailableToJoin, getJoinPlanRequests, acceptJoinPlanRequest, rejectJoinPlanRequest, postPlanByAI };

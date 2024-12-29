@@ -1,17 +1,53 @@
 import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ProgressChart } from "react-native-chart-kit";
 import ExpenseMembers from "@/components/Expenses/ExpenseMembers";
 import ExpenseLocations from "@/components/Expenses/ExpenseLocation";
 import SeparateLine from "@/components/Others/SeparateLine";
+import { getExpensesByPlanId } from "@/services/plan/plan";
+import { useAuth } from "@/app/(auth)/AuthContext";
+import { useTabStore } from "@/utils/store";
+import { set } from "date-fns";
+
+interface ChartData {
+  labels: string[];
+  data: number[];
+}
 
 const TripBudget = () => {
-  const chartData = {
-    labels: ["Đã chi"], // optional
-    data: [0.8],
+  const { session } = useAuth();
+  const sharedId = useTabStore((state) => state.sharedId);
+  // const chartData = {
+  //   labels: ["Đã chi"], // optional
+  //   data: [0.8],
+  // };
+  const [_chartData, setChartData] = useState<ChartData>({
+    labels: ["Đã chi"],
+    data: [0],
+  });
+  const _fetchData = async () => {
+    try {
+      const response = await getExpensesByPlanId(
+        session.userToken.accessToken,
+        sharedId,
+        {}
+      );
+      if (response) {
+        const ratio = response.data.expense / response.data.totalExpense;
+        setChartData({
+          labels: ["Đã chi"], // optional
+          data: [ratio],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+  useEffect(() => {
+    _fetchData();
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -36,7 +72,7 @@ const TripBudget = () => {
       <Text style={styles.title}>Trip Budget</Text>
       <View>
         <ProgressChart
-          data={chartData}
+          data={_chartData}
           width={Dimensions.get("window").width} // from react-native
           height={220}
           strokeWidth={16}
@@ -63,16 +99,15 @@ const TripBudget = () => {
           }}
           hideLegend={true} // Hide default legend
         />
-        
       </View>
-      
+
       {/* Custom Legend */}
       <View style={styles.legendContainer}>
         <Text style={styles.legendText}>Đã chi</Text>
-        <Text style={styles.legendText}>Legend value: 80%</Text>
+        <Text style={styles.legendText}>{_chartData.data[0] *100}%</Text>
       </View>
       <ExpenseLocations />
-      <SeparateLine text=""/>
+      <SeparateLine text="" />
       <ExpenseMembers />
     </View>
   );

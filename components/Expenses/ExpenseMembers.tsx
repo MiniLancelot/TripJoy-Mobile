@@ -2,7 +2,7 @@ import { View, Text, TextInput, Image, Pressable, FlatList, } from "react-native
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { useTabStore } from "@/utils/store";
-import { Member } from "@/constants/Member";
+import { Member } from "@/utils/Member";
 import getMembers from "@/services/plan/member";
 import {  GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlashList } from "@shopify/flash-list";

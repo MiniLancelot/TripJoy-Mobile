@@ -1,7 +1,7 @@
 import { View, Text, Pressable, FlatList, TextInput } from "react-native";
 import { useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
-import { Comment } from "@/constants/Comment";
+import { Comment } from "@/utils/Comment";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import {
   deleteComment,

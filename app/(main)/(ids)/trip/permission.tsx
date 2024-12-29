@@ -1,8 +1,8 @@
-import { View, Text, TextInput, Image, Pressable } from "react-native";
+import { View, Text, TextInput, Image, Pressable, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { useTabStore } from "@/utils/store";
-import { Member } from "@/constants/Member";
+import { Member } from "@/utils/Member";
 import getMembers from "@/services/plan/member";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlashList } from "@shopify/flash-list";
@@ -84,14 +84,19 @@ const permission = () => {
   }, []);
 
   const _changePermission = async (userId: string) => {
-    const response = await changePermission(
-      sharedId,
-      userId,
-      session.userToken.accessToken
-    );
-    if (response.status === 200) {
-      setPageIndex(0); // Reset to reload comments from page 1
-      fetchMembers(false);
+    try {
+      const response = await changePermission(
+        sharedId,
+        userId,
+        session.userToken.accessToken
+      );
+      if (response.status === 200) {
+        setPageIndex(0); // Reset to reload comments from page 1
+        fetchMembers(false);
+      }
+    } catch (error) {
+      console.log("Change permission error: " + error);
+      Alert.alert("Lỗi", "Bạn không có quyền thay đổi quyền thành viên");
     }
   };
 

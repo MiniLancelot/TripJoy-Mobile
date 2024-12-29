@@ -1,6 +1,6 @@
 import { post } from "@/utils/request";
 import showError from "@/utils/showError";
-import { Params } from "@/constants/QueryParams2";
+import { Params } from "@/utils/QueryParams2";
 
 // interface _Params extends Params {
 //   userId?: string;

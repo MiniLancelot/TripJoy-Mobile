@@ -29,7 +29,7 @@ import * as ImagePicker from "expo-image-picker";
 import AnimationTextInput from "@/components/TextInput/MyTextInput";
 import Toast from "react-native-toast-message";
 import { vi } from "date-fns/locale";
-import { Province } from "@/constants/Provinces";
+import { Province } from "@/utils/Provinces";
 import { useTabStore } from "@/utils/store";
 
 
@@ -257,6 +257,9 @@ const UpdatePlan = () => {
     } catch (err: any) {
       console.error(err);
       setIsLoading(false);
+      if (err.response) {
+        console.error(err.response.data);
+      }
     }
   };
 

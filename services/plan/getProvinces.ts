@@ -1,4 +1,4 @@
-import { Params } from "@/constants/QueryParams";
+import { Params } from "@/utils/QueryParams";
 import { plan } from "@/utils/request";
 
 // type Params = {

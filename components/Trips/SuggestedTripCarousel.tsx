@@ -6,7 +6,7 @@ import TripCard from "./TripCard";
 import CarouselPagination from "./CarouselPagination";
 import { Trips } from "@/constants/Trip";
 import SuggestedTripCard from "./SuggestedTripCard";
-import { TripProps } from "@/constants/TripProps";
+import { TripProps } from "@/utils/TripProps";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;

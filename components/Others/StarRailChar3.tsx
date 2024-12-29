@@ -435,7 +435,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
     <View style={styles.container}>
       <GestureHandlerRootView>
         <BottomSheetModalProvider>
-          <FlashList
+          <FlatList
             data={chars}
             // renderItem={renderItem}
             renderItem={({ item, index }) => (
@@ -450,7 +450,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
             //   contentContainerStyle={{ paddingBottom:  80 }}
             onEndReached={() => fetchChars(true)}
             ListFooterComponent={listFooter}
-            estimatedItemSize={500}
+            // estimatedItemSize={500}
             onEndReachedThreshold={0.5}
             refreshing={loading}
             onRefresh={refreshHandler}

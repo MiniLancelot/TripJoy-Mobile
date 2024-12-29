@@ -5,7 +5,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import getPronvinces from "@/services/plan/getProvinces";
 import { is } from "date-fns/locale";
 import { get_friends } from "@/services/user/friend_request";
-import { FriendProps } from "@/constants/Friend";
+import { FriendProps } from "@/utils/Friend";
 import { set } from "date-fns";
 // import { Province } from "@/constants/Provinces";
 // import debounce from "@/services/debounce";
