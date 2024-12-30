@@ -28,8 +28,8 @@ const InvitationResponse = ({ planId, inviterId, title, startDate, endDate, invi
           <Image source={{ uri: avatarUri }} style={styles.avatar} />
         </View>
         <View>
-          <Text>{inviterName} muốn mời bạn vào {title}</Text>
-          <Text>{startDate} đến {endDate}</Text>
+          <Text>{inviterName}</Text>
+          {/* <Text>{startDate} đến {endDate}</Text> */}
         </View>
       </Pressable>
       <View style={styles.invitationContainer}>

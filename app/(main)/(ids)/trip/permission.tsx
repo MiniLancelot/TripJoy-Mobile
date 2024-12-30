@@ -6,7 +6,11 @@ import { Member } from "@/utils/Member";
 import getMembers from "@/services/plan/member";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlashList } from "@shopify/flash-list";
-import { changePermission, removeMember } from "@/services/plan/invitePeople";
+import {
+  changePermission,
+  memberLeave,
+  removeMember,
+} from "@/services/plan/invitePeople";
 import { it } from "date-fns/locale";
 
 const PAGE_SIZE = 10;
@@ -100,12 +104,8 @@ const permission = () => {
     }
   };
 
-  const leaveGroup = async (userId: string) => {
-    const response = await removeMember(
-      sharedId,
-      userId,
-      session.userToken.accessToken
-    );
+  const leaveGroup = async () => {
+    const response = await memberLeave(sharedId, session.userToken.accessToken);
     if (response.status === 200) {
       setPageIndex(0); // Reset to reload comments from page 1
       fetchMembers(false);
@@ -149,7 +149,7 @@ const permission = () => {
                 ) : null;
               })()}
               {item.userId == session.userInfo.user.profile.id ? (
-                <Pressable onPress={() => leaveGroup(item.userId)}>
+                <Pressable onPress={() => leaveGroup()}>
                   <Text>Rời nhóm</Text>
                 </Pressable>
               ) : null}

@@ -141,4 +141,20 @@ const removeMember = async (planId: any, userId: any, accessToken: any) => {
   }
 }
 
-export { inviteMember, revokeMember, acceptInvitation, declineInvitation, getMembersByPlanId, changePermission, removeMember, getPlanInvitaitonsAvailable, planInvitations };
+const memberLeave = async (planId: any, accessToken: any) => {
+  try{
+    const result = await plan(`/plans/${planId}/members/remove`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return result;
+  } catch (error: any) {
+    showError(error);
+    throw error;
+  }
+}
+
+export { inviteMember, revokeMember, acceptInvitation, declineInvitation, getMembersByPlanId, changePermission, 
+  removeMember, getPlanInvitaitonsAvailable, planInvitations, memberLeave };
