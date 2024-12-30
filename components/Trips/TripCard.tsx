@@ -16,7 +16,10 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
-import { getPlanLocationById, putChangeJoinStatusPlan } from "@/services/plan/plan";
+import {
+  getPlanLocationById,
+  putChangeJoinStatusPlan,
+} from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { router } from "expo-router";
 import { TripProps } from "@/utils/TripProps";
@@ -32,8 +35,6 @@ type TProps = {
   item: TripProps;
   _changeJoinStatus?: (id: string) => void;
 };
-
-
 
 const catImages = [
   "https://i.pinimg.com/736x/d1/7c/c7/d17cc7bf0e13fcdf975dd682d5df792f.jpg",
@@ -100,30 +101,40 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
   };
 
   const _changeJoinStatusTripCard = async () => {
-    if(item.joinStatus == 1) {
-      Alert.alert("Thông báo", "Bạn có chắc chắn muốn công khai chuyến đi này?", [
-        {
-          text: "Hủy",
-          onPress: () => {},
-        },
-        {
-          text: "Đồng ý",
-          onPress: async () => _changeJoinStatus && _changeJoinStatus(item.id)
-        },
-      ]);
+    if (item.joinStatus == 1) {
+      Alert.alert(
+        "Thông báo",
+        "Bạn có chắc chắn muốn công khai chuyến đi này?",
+        [
+          {
+            text: "Hủy",
+            onPress: () => {},
+          },
+          {
+            text: "Đồng ý",
+            onPress: async () =>
+              _changeJoinStatus && _changeJoinStatus(item.id),
+          },
+        ]
+      );
     } else {
-      Alert.alert("Thông báo", "Bạn có chắc chắn muốn hủy công khai chuyến đi này?", [
-        {
-          text: "Hủy",
-          onPress: () => {},
-        },
-        {
-          text: "Đồng ý",
-          onPress: async () => _changeJoinStatus && _changeJoinStatus(item.id)
-        },
-      ]);
+      Alert.alert(
+        "Thông báo",
+        "Bạn có chắc chắn muốn hủy công khai chuyến đi này?",
+        [
+          {
+            text: "Hủy",
+            onPress: () => {},
+          },
+          {
+            text: "Đồng ý",
+            onPress: async () =>
+              _changeJoinStatus && _changeJoinStatus(item.id),
+          },
+        ]
+      );
     }
-  }
+  };
   return (
     <Animated.View
       style={[
@@ -158,17 +169,16 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
                   <Text style={style.titleStyle}>{item?.title}</Text>
                 </TouchableOpacity>
                 <Text style={style.descriptionStyle}>
-                  {item?.startDate
-                    ? formatDate(item.startDate)
-                    : ""}{" "}
-                  đến{" "}
-                  {item?.endDate
-                    ? formatDate(item.endDate)
-                    : ""}
+                  {item?.startDate ? formatDate(item.startDate) : ""} đến{" "}
+                  {item?.endDate ? formatDate(item.endDate) : ""}
                 </Text>
                 {item?.leadUserId == session.userInfo.user.profile.id && (
                   <Pressable onPress={_changeJoinStatusTripCard}>
-                    <Text>{item?.joinStatus == 1 ? "Công khai chuyến đi" : "Hủy công khai"}</Text>
+                    <View>
+                      {item?.joinStatus == 1
+                        ? <Text>Công khai chuyến đi</Text>
+                        : <Text>Hủy công khai</Text>}
+                    </View>
                   </Pressable>
                 )}
                 <Pressable onPress={() => router.push(`/post/plan/${item.id}`)}>
@@ -187,7 +197,11 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
                 ))}
                 <TouchableOpacity
                   onPress={() => {
-                    _connection!.invoke("JoinPlan", session.userInfo.user.profile.id, item.id);
+                    _connection!.invoke(
+                      "JoinPlan",
+                      session.userInfo.user.profile.id,
+                      item.id
+                    );
                     router.push(`/trip/${item.id}`);
                   }}
                   style={{ marginLeft: 120 }}

@@ -342,13 +342,22 @@ const StarRailChar2 = ({ _userId }: Params) => {
             )}
           </View>
           {_userId != null && _userId == session.userInfo.user.profile.id && (
+            // <TouchableOpacity
+            //   onPress={() => {
+            //     console.log("Delete clicked: " + item.postId);
+            //     _onDelete(item.postId);
+            //   }}
+            // >
+            //   <Text>Xóa bài viết</Text>
+            // </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 console.log("Delete clicked: " + item.postId);
                 _onDelete(item.postId);
               }}
+              style={styles.delete}
             >
-              <Text>Xóa bài viết</Text>
+              <Ionicons name="trash-bin-outline" size={20} color={"#ff6188"} />
             </TouchableOpacity>
           )}
           <View style={styles.imageContainer}>
@@ -566,6 +575,12 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontSize: 13,
     color: "#626262",
+  },
+  delete: {
+    color: "red",
+    position: "absolute",
+    right: 20,
+    top: 15,
   },
 });
 

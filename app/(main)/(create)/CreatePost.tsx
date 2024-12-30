@@ -7,6 +7,7 @@ import {
   Image,
   Touchable,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useState } from "react";
 import { useAuth } from "@/app/(auth)/AuthContext";
@@ -18,7 +19,6 @@ import { createPost } from "@/services/post/post";
 import { router, Stack } from "expo-router";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { set } from "date-fns";
 
 // interface CreatePostProps {
 //   content: string,
@@ -32,10 +32,14 @@ const CreatePost = () => {
   const [content, setContent] = useState<string>("");
   // const [shareStatus, setShareStatus] = useState<string>("");
   const [images, setImages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   // const [tagUsers, setTagUsers] = useState<FriendProps>({
   //   userId: "",
   //   name: "",
   // });
+
+  const isButtonDisabled = !content;
 
   const tempAvatar =
     "https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE=";
@@ -60,7 +64,7 @@ const CreatePost = () => {
 
   const getImageWidth = (numImages: number) => {
     if (numImages === 1) return "100%";
-    if (numImages === 2) return "49.5%";
+    if (numImages === 2) return "100%";
     if (numImages === 3) return "32.5%";
     return "32.5%";
   };
@@ -128,9 +132,9 @@ const CreatePost = () => {
         />
       </TouchableOpacity>
 
-      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+      <View style={styles.avatarContainer}>
       {images.map((image, index) => (
-        <View style={styles.avatarContainer}>
+        <View style={{ width: "48.5%" }}>
           <Pressable
             onPress={() =>
               setImages((prev) => prev.filter((_, i) => i !== index))
@@ -159,9 +163,37 @@ const CreatePost = () => {
         </View>
       )}
 
-      <Pressable onPress={_createPost}>
+      {/* <Pressable onPress={_createPost}>
         <Text>Post</Text>
-      </Pressable>
+      </Pressable> */}
+              <View style={styles.loginButtonContainer}>
+                <Pressable
+                  onPress={_createPost}
+                  disabled={isButtonDisabled || isLoading}
+                  android_ripple={isButtonDisabled ? null : { color: "#b9bcc6" }}
+                  // android_ripple={{ color: "gray" }}
+                >
+                  <View
+                    style={[
+                      styles.innerLoginButtonContainer,
+                      isButtonDisabled && styles.loginButtonDisabled,
+                    ]}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator color="#fff" size={28} />
+                    ) : (
+                      <Text
+                        style={[
+                          styles.loginButtonText,
+                          { color: isButtonDisabled ? "#b9bcc6" : "#fff" },
+                        ]}
+                      >
+                        Tạo bài viết
+                      </Text>
+                    )}
+                  </View>
+                </Pressable>
+              </View>
     </View>
   );
 };
@@ -174,6 +206,10 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "white",
   },
+  loginButtonDisabled: {
+    backgroundColor: "#e7e8ee",
+    color: "#b9bcc6",
+  },
   // itemOuterContainer: {
   //   padding: 15,
   //   flex: 1,
@@ -184,6 +220,8 @@ const styles = StyleSheet.create({
   avatarContainer: {
     alignItems: "center",
     marginTop: 5,
+    width: "100%",
+    gap: 10,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
@@ -200,5 +238,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 50,
     zIndex: 4,
+  },
+  loginButtonContainer: {
+    backgroundColor: "#13c892",
+    borderRadius: 12,
+    overflow: "hidden",
+    margin: 10,
+    width: "93%",
+    marginTop: 280,
+    bottom: 20,
+
+  },
+  innerLoginButtonContainer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginButtonText: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: "semibold",
+    lineHeight: 28,
   },
 });

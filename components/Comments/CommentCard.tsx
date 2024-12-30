@@ -158,7 +158,7 @@ const CommentCard = ({
     <View style={styles.container}>
       {item.userId === session.userInfo.user.profile.id && (
         <Pressable onPress={deleteComment} style={styles.delete}>
-          <Ionicons name="trash-bin-outline" size={20} color={"#ff6188"} />
+          <Ionicons name="trash-bin-outline" size={layer == 0 ? 20 : 16} color={"#ff6188"} />
         </Pressable>
       )}
       <Image
