@@ -169,18 +169,27 @@ const CommentCard = ({
         <Text style={styles.name}>{item.userName}</Text>
         <Text style={styles.time}>{formatDate(item.createdAt)}</Text>
         <Text style={styles.content}>{item.content}</Text>
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 10, width: "100%" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 10,
+            marginTop: 10,
+            width: "100%",
+          }}
+        >
           {/* <Text>{replies.length} phản hồi</Text> */}
-          <View style={{width: "90%"}}>
-            <Pressable
-              onPress={() => {
-                setOpenReplies(!openReplies);
-              }}
-            >
-              <Text>
-                {openReplies ? "Ẩn" : "Xem"} {replies.length} phản hồi
-              </Text>
-            </Pressable>
+          <View style={{ width: "90%" }}>
+            {layer <= 0 && (
+              <Pressable
+                onPress={() => {
+                  setOpenReplies(!openReplies);
+                }}
+              >
+                <Text>
+                  {openReplies ? "Ẩn" : "Xem"} {replies.length} phản hồi
+                </Text>
+              </Pressable>
+            )}
             {layer! <= 0 && openReplies && (
               <View style={{ marginLeft: 20 }}>
                 <FlatList
@@ -222,20 +231,20 @@ const CommentCard = ({
                   }}
                 />
                 <TouchableOpacity
-          onPress={() => {
-            if (content.trim()) {
-              saveData();
-              setContent("");
-            }
-          }}
-          style={styles.sendBtn}
-        >
-          <FontAwesome
-            name="paper-plane"
-            size={20}
-            color={content.length === 0 ? "#808080" : "#26d7fe"}
-          />
-        </TouchableOpacity>
+                  onPress={() => {
+                    if (content.trim()) {
+                      saveData();
+                      setContent("");
+                    }
+                  }}
+                  style={styles.sendBtn}
+                >
+                  <FontAwesome
+                    name="paper-plane"
+                    size={20}
+                    color={content.length === 0 ? "#808080" : "#26d7fe"}
+                  />
+                </TouchableOpacity>
                 {/* <Pressable onPress={saveData}>
                   <Text>Trả lời</Text>
                 </Pressable> */}
@@ -254,7 +263,7 @@ const styles = StyleSheet.create({
   sendBtn: {
     position: "absolute",
     right: 30,
-    bottom: 25
+    bottom: 25,
   },
   container: {
     margin: 10,
