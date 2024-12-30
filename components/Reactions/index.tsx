@@ -14,7 +14,6 @@ import EmojiItem from "./EmojiItem";
 import Hint from "./Hint";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { set } from "date-fns";
 
 const items = [
   {

@@ -1,4 +1,14 @@
-import { View, Text, Pressable, FlatList, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  FlatList,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { Comment } from "@/utils/Comment";
@@ -14,9 +24,17 @@ import {
   ScrollView,
 } from "react-native-gesture-handler";
 import CommentCard from "@/components/Comments/CommentCard";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
+import React from "react";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 const PAGE_SIZE = 10;
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const CommentList = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -27,6 +45,7 @@ const CommentList = () => {
   const [loading, setLoading] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [content, setContent] = useState("");
+  const nameBorderColor = useSharedValue("#e7e8ee");
 
   const fetchComments = async (isLoadMore = false) => {
     try {
@@ -138,16 +157,60 @@ const CommentList = () => {
   //   }
   // };
 
+  const handleFocus = (borderColor: { value: string }) => {
+    borderColor.value = withTiming("#657ef8", { duration: 250 });
+  };
+  const handleBlur = (borderColor: { value: string }) => {
+    borderColor.value = withTiming("#e7e8ee", { duration: 250 });
+  };
+  const animatedBorderStyle = (borderColor: { value: any }) =>
+    useAnimatedStyle(() => ({
+      borderColor: borderColor.value,
+    }));
+
   useEffect(() => {
     fetchComments();
   }, []);
 
   return (
-    <View>
+    <KeyboardAvoidingView
+      style={{
+        flex: 1,
+        width: "100%",
+        height: "100%",
+        padding: 10,
+        paddingTop: 0,
+        backgroundColor: "#fff",
+      }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={-200}
+    >
+      <Stack.Screen
+        options={{
+          title: "Bình luận",
+          headerRight: () => {
+            return (
+              <>
+                <View style={styles.backBtnWrapper}>
+                  <TouchableOpacity onPress={() => fetchComments(true)}>
+                    <Text>
+                      <Ionicons
+                        name="refresh-outline"
+                        size={25}
+                        color={"#b3b3b3"}
+                      />
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            );
+          },
+        }}
+      />
       {loading && pageIndex === 0 ? (
         <Text>Đang tải...</Text>
       ) : (
-        <View>
+        <View style = {{flex: 1}}>  
           <FlatList
             data={comments}
             renderItem={({ item }) => (
@@ -166,12 +229,9 @@ const CommentList = () => {
               isFetchingMore ? <Text>Đang tải thêm...</Text> : null
             }
           />
-          <Pressable onPress={() => fetchComments(true)}>
-            <Text>Xem thêm</Text>
-          </Pressable>
         </View>
       )}
-      <TextInput
+      {/* <TextInput
         placeholder="Nhập bình luận"
         onChangeText={(text) => setContent(text)}
         value={content}
@@ -185,9 +245,58 @@ const CommentList = () => {
         }}
       >
         <Text>Đăng</Text>
-      </Pressable>
-    </View>
+      </Pressable> */}
+      <View style={{ bottom: 0 }}> 
+        <AnimatedTextInput
+          placeholder="Nhắn tin"
+          value={content}
+          onChangeText={(text) => setContent(text)}
+          style={[
+            animatedBorderStyle(nameBorderColor),
+            {
+              borderWidth: 1,
+              // borderColor: "#b3b3b3",
+              borderRadius: 40,
+              backgroundColor: "#f5f7fa",
+              padding: 10,
+              paddingLeft: 20,
+              margin: 10,
+            },
+          ]}
+          onFocus={() => handleFocus(nameBorderColor)}
+          onBlur={() => handleBlur(nameBorderColor)}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            if (content.trim()) {
+              saveData();
+              setContent("");
+            }
+          }}
+          style={styles.sendBtn}
+        >
+          <FontAwesome
+            name="paper-plane"
+            size={20}
+            color={content.length === 0 ? "#808080" : "#26d7fe"}
+          />
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
+
+const styles = StyleSheet.create({
+  backBtnWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingRight: 0,
+  },
+  sendBtn: {
+    position: "absolute",
+    right: 30,
+    bottom: 25
+  },
+});
 
 export default CommentList;

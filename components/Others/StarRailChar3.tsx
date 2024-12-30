@@ -213,7 +213,10 @@ const StarRailChar2 = ({ _userId }: Params) => {
         let response = null;
         // Gọi API cập nhật trạng thái
         if (reaction === null) {
-          response = await unlikePost(session.userToken.accessToken, item.postId);
+          response = await unlikePost(
+            session.userToken.accessToken,
+            item.postId
+          );
         } else {
           response = await likePost(
             { LikePost: { Emotion: reaction } },
@@ -221,33 +224,32 @@ const StarRailChar2 = ({ _userId }: Params) => {
             item.postId
           );
         }
-        if (response.data.isSuccess){
+        if (response.data.isSuccess) {
           // Lấy dữ liệu mới nhất của post (nếu cần)
-        const _newItem = await getPostById(
-          session.userToken.accessToken,
-          item.postId
-        );
-        _onChangeItem &&
-          _onChangeItem(
-            {
-              postId: _newItem.data.post.postId,
-              userId: _newItem.data.post.userPosted.userId,
-              content: _newItem.data.post.content,
-              images: _newItem.data.post.postImages.map(
-                (image: any) => image.url
-              ),
-              planPost: _newItem.data.post.planPost,
-              createdAt: _newItem.data.post.createdAt.split("T")[0],
-              isLiked: _newItem.data.post.emotionByMe,
-              liked: _newItem.data.post.likeCount,
-              username: _newItem.data.post.userPosted.userName,
-              avatar: _newItem.data.post.userPosted.avatar,
-              commnentCount: _newItem.data.post.commentCount,
-            },
-            _key
+          const _newItem = await getPostById(
+            session.userToken.accessToken,
+            item.postId
           );
+          _onChangeItem &&
+            _onChangeItem(
+              {
+                postId: _newItem.data.post.postId,
+                userId: _newItem.data.post.userPosted.userId,
+                content: _newItem.data.post.content,
+                images: _newItem.data.post.postImages.map(
+                  (image: any) => image.url
+                ),
+                planPost: _newItem.data.post.planPost,
+                createdAt: _newItem.data.post.createdAt.split("T")[0],
+                isLiked: _newItem.data.post.emotionByMe,
+                liked: _newItem.data.post.likeCount,
+                username: _newItem.data.post.userPosted.userName,
+                avatar: _newItem.data.post.userPosted.avatar,
+                commnentCount: _newItem.data.post.commentCount,
+              },
+              _key
+            );
         }
-        
       } catch (error) {
         console.error("Error updating reaction:", error);
       }
@@ -271,7 +273,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
       <Pressable>
         <View style={styles.itemOuterContainer}>
           <View style={styles.itemContainer}>
-            <Pressable onPress={() => console.log("Avatar clicked")}>
+            <Pressable onPress={() => router.push(`/user/${item.userId}`)}>
               {/* <Image source={{ uri: item.img }} style={styles.avatar} /> */}
               <Image source={avatarUri} style={styles.avatar} />
             </Pressable>
@@ -283,13 +285,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.title}>{item.content}</Text>
-            <ReadMoreText text={item.content} numberOfLines={1} />
-            {/* <ReadMoreText
-              text={tempTextContent}
-              numberOfLines={3}
-              isExpanded={expandedItems[item.id] || false} // Get expanded state from parent
-              toggleExpand={() => toggleExpand(item.id)} // Pass toggle function to child
-            /> */}
+            {/* <ReadMoreText text={item.content} numberOfLines={5} /> */}
             {item.planPost != null && (
               <View>
                 <Text style={styles.title}>
@@ -345,7 +341,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
               </View>
             )}
           </View>
-          {_userId != null &&_userId == session.userInfo.user.profile.id && (
+          {_userId != null && _userId == session.userInfo.user.profile.id && (
             <TouchableOpacity
               onPress={() => {
                 console.log("Delete clicked: " + item.postId);
@@ -368,38 +364,17 @@ const StarRailChar2 = ({ _userId }: Params) => {
             ))}
           </View>
           <View style={styles.interactionBar}>
-            {item.planPost != null && item.userId != session.userInfo.user.profile.id && (
-              <Pressable
-                onPress={() => {
-                  console.log("Plan clicked: " + item.postId);
-                }}
-              >
-                <Text>Xin gia nhập</Text>
-              </Pressable>
-            )}
-            <TouchableOpacity
-              style={styles.likeContainer}
-              onPress={() => {
-                console.log("Comment clicked: " + item.postId);
-                // handleOpen(item);
-                router.push(`/comment/${item.postId}`);
-              }}
-            >
-              <Ionicons name="chatbubble-outline" size={22} color="#626262" />
-              <Text style={styles.like}>{item.commnentCount}</Text>
-            </TouchableOpacity>
+            {item.planPost != null &&
+              item.userId != session.userInfo.user.profile.id && (
+                <Pressable
+                  onPress={() => {
+                    console.log("Plan clicked: " + item.postId);
+                  }}
+                >
+                  <Text>Xin gia nhập</Text>
+                </Pressable>
+              )}
             <View style={styles.likeContainer}>
-              {/* <TouchableOpacity
-                onPress={toggleLike}
-                style={{ alignItems: "center", justifyContent: "center" }}
-              >
-                <AntDesign
-                  name={itemIsLiked ? "like1" : "like2"}
-                  size={22}
-                  color={itemIsLiked ? "#E85D75" : "#626262"}
-                />
-              </TouchableOpacity> */}
-
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <ReactionBox
                   _current={currentReaction}
@@ -409,6 +384,16 @@ const StarRailChar2 = ({ _userId }: Params) => {
 
               <Text style={styles.like}>{item.liked}</Text>
             </View>
+            <TouchableOpacity
+              style={styles.likeContainer}
+              onPress={() => {
+                console.log("Comment clicked: " + item.postId);
+                router.push(`/comment/${item.postId}`);
+              }}
+            >
+              <Ionicons name="chatbubble-outline" size={22} color="#626262" />
+              <Text style={styles.cmtNumber}>{item.commnentCount}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Pressable>
@@ -539,6 +524,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "500",
     paddingVertical: 5,
+    marginTop: 5,
     // paddingLeft: 10,
   },
   imageContainer: {
@@ -571,6 +557,12 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   like: {
+    marginLeft: -10,
+    fontSize: 13,
+    color: "#626262",
+  },
+
+  cmtNumber: {
     marginLeft: 5,
     fontSize: 13,
     color: "#626262",

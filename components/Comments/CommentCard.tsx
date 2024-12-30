@@ -5,13 +5,15 @@ import {
   Image,
   Pressable,
   FlatList,
-  TextInput
+  TextInput,
+  TouchableOpacity,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { Comment } from "@/utils/Comment";
 import { getRepliesByCommentId } from "@/services/comment/comment";
 import { useAuth } from "@/app/(auth)/AuthContext";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 // import { TextInput } from "react-native-gesture-handler";
 
 interface CommentCardProps {
@@ -82,7 +84,9 @@ const CommentCard = ({
           commentReactionsDistinct: comment.commentReactionsDistinct,
         })
       );
-      setReplies((prev) => (isLoadMore ? [...prev, ...newReplies] : newReplies));
+      setReplies((prev) =>
+        isLoadMore ? [...prev, ...newReplies] : newReplies
+      );
       setHasNextPage(newReplies.length === PAGE_SIZE);
       if (isLoadMore) {
         setPageIndex((prev) => prev + 1);
@@ -104,7 +108,11 @@ const CommentCard = ({
 
   const saveData = async () => {
     try {
-      const response = await onRespond!(content, responseToComment, item.commentId);
+      const response = await onRespond!(
+        content,
+        responseToComment,
+        item.commentId
+      );
       if (response.status === 200) {
         setContent(""); // Clear input
         setPageIndex(0); // Reset to reload comments from page 1
@@ -121,7 +129,9 @@ const CommentCard = ({
       const response = await onDelete!(item.commentId, responseToComment);
       if (response.status === 200) {
         setOpenReplies(false);
-        _setReplies!((prev: any) => prev.filter((reply: any) => reply.commentId !== item.commentId));
+        _setReplies!((prev: any) =>
+          prev.filter((reply: any) => reply.commentId !== item.commentId)
+        );
       }
       // console.log(response);
     } catch (error) {
@@ -137,67 +147,102 @@ const CommentCard = ({
     }
   }, [openReplies]);
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    return `${day}-${month}`;
+  };
+
   return (
-    <View>
-      <Image source={{ uri: item.avatar ?? tempAvatar }} style={styles.avatar} />
-      <Text>{item.userName}</Text>
-      <Text>{item.content}</Text>
-      <Text>{item.likeCount} lượt thích</Text>
-      <Text>{replies.length} phản hồi</Text>
-      {item.userId === session.userInfo.user.profile.id && (<Pressable onPress={deleteComment}>
-        <Text>Xóa</Text>
-      </Pressable>)}
-      <Text>{item.createdAt}</Text>
-      <View>
-        <Pressable
-          onPress={() => {
-            setOpenReplies(!openReplies);
-          }}
-        >
-          <Text>
-            {openReplies ? "Ẩn" : "Xem"} {replies.length} phản hồi
-          </Text>
+    <View style={styles.container}>
+      {item.userId === session.userInfo.user.profile.id && (
+        <Pressable onPress={deleteComment} style={styles.delete}>
+          <Ionicons name="trash-bin-outline" size={20} color={"#ff6188"} />
         </Pressable>
-        {layer! <= 2 && openReplies && (
-          <View style={{ marginLeft: 20 }}>
-            <FlatList
-              data={replies}
-              keyExtractor={(reply) => reply.commentId}
-              renderItem={({ item }) => (
-                <CommentCard
-                  item={item}
-                  responseToComment={true}
-                  onRespond={onRespond}
-                  layer={layer + 1}
-                  onDelete={onDelete}
-                  _setReplies={setReplies}
-                />
-              )}
-              nestedScrollEnabled
-              ListFooterComponent={
-                isFetchingMore ? (
-                  <Text>Đang tải...</Text>
-                ) : (
-                  hasNextPage ? (
-                    <Pressable onPress={() => fetchReplies(true)}>
-                      <Text>Xem thêm</Text>
-                    </Pressable>
-                  ) : null
-                )
-              }
-            />
-            <TextInput
-              placeholder="Viết phản hồi..."
-              value={content}
-              onChangeText={setContent}
-            />
+      )}
+      <Image
+        source={{ uri: item.avatar ?? tempAvatar }}
+        style={styles.avatar}
+      />
+      <View style={styles.innerContainer}>
+        <Text style={styles.name}>{item.userName}</Text>
+        <Text style={styles.time}>{formatDate(item.createdAt)}</Text>
+        <Text style={styles.content}>{item.content}</Text>
+        <View style={{ flexDirection: "row", gap: 10, marginTop: 10, width: "100%" }}>
+          {/* <Text>{replies.length} phản hồi</Text> */}
+          <View style={{width: "90%"}}>
             <Pressable
-              onPress={saveData}
+              onPress={() => {
+                setOpenReplies(!openReplies);
+              }}
             >
-              <Text>Trả lời</Text>
+              <Text>
+                {openReplies ? "Ẩn" : "Xem"} {replies.length} phản hồi
+              </Text>
             </Pressable>
+            {layer! <= 1 && openReplies && (
+              <View style={{ marginLeft: 20 }}>
+                <FlatList
+                  data={replies}
+                  keyExtractor={(reply) => reply.commentId}
+                  renderItem={({ item }) => (
+                    <CommentCard
+                      item={item}
+                      responseToComment={true}
+                      onRespond={onRespond}
+                      layer={layer + 1}
+                      onDelete={onDelete}
+                      _setReplies={setReplies}
+                    />
+                  )}
+                  nestedScrollEnabled
+                  ListFooterComponent={
+                    isFetchingMore ? (
+                      <Text>Đang tải...</Text>
+                    ) : hasNextPage ? (
+                      <Pressable onPress={() => fetchReplies(true)}>
+                        <Text>Xem thêm</Text>
+                      </Pressable>
+                    ) : null
+                  }
+                />
+                <TextInput
+                  placeholder="Viết phản hồi..."
+                  value={content}
+                  onChangeText={setContent}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#e7e8ee",
+                    borderRadius: 40,
+                    backgroundColor: "#f5f7fa",
+                    padding: 10,
+                    paddingLeft: 20,
+                    margin: 10,
+                  }}
+                />
+                <TouchableOpacity
+          onPress={() => {
+            if (content.trim()) {
+              saveData();
+              setContent("");
+            }
+          }}
+          style={styles.sendBtn}
+        >
+          <FontAwesome
+            name="paper-plane"
+            size={20}
+            color={content.length === 0 ? "#808080" : "#26d7fe"}
+          />
+        </TouchableOpacity>
+                {/* <Pressable onPress={saveData}>
+                  <Text>Trả lời</Text>
+                </Pressable> */}
+              </View>
+            )}
           </View>
-        )}
+        </View>
       </View>
     </View>
   );
@@ -206,10 +251,45 @@ const CommentCard = ({
 export default CommentCard;
 
 const styles = StyleSheet.create({
+  sendBtn: {
+    position: "absolute",
+    right: 30,
+    bottom: 25
+  },
+  container: {
+    margin: 10,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#f6f6f6",
+    borderRadius: 10,
+    gap: 10,
+    flexDirection: "row",
+  },
+  innerContainer: {
+    gap: 3,
+  },
   avatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
     marginRight: 10,
+  },
+  time: {
+    fontSize: 12,
+    color: "gray",
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  content: {
+    fontSize: 15,
+    color: "#323232",
+  },
+  delete: {
+    color: "red",
+    position: "absolute",
+    right: 15,
+    top: 15,
   },
 });
