@@ -4,7 +4,7 @@ import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const _layout = () => {
-  const nullHrefScreens = ["inviteMembers/members", "inviteMembers/PlanJoinRequestScreen"];
+  const nullHrefScreens = ["inviteMembers/members", "inviteMembers/PlanJoinRequestScreen", "trip-budget"];
   return (
     <Tabs
       screenOptions={{
@@ -46,7 +46,7 @@ const _layout = () => {
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="trip-budget"
         options={{
           title: "Chi tiêu",
@@ -59,7 +59,7 @@ const _layout = () => {
             />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="invite-people"
         options={{

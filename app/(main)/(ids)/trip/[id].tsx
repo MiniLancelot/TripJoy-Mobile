@@ -102,9 +102,9 @@ const ChosenTrip = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const today = new Date().toISOString().split("T")[0];
+  // const today = new Date().toISOString().split("T")[0];
   const [userLocation, setUserLocation] = useState<Location | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(today);
+  const [selectedDate, setSelectedDate] = useState<string | null>("");
   const [planLocations, setPlanLocations] = useState<PlanLocationProps[]>([]);
   const [plan, setPlan] = useState<TripProps | null>(null);
 
@@ -204,6 +204,8 @@ const ChosenTrip = () => {
             provinceName: response.data.plan.provinceEnd.provinceName,
           },
         });
+
+        setSelectedDate(response.data.plan.estimatedStartDate.split("T")[0]);
         console.log("Plan locations: ", planLocations);
         setIsLoading(false);
       }
@@ -882,6 +884,7 @@ const ChosenTrip = () => {
           >
             <View style={styles.modalContainer}>
               <Calendar
+              initialMonth={new Date().toISOString().split("T")[0]}
                 current={selectedDate} // Default value if no date is selected
                 onDayPress={handleDayPress}
                 minDate={plan?.estimatedStartDate}

@@ -313,8 +313,8 @@ const profile = () => {
           <View style={styles.mainInnerContainer}>
             <View style={styles.mainTopContainer}>
               <View>
-                <Pressable
-                  onPress={() => Alert.alert("Avatar")}
+                <View
+                  // onPress={() => Alert.alert("Avatar")}
                   style={styles.outerAvatarContainer}
                 >
                   <Animated.View
@@ -325,7 +325,7 @@ const profile = () => {
                       style={styles.mainAvatar}
                     />
                   </Animated.View>
-                </Pressable>
+                </View>
                 <TouchableOpacity onLongPress={fetchUser}>
                   <Text style={styles.text}>
                     {session.userInfo == null
@@ -353,6 +353,23 @@ const profile = () => {
                       : user.profile.phoneNumber}
                   </Text>
                 </View>
+                <View
+                  style={[
+                    styles.text,
+                    {
+                      flexDirection: "row",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      marginTop: 10,
+                      gap: 5,
+                    },
+                  ]}
+                >
+                  <Ionicons name="people" size={20} color="#bfbfbf" />
+                  <Text style={{ marginLeft: 5, color: "#bfbfbf" }}>
+                    {session.userInfo == null ? 0 : user.friends.length} bạn bè
+                  </Text>
+                </View>
               </View>
               <View style={styles.outerEditContainer}>
                 <View style={styles.editContainer}>
@@ -371,7 +388,7 @@ const profile = () => {
               </View>
             </View>
             <View style={styles.dataContainer}>
-              <View style={styles.dataSingleContainer}>
+              {/* <View style={styles.dataSingleContainer}>
                 <Text style={styles.dataNumber}>{game.posts}</Text>
                 <Text>Bài Viết</Text>
               </View>
@@ -387,7 +404,7 @@ const profile = () => {
               <View style={styles.dataSingleContainer}>
                 <Text style={styles.dataNumber}>{game.trips}</Text>
                 <Text>Chuyến Đi</Text>
-              </View>
+              </View> */}
             </View>
             <View>
               <Pressable onLongPress={refreshPage}>
@@ -402,7 +419,7 @@ const profile = () => {
                 </Text>
               </Pressable>
               <View key={refreshKey}>
-                <StarRailChar2 _userId={session.userInfo.user.profile.id}/>
+                <StarRailChar2 _userId={session.userInfo.user.profile.id} />
               </View>
             </View>
           </View>
@@ -590,8 +607,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 50,
-    paddingBottom: 35,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
     borderBottomColor: "#bfbfbf",
     borderBottomWidth: 0.2,
   },
