@@ -181,7 +181,7 @@ const CommentCard = ({
                 {openReplies ? "Ẩn" : "Xem"} {replies.length} phản hồi
               </Text>
             </Pressable>
-            {layer! <= 1 && openReplies && (
+            {layer! <= 0 && openReplies && (
               <View style={{ marginLeft: 20 }}>
                 <FlatList
                   data={replies}

@@ -220,6 +220,7 @@ const CommentList = () => {
                 onRespond={_postComment}
                 onDelete={_deleteComment}
                 _setReplies={setComments}
+                layer={0}
               />
             )}
             nestedScrollEnabled

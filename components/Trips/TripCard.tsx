@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Animated, {
@@ -97,6 +98,32 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
       month: "2-digit",
     });
   };
+
+  const _changeJoinStatusTripCard = async () => {
+    if(item.joinStatus == 1) {
+      Alert.alert("Thông báo", "Bạn có chắc chắn muốn công khai chuyến đi này?", [
+        {
+          text: "Hủy",
+          onPress: () => {},
+        },
+        {
+          text: "Đồng ý",
+          onPress: async () => _changeJoinStatus && _changeJoinStatus(item.id)
+        },
+      ]);
+    } else {
+      Alert.alert("Thông báo", "Bạn có chắc chắn muốn hủy công khai chuyến đi này?", [
+        {
+          text: "Hủy",
+          onPress: () => {},
+        },
+        {
+          text: "Đồng ý",
+          onPress: async () => _changeJoinStatus && _changeJoinStatus(item.id)
+        },
+      ]);
+    }
+  }
   return (
     <Animated.View
       style={[
@@ -140,7 +167,7 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
                     : ""}
                 </Text>
                 {item?.leadUserId == session.userInfo.user.profile.id && (
-                  <Pressable onPress={() => _changeJoinStatus && _changeJoinStatus(item.id)}>
+                  <Pressable onPress={_changeJoinStatusTripCard}>
                     <Text>{item?.joinStatus == 1 ? "Công khai chuyến đi" : "Hủy công khai"}</Text>
                   </Pressable>
                 )}
