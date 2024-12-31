@@ -155,12 +155,12 @@ const InviteFriends = () => {
           "Bạn có muốn khiến người này rời khỏi không?",
           [
             {
-              text: "Cancel",
+              text: "Hủy",
               onPress: () => {},
               style: "cancel",
             },
             {
-              text: "OK",
+              text: "Tiếp tục",
               onPress: async () => {
                 const response = await removeMember(
                   sharedId,
@@ -184,12 +184,12 @@ const InviteFriends = () => {
           "Bạn có muốn mời người này tham dự không?",
           [
             {
-              text: "Cancel",
+              text: "Hủy",
               onPress: () => {},
               style: "cancel",
             },
             {
-              text: "OK",
+              text: "Tiếp tục",
               onPress: async () => {
                 const response = await inviteMember(
                   userId,
@@ -213,12 +213,12 @@ const InviteFriends = () => {
           "Bạn có muốn huỷ lời mời không?",
           [
             {
-              text: "Cancel",
+              text: "Hủy",
               onPress: () => {},
               style: "cancel",
             },
             {
-              text: "OK",
+              text: "Tiếp tục",
               onPress: async () => {
                 const response = await revokeMember(
                   userId,

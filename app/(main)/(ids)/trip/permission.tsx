@@ -12,6 +12,7 @@ import {
   removeMember,
 } from "@/services/plan/invitePeople";
 import { it } from "date-fns/locale";
+import { router } from "expo-router";
 
 const PAGE_SIZE = 10;
 
@@ -105,11 +106,37 @@ const permission = () => {
   };
 
   const leaveGroup = async () => {
-    const response = await memberLeave(sharedId, session.userToken.accessToken);
-    if (response.status === 200) {
-      setPageIndex(0); // Reset to reload comments from page 1
-      fetchMembers(false);
-    }
+    Alert.alert("Xác nhận", "Bạn có chắc chắn muốn rời nhóm?", [
+      {
+        text: "Hủy",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      {
+        text: "Đồng ý",
+        onPress: async () => {
+          try {
+            const response = await memberLeave(
+              sharedId,
+              session.userToken.accessToken
+            );
+            if (response.status === 200) {
+              // navigation.goBack();
+              console.log("Rời nhóm thành công");
+              router.replace("/home")
+            }
+          } catch (error) {
+            console.log("Leave group error: " + error);
+            Alert.alert("Lỗi", "Bạn không thể rời nhóm");
+          }
+          //       const response = await memberLeave(sharedId, session.userToken.accessToken);
+          // if (response.status === 200) {
+          //   setPageIndex(0); // Reset to reload comments from page 1
+          //   fetchMembers(false);
+          // }
+        },
+      },
+    ]);
   };
 
   return (

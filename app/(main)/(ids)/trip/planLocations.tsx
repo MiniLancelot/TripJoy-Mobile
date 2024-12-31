@@ -240,16 +240,16 @@ const planLocations = () => {
 
   const _deletePlanLocationByPlanId = async (id: string) => {
     Alert.alert(
-      "Delete Plan Location",
-      "Are you sure you want to delete this plan location?",
+      "Xóa địa điểm",
+      "Bạn có chắc chắn muốn xóa địa điểm này?",
       [
         {
-          text: "Cancel",
+          text: "Hủy",
           onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
         {
-          text: "OK",
+          text: "Tiếp tục",
           onPress: async () => {
             try {
               const result = await deletePlanLocationByPlanLocationId(

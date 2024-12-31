@@ -1,12 +1,20 @@
-import { View, Text, TextInput, Pressable } from "react-native";
-import React from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
+import React, { useEffect } from "react";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Province } from "@/utils/Provinces";
 import { getPlanById } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { ca } from "date-fns/locale";
 import { createPostPlan } from "@/services/post/post";
 import Toast from "react-native-toast-message";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 type PlanProps = {
   id: string;
@@ -44,10 +52,13 @@ const PostPlan = () => {
     budget: 0,
     vehicle: 0,
   });
+
   const [planLocation, setPlanLocation] = React.useState<PlanLocation[]>([]);
   const [content, setContent] = React.useState<string>("");
+    const [isLoading, setIsLoading] = React.useState(false);
   const [isIncludePlanLocal, setIsIncludePlanLocal] =
     React.useState<boolean>(false);
+  const isButtonDisabled = !content;
   React.useEffect(() => {
     fetchData();
   }, []);
@@ -86,6 +97,10 @@ const PostPlan = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    console.log(isIncludePlanLocal);
+  }, [isIncludePlanLocal]);
 
   const _createPlanPost = async () => {
     try {
@@ -162,16 +177,32 @@ const PostPlan = () => {
   };
 
   return (
-    <View>
-      <Text>Tạo bài viết về chuyến đi</Text>
+    <View style={{ flex: 1, padding: 10, backgroundColor: "#fff" }}>
+      <Stack.Screen
+        options={{
+          title: "Tạo bài viết về chuyến đi",
+        }}
+      />
+      {/* <Text>Tạo bài viết về chuyến đi</Text> */}
+
       <TextInput
         placeholder="Nội dung"
         value={content}
-        onChangeText={setContent}
         multiline
-        numberOfLines={4}
+        numberOfLines={5}
+        maxLength={300}
+        onChangeText={setContent}
+        style={{
+          borderWidth: 1,
+          borderColor: "#e6e6e6",
+          padding: 10,
+          borderRadius: 10,
+          marginTop: 10,
+          textAlignVertical: "top",
+          maxHeight: 200,
+        }}
       />
-      <Pressable
+      {/* <Pressable
         onPress={() => {
           setIsIncludePlanLocal(!isIncludePlanLocal);
         }}
@@ -181,14 +212,76 @@ const PostPlan = () => {
             ? "Đã bao gồm địa điểm"
             : "Chưa kèm theo địa điểm"}
         </Text>
-      </Pressable>
-      <Pressable
-        onPress={_createPlanPost}
-      >
+      </Pressable> */}
+      <BouncyCheckbox
+        text="Bao gồm địa điểm"
+        unFillColor="#FFFFFF"
+        fillColor="#71d7c7"
+        onPress={(checked) => setIsIncludePlanLocal(checked)}
+        textStyle={{
+          textDecorationLine: "none",
+        }}
+      />
+      {/* <Pressable onPress={_createPlanPost}>
         <Text>Đăng</Text>
-      </Pressable>
+      </Pressable> */}
+      <View style={styles.loginButtonContainer}>
+        <Pressable
+          onPress={_createPlanPost}
+          disabled={isButtonDisabled || isLoading}
+          android_ripple={isButtonDisabled ? null : { color: "#b9bcc6" }}
+          // android_ripple={{ color: "gray" }}
+        >
+          <View
+            style={[
+              styles.innerLoginButtonContainer,
+              isButtonDisabled && styles.loginButtonDisabled,
+            ]}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" size={28} />
+            ) : (
+              <Text
+                style={[
+                  styles.loginButtonText,
+                  { color: isButtonDisabled ? "#b9bcc6" : "#fff" },
+                ]}
+              >
+                Tạo bài viết
+              </Text>
+            )}
+          </View>
+        </Pressable>
+      </View>
     </View>
   );
 };
 
 export default PostPlan;
+
+const styles = StyleSheet.create({
+  loginButtonContainer: {
+    backgroundColor: "#13c892",
+    borderRadius: 12,
+    overflow: "hidden",
+    margin: 10,
+    width: "93%",
+    marginTop: 100,
+    bottom: 20,
+  },
+  innerLoginButtonContainer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginButtonDisabled: {
+    backgroundColor: "#e7e8ee",
+    color: "#b9bcc6",
+  },
+  loginButtonText: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: "semibold",
+    lineHeight: 28,
+  },
+});

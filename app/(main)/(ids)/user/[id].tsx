@@ -267,12 +267,12 @@ const User = () => {
         "Bạn có muốn tiếp tục không?", // Nội dung của alert
         [
           {
-            text: "Cancel", // Nút hủy
+            text: "Hủy", // Nút hủy
             onPress: () => {},
             style: "cancel", // Style cho nút hủy
           },
           {
-            text: "OK", // Nút đồng ý
+            text: "Tiếp tục", // Nút đồng ý
             onPress: async () => {
               const response = await revoke_friend_request(
                 session.userToken.accessToken,
@@ -322,12 +322,12 @@ const User = () => {
         "Bạn có muốn tiếp tục không?", // Nội dung của alert
         [
           {
-            text: "Cancel", // Nút hủy
+            text: "Hủy", // Nút hủy
             onPress: () => {},
             style: "cancel", // Style cho nút hủy
           },
           {
-            text: "OK", // Nút đồng ý
+            text: "Tiếp tục", // Nút đồng ý
             onPress: async () => {
               const response = await decline_friend_request(
                 session.userToken.accessToken,
@@ -362,12 +362,12 @@ const User = () => {
         "Bạn có muốn tiếp tục không?", // Nội dung của alert
         [
           {
-            text: "Cancel", // Nút hủy
+            text: "Hủy", // Nút hủy
             onPress: () => {},
             style: "cancel", // Style cho nút hủy
           },
           {
-            text: "OK", // Nút đồng ý
+            text: "TIếp tục", // Nút đồng ý
             onPress: async () => {
               const response = await remove_friend(
                 session.userToken.accessToken,
@@ -480,7 +480,7 @@ const User = () => {
             <View style={styles.mainTopContainer}>
               <View>
                 <Pressable
-                  onPress={() => Alert.alert("Avatar")}
+                  // onPress={() => Alert.alert("Avatar")}
                   style={styles.outerAvatarContainer}
                 >
                   <Animated.View

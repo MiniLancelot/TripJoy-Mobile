@@ -7,6 +7,7 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Image } from "expo-image";
 import { useState, useEffect, memo, useRef, useCallback, useMemo } from "react";
@@ -148,14 +149,36 @@ const StarRailChar2 = ({ _userId }: Params) => {
   };
 
   const _deletePost = async (postId: string) => {
-    try {
-      const response = await deletePost(postId, session.userToken.accessToken);
-      if (response.status === 200) {
-        setChars((prev) => prev.filter((item) => item.postId !== postId));
-      }
-    } catch (error) {
-      console.log("Delete post error: " + error);
-    }
+    Alert.alert(
+      "Xác nhận",
+      "Bạn có chắc chắn muốn xóa bài viết này?",
+      [
+        {
+          text: "Hủy",
+          onPress: () => {},
+          style: "cancel",
+        },
+        {
+          text: "Xác nhận",
+          onPress: async () => {
+            try {
+              const response = await deletePost(
+                session.userToken.accessToken,
+                postId
+              );
+              if (response.data.isSuccess) {
+                setChars((prev) =>
+                  prev.filter((char) => char.postId !== postId)
+                );
+              }
+            } catch (error) {
+              console.error("Error deleting post:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   if (loading) {
