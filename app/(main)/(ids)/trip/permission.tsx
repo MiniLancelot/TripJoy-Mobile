@@ -11,7 +11,6 @@ import {
   memberLeave,
   removeMember,
 } from "@/services/plan/invitePeople";
-import { it } from "date-fns/locale";
 import { router } from "expo-router";
 
 const PAGE_SIZE = 10;

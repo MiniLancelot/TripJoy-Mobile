@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Pressable,
   Alert,
+  Touchable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Animated, {
@@ -23,7 +24,7 @@ import {
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { router } from "expo-router";
 import { TripProps } from "@/utils/TripProps";
-import { is } from "date-fns/locale";
+import { FontAwesome6 } from "@expo/vector-icons";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;
@@ -163,6 +164,31 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
             style={[style.imageBackgroundView, translateTextStyle]}
           >
             <View style={style.userImageView}>
+              {item?.leadUserId == session.userInfo.user.profile.id && (
+                <TouchableOpacity
+                  style={[
+                    style.statusContainer,
+                    {
+                      backgroundColor:
+                        item?.joinStatus == 1 ? "#c8fce6" : "#f9d4d4",
+                    },
+                  ]}
+                  onPress={_changeJoinStatusTripCard}
+                >
+                  {item?.joinStatus == 1 ? (
+                    <Text style={{ color: "#02a876" }}>Riêng tư</Text>
+                  ) : (
+                    <Text style={{ color: "#ff7324" }}>Công khai</Text>
+                  )}
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={style.shareContainer}
+                onPress={() => router.push(`/post/plan/${item.id}`)}
+              >
+                {/* <FontAwesome6 name="share" size={24} color="#67baff" /> */}
+                <Text style={{ color: "white" }}>Chia sẻ</Text>
+              </TouchableOpacity>
               {/* <Image source={item.icon} style={style.userImage} /> */}
               <View style={style.titleCardView}>
                 <TouchableOpacity>
@@ -172,18 +198,9 @@ const TripCard = ({ item, scrollX, id, total, _changeJoinStatus }: TProps) => {
                   {item?.startDate ? formatDate(item.startDate) : ""} đến{" "}
                   {item?.endDate ? formatDate(item.endDate) : ""}
                 </Text>
-                {item?.leadUserId == session.userInfo.user.profile.id && (
-                  <Pressable onPress={_changeJoinStatusTripCard}>
-                    <View>
-                      {item?.joinStatus == 1
-                        ? <Text>Công khai chuyến đi</Text>
-                        : <Text>Hủy công khai</Text>}
-                    </View>
-                  </Pressable>
-                )}
-                <Pressable onPress={() => router.push(`/post/plan/${item.id}`)}>
+                {/* <Pressable onPress={() => router.push(`/post/plan/${item.id}`)}>
                   <Text>Chia sẻ</Text>
-                </Pressable>
+                </Pressable> */}
               </View>
             </View>
             <View style={style.bottomContainer}>
@@ -250,13 +267,30 @@ const style = StyleSheet.create({
     height: 30,
     width: 30,
   },
+  statusContainer: {
+    position: "absolute",
+    top: -100,
+    right: -5,
+    padding: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  shareContainer: {
+    position: "absolute",
+    top: -55,
+    right: -5,
+    padding: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: "#67baff",
+  },
   titleCardView: {
     gap: 2,
-    transform: [{ translateY: -40 }],
+    transform: [{ translateY: -50 }],
   },
   titleStyle: {
     color: "white",
-    fontSize: 30,
+    fontSize: 27,
     fontWeight: "700",
   },
   descriptionStyle: {

@@ -11,7 +11,6 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Province } from "@/utils/Provinces";
 import { getPlanById } from "@/services/plan/plan";
 import { useAuth } from "@/app/(auth)/AuthContext";
-import { ca } from "date-fns/locale";
 import { createPostPlan } from "@/services/post/post";
 import Toast from "react-native-toast-message";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -55,7 +54,7 @@ const PostPlan = () => {
 
   const [planLocation, setPlanLocation] = React.useState<PlanLocation[]>([]);
   const [content, setContent] = React.useState<string>("");
-    const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [isIncludePlanLocal, setIsIncludePlanLocal] =
     React.useState<boolean>(false);
   const isButtonDisabled = !content;
@@ -177,19 +176,19 @@ const PostPlan = () => {
   };
 
   return (
-    <View style={{ flex: 1, padding: 10, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, padding: 16, backgroundColor: "#fff" }}>
       <Stack.Screen
         options={{
           title: "Tạo bài viết về chuyến đi",
         }}
       />
       {/* <Text>Tạo bài viết về chuyến đi</Text> */}
-
+      <Text style={{ fontSize: 20, fontWeight: "500" }}>Nội dung</Text>
       <TextInput
         placeholder="Nội dung"
         value={content}
         multiline
-        numberOfLines={5}
+        numberOfLines={15}
         maxLength={300}
         onChangeText={setContent}
         style={{
@@ -199,29 +198,22 @@ const PostPlan = () => {
           borderRadius: 10,
           marginTop: 10,
           textAlignVertical: "top",
-          maxHeight: 200,
+          maxHeight: 500,
         }}
       />
-      {/* <Pressable
-        onPress={() => {
-          setIsIncludePlanLocal(!isIncludePlanLocal);
-        }}
-      >
-        <Text>
-          {isIncludePlanLocal
-            ? "Đã bao gồm địa điểm"
-            : "Chưa kèm theo địa điểm"}
-        </Text>
-      </Pressable> */}
-      <BouncyCheckbox
-        text="Bao gồm địa điểm"
-        unFillColor="#FFFFFF"
-        fillColor="#71d7c7"
-        onPress={(checked) => setIsIncludePlanLocal(checked)}
-        textStyle={{
-          textDecorationLine: "none",
-        }}
-      />
+      <View style={{marginTop: 20}}>
+        <BouncyCheckbox
+          text="Bao gồm địa điểm"
+          unFillColor="#FFFFFF"
+          fillColor="#71d7c7"
+          onPress={(checked) => setIsIncludePlanLocal(checked)}
+          textStyle={{
+            textDecorationLine: "none",
+            color: "#000",
+          }}
+        />
+      </View>
+
       {/* <Pressable onPress={_createPlanPost}>
         <Text>Đăng</Text>
       </Pressable> */}
@@ -266,7 +258,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     margin: 10,
     width: "93%",
-    marginTop: 100,
+    marginTop: 350,
     bottom: 20,
   },
   innerLoginButtonContainer: {

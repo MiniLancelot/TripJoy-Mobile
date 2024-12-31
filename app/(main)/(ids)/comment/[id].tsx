@@ -249,7 +249,7 @@ const CommentList = () => {
       </Pressable> */}
       <View style={{ bottom: 0 }}> 
         <AnimatedTextInput
-          placeholder="Nhắn tin"
+          placeholder="Bình luận ..."
           value={content}
           onChangeText={(text) => setContent(text)}
           style={[

@@ -3,7 +3,7 @@ import React, { useState, useRef, useMemo, useCallback } from "react";
 import { Tabs, Link, useRouter } from "expo-router";
 // import TabBar from "@/components/Others/TabBar";
 import Ionicons from "@expo/vector-icons/Ionicons";
-// import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { FontAwesome6 } from "@expo/vector-icons";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 import BottomSheet, {
   BottomSheetModal,
@@ -199,7 +199,7 @@ const Layout = () => {
             <BottomSheet
               ref={bottomSheetRef}
               onChange={handleSheetChanges}
-              snapPoints={["25%"]}
+              snapPoints={["30%"]}
               index={-1}
               backdropComponent={renderBackDrop}
               enablePanDownToClose={true}
@@ -208,27 +208,81 @@ const Layout = () => {
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>
                   Tạo chuyến đi của bạn 🎉
                 </Text>
-                <View style={{ flexDirection: "row", gap: 35, marginTop: 35 }}>
+                {/* <View style={{ flexDirection: "row", gap: 35, marginTop: 35 }}>
                   <Pressable onPress={() => router.push("/Trip1")}>
                     <Text>Tạo chuyến đi thủ công</Text>
                   </Pressable>
                   <Pressable onPress={() => router.push("/Trip2")}>
                     <Text>Tạo chuyến đi bằng AI</Text>
                   </Pressable>
-                </View>
+                </View> */}
                 <View style={{ flexDirection: "row", gap: 35, marginTop: 35 }}>
-                  <Pressable onPress={() => router.push("/Trip3")}>
-                    <Text>Test</Text>
-                  </Pressable>
-                  <Pressable onPress={() => router.push("/Trip4")}>
-                    <Text>Test2</Text>
-                  </Pressable>
-                  <Pressable onPress={() => router.push("/CreatePost")}>
-                    <Text>Post</Text>
-                  </Pressable>
-                  <Pressable onPress={() => router.push("/(create-ai-plan)/AiStep1")}>
-                    <Text>Plan AI</Text>
-                  </Pressable>
+                  <View style={styles.buttonOuterContainer}>
+                    <Pressable
+                      onPress={() => router.push("/Trip3")}
+                      style={{
+                        alignItems: "center",
+                        padding: 30,
+                        backgroundColor: "#fff5e1",
+                        borderRadius: 100,
+                      }}
+                    >
+                      <FontAwesome6
+                        name="map-location-dot"
+                        size={35}
+                        color="#fbb05a"
+                      />
+                    </Pressable>
+                    <Text style={styles.buttonUnderText}>
+                      Tạo chuyến đi thủ công
+                    </Text>
+                  </View>
+
+                  {/* <Pressable onPress={() => router.push("/CreatePost")}>
+                    <Text style={styles.buttonUnderText}>Tạo bài đăng</Text>
+                  </Pressable> */}
+                  <View style={styles.buttonOuterContainer}>
+                    <Pressable
+                      onPress={() => router.push("/(create-ai-plan)/AiStep1")}
+                      style={{
+                        alignItems: "center",
+                        padding: 30,
+                        backgroundColor: "#def9ee",
+                        borderRadius: 100,
+                      }}
+                    >
+                      <FontAwesome6 name="android" size={35} color="#34d9b8" />
+                    </Pressable>
+                    <Text style={styles.buttonUnderText}>
+                      Tạo chuyến đi bằng AI
+                    </Text>
+                  </View>
+                  <View style={styles.buttonOuterContainer}>
+                    <Pressable
+                      onPress={() => router.push("/CreatePost")}
+                      style={{
+                        alignItems: "center",
+                        padding: 30,
+                        backgroundColor: "#e0f3ff",
+                        borderRadius: 100,
+                      }}
+                    >
+                      <FontAwesome6
+                        name="pen-to-square"
+                        size={35}
+                        color="#55d4ff"
+                      />
+                    </Pressable>
+                    <Text style={styles.buttonUnderText}>Tạo bài đăng</Text>
+                  </View>
+
+                  {/* <Pressable
+                    onPress={() => router.push("/(create-ai-plan)/AiStep1")}
+                  >
+                    <Text style={styles.buttonUnderText}>
+                      Tạo chuyến đi bằng AI
+                    </Text>
+                  </Pressable> */}
                 </View>
               </BottomSheetView>
             </BottomSheet>
@@ -254,6 +308,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+  },
+  buttonUnderText: {
+    maxWidth: 100,
+    lineHeight: 20,
+    textAlign: "center",
+  },
+  buttonOuterContainer: {
+    flexDirection: "column",
+    gap: 5,
   },
 });
 

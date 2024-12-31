@@ -431,13 +431,13 @@ const ChosenTrip = () => {
     )
       .then((response) => {
         console.log("Add Plan Location Response:", response.data);
-        Alert.alert("Success", "Location added to the trip.");
+        Alert.alert("Thành công", "Đã thêm địa điểm vào lộ trình.");
         setIsAdding(true);
         // navigation.navigate("/(tabs)/trip");
       })
       .catch((error) => {
         console.error("Error adding location to trip:", error);
-        Alert.alert("Error", "Failed to add location to the trip.");
+        Alert.alert("Thất bại", "Không thể thêm địa điểm vào lộ trình.");
       });
   };
 

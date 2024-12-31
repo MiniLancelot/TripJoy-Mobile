@@ -109,7 +109,7 @@ const CreatePost = () => {
         placeholder="Nội dung"
         value={content}
         multiline
-        numberOfLines={5}
+        numberOfLines={10}
         maxLength={300}
         onChangeText={setContent}
         style={{
@@ -119,7 +119,7 @@ const CreatePost = () => {
           borderRadius: 10,
           marginTop: 10,
           textAlignVertical: "top",
-          maxHeight: 200,
+          maxHeight: 500,
         }}
       />
 
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     margin: 10,
     width: "93%",
-    marginTop: 280,
+    marginTop: 180,
     bottom: 20,
 
   },
