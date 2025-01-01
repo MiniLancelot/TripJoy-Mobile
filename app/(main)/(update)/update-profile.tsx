@@ -202,6 +202,11 @@ const UpdateProfile = () => {
     []
   );
 
+  const formatDate = (dateStr: string) => {
+    const [month, day, year] = dateStr.split("/");
+    return `${day}-${month}-${year}`;
+  };
+
   // const [image, setImage] = useState<string | null>(null);
 
   const pickImage = async () => {
@@ -305,7 +310,7 @@ const UpdateProfile = () => {
                   <Text style={{ fontSize: 16, fontWeight: "700" }}>
                     {profile.dateOfBirth === null
                       ? "Chưa có thông tin ngày sinh"
-                      : profile.dateOfBirth.split(" ")[0]}
+                      : formatDate(profile.dateOfBirth.split(" ")[0])}
                   </Text>
                 </View>
               </Pressable>
