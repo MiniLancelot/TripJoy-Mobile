@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
   Pressable,
+  Alert,
 } from "react-native";
 import React, {
   useCallback,
@@ -140,6 +141,7 @@ const Trip = () => {
       }
     } catch (err: any) {
       setError(err.message);
+      (err.response.status == 400) ? Alert.alert("Thông báo", "Bạn đã ở trong 1 plan khác trong khoảng thời gian của plan này.") : Alert.alert("Thông báo", "Có lỗi xảy ra, vui lòng thử lại sau!");
     }
   };
 
