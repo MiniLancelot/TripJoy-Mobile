@@ -227,7 +227,7 @@ const permission = () => {
                         <View style={[styles.editContainer, { borderColor: color }]} >
                           <Pressable
                             onPress={() => _changePermission(item.userId)}
-                            disabled={item.role != Role.OWNER}
+                            disabled={item.role == Role.OWNER}
                             style={[styles.innerEditContainer]}
                           >
                             <Text style={{ color: color }}>{role}</Text>
