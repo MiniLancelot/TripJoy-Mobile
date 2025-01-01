@@ -122,17 +122,42 @@ const permission = () => {
             if (response.status === 200) {
               // navigation.goBack();
               console.log("Rời nhóm thành công");
-              router.replace("/home")
+              router.replace("/home");
             }
           } catch (error) {
             console.log("Leave group error: " + error);
-            Alert.alert("Lỗi", "Bạn không thể rời nhóm");
+            Alert.alert("Lỗi", "Bạn không thể rời nhóm vì bạn có thể có tham gia chi tiêu");
           }
-          //       const response = await memberLeave(sharedId, session.userToken.accessToken);
-          // if (response.status === 200) {
-          //   setPageIndex(0); // Reset to reload comments from page 1
-          //   fetchMembers(false);
-          // }
+        },
+      },
+    ]);
+  };
+
+  const _removeMember = async (userId: string) => {
+    Alert.alert("Xác nhận", "Bạn có chắc chắn loại người này?", [
+      {
+        text: "Hủy",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      {
+        text: "Đồng ý",
+        onPress: async () => {
+          try {
+            const response = await removeMember(
+              sharedId,
+              userId,
+              session.userToken.accessToken
+            );
+            if (response.status === 200) {
+              // navigation.goBack();
+              console.log("Rời nhóm thành công");
+              router.replace("/home");
+            }
+          } catch (error) {
+            console.log("Leave group error: " + error);
+            Alert.alert("Lỗi", "Bạn không thể loại người này vì người này có thể có tham gia chi tiêu");
+          }
         },
       },
     ]);
@@ -147,7 +172,7 @@ const permission = () => {
           data={_members}
           renderItem={({ item }) => (
             // <CommentCard item={item} responseType={"comment"} />
-            <View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Image
                 source={{ uri: item.avatar ?? tempAvatar }}
                 style={{ width: 50, height: 50 }}
@@ -155,26 +180,38 @@ const permission = () => {
               <Text>{item.name}</Text>
               {(() => {
                 let role = "";
+                let color = "";
                 switch (item.role) {
                   case Role.OWNER:
-                    role = "Chủ nhóm";
+                    role = "trưởng đoàn";
+                    color = "phó đoàn";
                     break;
                   case Role.VICE_OWNER:
                     role = "Phó chủ nhóm";
+                    color = "green";
                     break;
                   case Role.MEMBER:
                     role = "Thành viên";
+                    color = "grey";
                     break;
                   default:
                     return null;
                 }
-                return item.role == Role.OWNER ? (
-                  <Pressable onPress={() => _changePermission(item.userId)}>
-                    <Text>{role}</Text>
+                return (
+                  <Pressable
+                    onPress={() => _changePermission(item.userId)}
+                    disabled={item.role != Role.OWNER}
+                    style={{ backgroundColor: color }}
+                  >
+                    <Text style={{ color: "white" }}>{role}</Text>
                   </Pressable>
-                ) : null;
+                );
               })()}
-              {item.userId == session.userInfo.user.profile.id ? (
+              {item.role == Role.OWNER ? (
+                <Pressable onPress={() => _removeMember(item.userId)}>
+                  <Text>Loại</Text>
+                </Pressable>
+              ) : item.userId == session.userInfo.user.profile.id ? (
                 <Pressable onPress={() => leaveGroup()}>
                   <Text>Rời nhóm</Text>
                 </Pressable>

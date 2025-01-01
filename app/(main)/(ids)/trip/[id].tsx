@@ -329,7 +329,7 @@ const ChosenTrip = () => {
       }
     } catch (error) {
       console.error("Error fetching geocoding results:", error);
-      Alert.alert("Error", "Unable to search for location.");
+      Alert.alert("Error", "Không thể tìm kiếm địa điểm.");
     }
   }, []);
 

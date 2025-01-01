@@ -35,6 +35,7 @@ const createPostPlan = async (data: any, accessToken: string) => {
     });
     return response;
   } catch (error: any) {
+    console.log("create post Error: ", error);
     showError(error);
     throw error;
   }

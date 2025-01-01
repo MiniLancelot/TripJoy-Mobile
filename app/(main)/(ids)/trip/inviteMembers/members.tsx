@@ -38,6 +38,8 @@ enum InviteStatus {
   NOT_INVITED = 3,
 }
 
+const PAGE_SIZE = 10;
+
 const InviteFriends = () => {
   const sharedId = useTabStore((state) => state.sharedId);
   const { session } = useAuth();
@@ -45,52 +47,37 @@ const InviteFriends = () => {
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [_pageIndex, setPageIndex] = useState<number>(0);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [isEnd, setIsEnd] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
 
-  const fetchPlanInvitationsAvailable = async (page: number) => {
+  const fetchPlanInvitationsAvailable = async (isLoadMore: boolean = false) => {
     try {
-      setLoading(true);
-      if (isEnd) return;
+      if (loading || (isLoadMore && !hasNextPage)) return;
+      if (isLoadMore) {
+        setIsFetchingMore(true);
+      } else {
+        setLoading(true);
+      }
       const res = await getPlanInvitaitonsAvailable(
         sharedId,
-        page,
+        _pageIndex,
         session.userToken.accessToken
       );
-      if (res && res.status == 200) {
-        if (res.data.users.count < 10) {
-          setIsEnd(true);
-          // return;
-        };
-        if(res.data.users.data.length == 0) return;
-        console.log(res.data.users.data);
-        if(_pageIndex == 0 )setUsers(res.data.users == null
-          ? []
-          : res.data.users.data.map((item: any): FriendProps => {
-              return {
-                userId: item.userId,
-                name: item.userName,
-                avatar: item.avatar,
-                status: item.status,
-              };
-            }));
-        else setUsers((prev) => [...prev,
-           ...res.data.users.data.map((item: any): FriendProps => {
-                return {
-                  userId: item.userId,
-                  name: item.userName,
-                  avatar: item.avatar,
-                  status: item.status,
-                };
-              })
-            ]);
 
-        console.log(
-          "Invite friend request: ",
-          res.data.users == null
-            ? []
-            : res.data.users.data.map((item: any) => item.userId)
-        );
+      const newData = res.data.users.data.map((item: any): FriendProps => {
+        return {
+          userId: item.userId,
+          name: item.userName,
+          avatar: item.avatar,
+          status: item.status,
+        };
+      })
+      setUsers((prev) => (isLoadMore ? [...prev, ...newData] : newData));
+      setHasNextPage(newData.length === PAGE_SIZE);
+      if (isLoadMore) {
+        setPageIndex((prev) => prev + 1);
       }
     } catch (e) {
       console.info(e);
@@ -99,12 +86,12 @@ const InviteFriends = () => {
     }
   };
 
-  useEffect(() => {
-    if (isEnd) {
-      setPageIndex((prevPage) => prevPage - 1);
-      console.log("End of list");
-    }
-  }, [isEnd])
+  // useEffect(() => {
+  //   if (isEnd) {
+  //     setPageIndex((prevPage) => prevPage - 1);
+  //     console.log("End of list");
+  //   }
+  // }, [isEnd]);
 
   // useEffect(() => {
   //   const timer = setTimeout(() => {
@@ -113,38 +100,28 @@ const InviteFriends = () => {
   //   return () => clearTimeout(timer);
   // }, [name]);
 
-  const handleRefreshPrevious = () => {
-    if (_pageIndex > 0 && !loading) {
-      if (isEnd) setIsEnd(false);
-      setPageIndex((prevPage) => prevPage - 1); // Chuyển về trang trước
-    }
-  };
+  // const handleRefreshPrevious = () => {
+  //   if (_pageIndex > 0 && !loading) {
+  //     if (isEnd) setIsEnd(false);
+  //     setPageIndex((prevPage) => prevPage - 1); // Chuyển về trang trước
+  //   }
+  // };
 
   const handleLoadNext = () => {
-    if (!isEnd && !loading) {
-      setPageIndex((prevPage) => prevPage + 1); // Chuyển sang trang tiếp theo
-    }
+    fetchPlanInvitationsAvailable(true);
   };
 
   useEffect(() => {
-    fetchPlanInvitationsAvailable(0);
+    fetchPlanInvitationsAvailable();
   }, []);
 
   useEffect(() => {
     if (isSuccess) {
-      if (_pageIndex == 0) {
-        setUsers([]);
-        fetchPlanInvitationsAvailable(0);
-      } else setPageIndex(0);
+      fetchPlanInvitationsAvailable(false);
+      setPageIndex(0);
       setIsSuccess(false);
     }
   }, [isSuccess]);
-
-  useEffect(() => {
-    if (_pageIndex >= 0) {
-      fetchPlanInvitationsAvailable(_pageIndex);
-    }
-  }, [_pageIndex]);
 
 
   const handleInvitationRequest = async (userId: string, status: number) => {

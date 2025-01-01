@@ -28,8 +28,8 @@ const InvitationResponse = ({ planId, inviterId, title, startDate, endDate, invi
           <Image source={{ uri: avatarUri }} style={styles.avatar} />
         </View>
         <View>
-          <Text>{inviterName}</Text>
-          {/* <Text>{startDate} đến {endDate}</Text> */}
+          <Text>{inviterName} mời bạn vào {title}</Text>
+          <Text>{startDate} đến {endDate}</Text>
         </View>
       </Pressable>
       <View style={styles.invitationContainer}>
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   container: {
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
     gap: 100,
