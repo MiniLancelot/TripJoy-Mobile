@@ -67,6 +67,7 @@ const PostPlan = () => {
       if (response) {
         const data = response.data.plan;
         const locations = response.data.plan.locations;
+        console.log(locations);
         setPlanData({
           id: data.id,
           // leadUserId: data.leadUserId,
@@ -84,8 +85,8 @@ const PostPlan = () => {
               locationId: item.id,
               name: item.name,
               address: item.address,
-              latitude: item.latitude,
-              longitude: item.longitude,
+              latitude: item.coordinates.latitude,
+              longitude: item.coordinates.longitude,
               estimatedStartDate: item.estimatedStartDate.split("T")[0],
               order: item.order,
             })

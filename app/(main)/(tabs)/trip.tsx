@@ -251,7 +251,7 @@ const Trip = () => {
               </Pressable>
             </View>
             <View style={{ flexDirection: "row", gap: 226 }}>
-              <Text style={styles.mainText2}>Đã đi</Text>
+              <Text style={styles.mainText2}>Chuyến đi</Text>
               {/* <Text style={styles.seeMore}>Tất cả</Text> */}
             </View>
           </View>

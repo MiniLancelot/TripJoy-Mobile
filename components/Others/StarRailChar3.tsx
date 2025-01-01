@@ -16,6 +16,13 @@ import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ReadMoreText from "./ReadMoreText";
 // import AntDesign from "@expo/vector-icons/AntDesign";
+import MotorIcon from "@/components/Icons/MotorIcon";
+import BoatIcon from "@/components/Icons/BoatIcon";
+import CarIcon from "@/components/Icons/CarIcon";
+import PlaneIcon from "@/components/Icons/PlaneIcon";
+import TrainIcon from "@/components/Icons/TrainIcon";
+import { FontAwesome6 } from "@expo/vector-icons";
+import React from "react";
 import {
   deletePost,
   getPostById,
@@ -35,22 +42,6 @@ import BottomSheet, {
 // import CommentList from "../Comments/CommentList";
 import { set } from "date-fns";
 import ReactionBox from "../Reactions";
-import { ca } from "date-fns/locale";
-// import FacebookReaction from "../Reactions/Reaction";
-// import ReactionBox from "../Reactions";
-// import { FontAwesome } from "@expo/vector-icons";
-// type CharProps = {
-//   id: number;
-//   name: string;
-//   rarity: number;
-//   path: string;
-//   element: string;
-//   intro: string;
-//   img: string;
-//   isLiked: boolean; //test like
-//   liked: number;
-//   location: string;
-// };
 
 type PostProps = {
   postId: string;
@@ -204,6 +195,52 @@ const StarRailChar2 = ({ _userId }: Params) => {
     );
   }
 
+  const DashLine = () => (
+    <View
+      style={{
+        borderStyle: "dashed",
+        borderWidth: 1,
+        height: 1,
+        width: 50,
+        borderColor: "#ccc",
+        marginVertical: 8,
+        marginHorizontal: 20,
+        borderRadius: 1,
+      }}
+    />
+  );
+
+  const VerticalDashLine = () => (
+    <View
+      style={{
+        height: 30,
+        width: 1,
+        borderLeftWidth: 1,
+        borderStyle: "dashed",
+        borderColor: "#ccc",
+        marginLeft: 12,
+        marginVertical: 5,
+      }}
+    />
+  );
+
+  const getVehicleIcon = (vehicle: number) => {
+    switch (vehicle) {
+      case 0:
+        return <MotorIcon width={40} height={40} />;
+      case 1:
+        return <CarIcon width={40} height={40} />;
+      case 2:
+        return <TrainIcon width={40} height={40} />;
+      case 3:
+        return <BoatIcon width={40} height={40} />;
+      case 4:
+        return <PlaneIcon width={40} height={40} />;
+      default:
+        return null; // Fallback if vehicle type is not recognized
+    }
+  };
+
   const RenderItem = ({
     _key,
     item,
@@ -274,7 +311,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
               },
               _key
             );
-            setIsLoaded(false);
+          setIsLoaded(false);
         }
       } catch (error) {
         console.error("Error updating reaction:", error);
@@ -295,6 +332,11 @@ const StarRailChar2 = ({ _userId }: Params) => {
     };
 
     const displayImages = item.images.slice(0, 2);
+
+    const formatBudget = (budget: number): string => {
+      return budget.toLocaleString("en-US");
+    };
+
     // console.log(displayImages.map(char => char.name));
 
     return (
@@ -308,28 +350,100 @@ const StarRailChar2 = ({ _userId }: Params) => {
 
             <View style={styles.infoContainer}>
               <Text style={styles.name}>{item.username}</Text>
-              <Text style={styles.path}>{item.createdAt}</Text>
+              <Text style={styles.path}>{item.createdAt.split("-").reverse().join("-")}</Text>
             </View>
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.title}>{item.content}</Text>
-            {/* <ReadMoreText text={item.content} numberOfLines={5} /> */}
             {item.planPost != null && (
-              <View>
-                <Text style={styles.title}>
+              <View
+                style={{
+                  marginVertical: 10,
+                  borderWidth: 1,
+                  borderColor: "#b2b2b2",
+                  borderRadius: 10,
+                  padding: 5,
+                  backgroundColor: "#fff",
+                  elevation: 1,
+                  paddingVertical: 10,
+                  paddingHorizontal: 10,
+                  width: "100%",
+                }}
+              >
+                <View
+                  style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+                >
+                  <Ionicons name="location" size={24} color="#17a1fa" />
+                  <Text style={styles.summaryLocationText}>
+                    {item.planPost.provinceStart.provinceName}
+                  </Text>
+                </View>
+                <VerticalDashLine />
+                <View
+                  style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+                >
+                  <Ionicons name="location" size={24} color="#ff6188" />
+                  <Text style={styles.summaryLocationText}>
+                    {" "}
+                    {item.planPost.provinceEnd.provinceName}
+                  </Text>
+                </View>
+
+                <View style={styles.summaryVehicleContainer}>
+                  {getVehicleIcon(item.planPost.vehicle)}
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 10,
+                    alignItems: "center",
+                    marginTop: 20,
+                  }}
+                >
+                  <Ionicons
+                    name={"calendar-outline"}
+                    size={30}
+                    color={"#6b707b"}
+                  />
+                  <Text style={styles.summaryLocationText}>
+                    {item.planPost.planStartDate.split("T")[0].split("-")[2]}-
+                    {item.planPost.planStartDate.split("T")[0].split("-")[1]}-
+                    {item.planPost.planStartDate.split("-")[0]}
+                  </Text>
+                  <DashLine />
+                  <Text style={styles.summaryLocationText}>
+                    {item.planPost.planEndDate.split("T")[0].split("-")[2]}-
+                    {item.planPost.planEndDate.split("-")[1]}-
+                    {item.planPost.planEndDate.split("-")[0]}
+                  </Text>
+                </View>
+                {/* <Text style={styles.title}>
                   Ngày bắt đầu: {item.planPost.planStartDate.split("T")[0]}
                 </Text>
                 <Text style={styles.title}>
                   Ngày kết thúc: {item.planPost.planEndDate.split("T")[0]}
-                </Text>
-                <Text style={styles.title}>
+                </Text> */}
+                {/* <Text style={styles.title}>
                   Địa điểm: {item.planPost.provinceStart.provinceName} -{" "}
                   {item.planPost.provinceEnd.provinceName}
-                </Text>
-                <Text style={styles.title}>
-                  Kinh phí: {item.planPost.budget}
-                </Text>
-                {(() => {
+                </Text> */}
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 10,
+                    alignItems: "center",
+                    marginTop: 20,
+                    marginLeft: 5,
+                  }}
+                >
+                  <FontAwesome6 name="money-bill" size={20} color={"#13c892"} />
+                  <Text style={styles.summaryLocationText}>
+                    Kinh phí dự tính: {formatBudget(item.planPost.budget)} đ
+                  </Text>
+                </View>
+
+                {/* {(() => {
                   let vehicle = "";
                   switch (item.planPost.vehicle) {
                     case Vehicle.MOTORBIKE:
@@ -353,19 +467,58 @@ const StarRailChar2 = ({ _userId }: Params) => {
                   return (
                     <Text style={styles.title}>Phương tiện: {vehicle}</Text>
                   );
-                })()}
-                <Text style={styles.title}>Lộ trình</Text>
-                <View style={{ marginLeft: 10 }}>
-                  {item.planPost.postPlanLocations.map(
-                    (location: any, index: any) => (
-                      <View key={index}>
-                        <Text>{location.name}</Text>
-                        <Text>{location.address}</Text>
-                        <Text>{location.estimatedStartDate.split("T")[0]}</Text>
-                      </View>
-                    )
-                  )}
-                </View>
+                })()} */}
+                {item.planPost.postPlanLocations.length > 0 && (
+                  <>
+                    <Text style={styles.title}>Lộ trình:</Text>
+                    <View style={{ marginLeft: 10 }}>
+                      {item.planPost.postPlanLocations.map(
+                        (location: any, index: any) => (
+                          <View key={index}>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                gap: 10,
+                                alignItems: "flex-start",
+                              }}
+                            >
+                              <FontAwesome6
+                                name="map-pin"
+                                size={20}
+                                color={"#ff6188"}
+                              />
+                              <Text style={{ fontSize: 16 }}>
+                                {location.estimatedStartDate
+                                  .split("T")[0]
+                                  .split("-")
+                                  .reverse()
+                                  .join("-")}
+                              </Text>
+
+                              <Text
+                                style={{
+                                  flex: 1,
+                                  flexWrap: "wrap",
+                                  flexShrink: 1,
+                                  fontSize: 16,
+                                }}
+                              >
+                                {location.name}
+                              </Text>
+                              {/* <Text>{location.address}</Text> */}
+                            </View>
+                            {index <
+                              item.planPost.postPlanLocations.length - 1 && (
+                              <View style={{ transform: [{ translateX: -6 }] }}>
+                                <VerticalDashLine />
+                              </View>
+                            )}
+                          </View>
+                        )
+                      )}
+                    </View>
+                  </>
+                )}
               </View>
             )}
           </View>
@@ -446,7 +599,11 @@ const StarRailChar2 = ({ _userId }: Params) => {
       <View style={styles.footerContainer}>
         <Text style={styles.footerText}>Đang tải...</Text>
       </View>
-    ) : null;
+    ) : (
+      <View style={styles.footerContainer}>
+        <Text style={styles.footerText}>Đã đến cuối</Text>
+      </View>
+    )
   };
 
   const refreshHandler = () => {
@@ -556,6 +713,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
   },
+  summaryLocationText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 
   title: {
     fontSize: 17,
@@ -575,6 +736,11 @@ const styles = StyleSheet.create({
     width: "32%",
     height: 190,
     borderRadius: 6,
+  },
+  summaryVehicleContainer: {
+    position: "absolute",
+    right: 15,
+    top: 15,
   },
   textContainer: {
     // marginTop: 10,

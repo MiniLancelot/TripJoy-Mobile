@@ -25,6 +25,8 @@ import BoatIcon from "@/components/Icons/BoatIcon";
 import CarIcon from "@/components/Icons/CarIcon";
 import PlaneIcon from "@/components/Icons/PlaneIcon";
 import TrainIcon from "@/components/Icons/TrainIcon";
+import { FontAwesome6 } from "@expo/vector-icons";
+import React from "react";
 
 interface PlanLocation {
   latitude: number;
@@ -38,6 +40,8 @@ interface AIPlanSuggestion {
   theme: string;
   details: PlanLocation[];
 }
+
+const fakeRenderItem = {};
 
 const map = [
   { label: "Xe máy", value: 0 },
@@ -209,6 +213,20 @@ export default function CreateAiPlan() {
     />
   );
 
+  const VerticalDashLine = () => (
+    <View
+      style={{
+        height: 30,
+        width: 1,
+        borderLeftWidth: 1,
+        borderStyle: "dashed",
+        borderColor: "#ccc",
+        marginLeft: 12,
+        marginVertical: 5,
+      }}
+    />
+  );
+
   const renderItems = (item: AIPlanSuggestion) => {
     return (
       <View
@@ -223,24 +241,81 @@ export default function CreateAiPlan() {
           elevation: 3,
           paddingVertical: 10,
           paddingHorizontal: 10,
-          width: "75%",
+          width: "100%",
         }}
       >
-        <Text>{item.theme}</Text>
+        <Text
+          style={{
+            fontWeight: "bold",
+            fontSize: 16,
+            marginBottom: 5,
+            flexWrap: "wrap",
+          }}
+        >
+          {item.theme}
+        </Text>
         {item.details.map((detail) => (
-          <View
-            key={detail.name}
-            style={{ flexDirection: "row", marginLeft: 10 }}
-          >
-            <Text style={{ fontWeight: 600 }}>
-              {detail.estimatedStartDate}:{" "}
-            </Text>
-            <Text>
-              {detail.name} - {detail.address}
-            </Text>
-          </View>
+          <>
+            <View
+              key={detail.name}
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                marginBottom: 5,
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: "600",
+                  marginRight: 5,
+                  flexShrink: 1,
+                }}
+              >
+                {detail.estimatedStartDate}:
+              </Text>
+              <Text
+                style={{
+                  flex: 1,
+                  flexWrap: "wrap",
+                  flexShrink: 1,
+                }}
+              >
+                {detail.name} - {detail.address}
+              </Text>
+            </View>
+            <VerticalDashLine />
+            <View style={{ marginLeft: 10, height: 10 }}></View>
+          </>
         ))}
-        <Button title="Tạo chuyến đi" onPress={() => choosePlan(item)} />
+        <View style={styles.loginButtonContainer}>
+          <Pressable
+            onPress={() => choosePlan(item)}
+            // disabled={isLoading}
+            android_ripple={{ color: "#b9bcc6" }}
+            // android_ripple={{ color: "gray" }}
+          >
+            <View
+              style={[
+                styles.innerLoginButtonContainer,
+                isLoading && styles.loginButtonDisabled,
+              ]}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" size={28} />
+              ) : (
+                <Text
+                  style={[
+                    styles.loginButtonText,
+                    { color: isLoading ? "#b9bcc6" : "#fff" },
+                  ]}
+                >
+                  Tạo chuyến đi
+                </Text>
+              )}
+            </View>
+          </Pressable>
+        </View>
+        {/* <Button title="Tạo chuyến đi" onPress={() => choosePlan(item)} /> */}
       </View>
     );
   };
@@ -256,31 +331,61 @@ export default function CreateAiPlan() {
               style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
             >
               <Ionicons name="location" size={24} color="#17a1fa" />
-              <Text style={styles.summaryLocationText}>Đà Nẵng</Text>
-            </View>
-            <DashLine />
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-            >
-              <Ionicons name="location" size={24} color="#ff6188" />
-              <Text style={styles.summaryLocationText}>Đà Nẵng</Text>
+              <Text style={styles.summaryLocationText}>
+                {provinceStart.provinceName}
+              </Text>
             </View>
           </View>
+
+          <VerticalDashLine />
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+            <Ionicons name="location" size={24} color="#ff6188" />
+            <Text style={styles.summaryLocationText}>
+              {" "}
+              {provinceEnd.provinceName}
+            </Text>
+          </View>
+
           <View style={styles.summaryVehicleContainer}>
             {getVehicleIcon(vehicle)}
           </View>
 
-          <View style={{ flexDirection: "row", gap: 10 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 10,
+              alignItems: "center",
+              marginTop: 20,
+            }}
+          >
             <Ionicons name={"calendar-outline"} size={30} color={"#6b707b"} />
-            <Text>
-              {startDate.split("-")[2]}-${startDate.split("-")[1]}-$
+            <Text style={styles.summaryLocationText}>
+              {startDate.split("-")[2]}-{startDate.split("-")[1]}-
               {startDate.split("-")[0]}
             </Text>
+            <DashLine />
+            <Text style={styles.summaryLocationText}>
+              {endDate.split("-")[2]}-{endDate.split("-")[1]}-
+              {endDate.split("-")[0]}
+            </Text>
           </View>
-          <Text>Kinh phí dự tính: {estimatedBudget} đ</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 10,
+              alignItems: "center",
+              marginTop: 20,
+              marginLeft: 10,
+            }}
+          >
+            <FontAwesome6 name="money-bill" size={20} color={"#13c892"} />
+            <Text style={styles.summaryLocationText}>
+              Kinh phí dự tính: {estimatedBudget} đ
+            </Text>
+          </View>
         </View>
-        <Text>Thời gian khởi hành: {startDate}</Text>
-        <Text>Thời gian kết thúc: {endDate}</Text>
+        {/* <Text>Thời gian khởi hành: {startDate}</Text>
+        <Text>Thời gian kết thúc: {endDate}</Text> */}
 
         {/* <Text>Phương tiện: {getVehicleLabel(vehicle)}</Text> */}
       </View>

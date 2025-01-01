@@ -70,13 +70,13 @@ const Index = () => {
     //   console.log("Có userToken: ", session.userToken.accessToken);
       console.log("Có userInfo: ", session.userInfo.user.profile.userName);
       console.log("Có userToken: ", session.userToken.accessToken); 
-      // router.replace("/home");
-      router.replace("/(create)/(create-ai-plan)/AiStep2");
+      router.replace("/home");
+      // router.replace("/(create)/(create-ai-plan)/AiStep2");
     } else {
       // console.log("No userToken: ", session.userToken);
       console.log("No userInfo: ", session.userInfo);
-      // router.replace("/login");
-      router.replace("/(create)/(create-ai-plan)/AiStep2");
+      router.replace("/login");
+      // router.replace("/(create)/(create-ai-plan)/AiStep2");
     }
   };
   return (
