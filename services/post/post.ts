@@ -90,7 +90,7 @@ const getPostsByUserId = async (
   }
 };
 
-const deletePost = async (postId: string, accessToken: string) => {
+const deletePost = async (accessToken: string, postId: string) => {
   try {
     const response = await post(`/posts/${postId}`, {
       method: "DELETE",

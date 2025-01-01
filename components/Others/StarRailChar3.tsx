@@ -220,6 +220,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
       item.isLiked
     );
     // const [likeQuantity, setLikeQuantity] = useState(item.liked);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     const tempAvatar =
       "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
@@ -227,6 +228,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
 
     const handleReaction = async (reaction: number | null) => {
       try {
+        setIsLoaded(true);
         // Cập nhật ngay trên giao diện
         console.log("Reaction: ", reaction);
         setCurrentReaction(reaction);
@@ -272,9 +274,12 @@ const StarRailChar2 = ({ _userId }: Params) => {
               },
               _key
             );
+            setIsLoaded(false);
         }
       } catch (error) {
         console.error("Error updating reaction:", error);
+        Alert.alert("Lỗi", "Có lỗi xảy ra khi thực hiện hành động này");
+        setIsLoaded(false);
       }
     };
 
