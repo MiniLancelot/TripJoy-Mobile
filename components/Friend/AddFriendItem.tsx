@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 100,
+    justifyContent: "space-between",
     marginTop: 10,
   },
   avatarContainer: {
@@ -117,9 +117,9 @@ const styles = StyleSheet.create({
   },
   outerEditContainer: {
     alignItems: "flex-end",
-    justifyContent: "center",
+    justifyContent: "flex-end",
+    transform: [{ translateX: -10 }],
     flex: 1,
-    marginRight: 30,
     // marginTop: -15,
   },
   editContainer: {
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     // alignItems: "flex-end",
     // justifyContent: "center",
     // flex: 1,
-    marginRight: 15,
+    marginRight: 20,
     // marginTop: 50,
   },
   invitationContainer: {

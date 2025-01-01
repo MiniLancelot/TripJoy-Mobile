@@ -375,6 +375,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "semibold",
     lineHeight: 28,
+    color: "#fff",
   },
   bannerIcon: {
     flexDirection: "row",
@@ -386,8 +387,8 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   bannerText2: {
-    marginTop: 5,
-    fontSize: 25,
+    marginTop: 20,
+    fontSize: 28,
     color: "#fff",
     fontWeight: "700",
   },

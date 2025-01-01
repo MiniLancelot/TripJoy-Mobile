@@ -23,16 +23,16 @@ const InviteFriend = ({ id, name, _onClick, avatar, _status }: FriendProps) => {
   const avatarUri = avatar == null ? tempAvatar : avatar;
   return (
     <View style={styles.container}>
-      <Pressable
+      <View
         style={styles.itemContainer}
         // onPress={() => router.push(`/user/${id}`)}
       >
-        <View style={styles.avatarContainer}>
+        <Pressable style={styles.avatarContainer} onPress={() => router.push(`/user/${id}`)}>
           <Image source={{ uri: avatarUri }} style={styles.avatar} />
-        </View>
-        <View>
+        </Pressable>
+        <Pressable onPress={() => router.push(`/user/${id}`)}>
           <Text>{name}</Text>
-        </View>
+        </Pressable>
         {(() => {
           switch (_status) {
             case InviteStatus.INVITED:
@@ -104,7 +104,7 @@ const InviteFriend = ({ id, name, _onClick, avatar, _status }: FriendProps) => {
               return null;
           }
         })()}
-      </Pressable>
+      </View>
       {/* <View style={styles.outerEditContainer}>
         <View style={styles.editContainer}>
           <Pressable
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "center",
     flex: 1,
-    marginRight: 30,
+    
     // marginTop: -15,
   },
   editContainer: {

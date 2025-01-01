@@ -258,7 +258,7 @@ export default function CreateAiPlan() {
         >
           {item.theme}
         </Text>
-        {item.details.map((detail) => (
+        {item.details.map((detail, index) => (
           <>
             <View
               key={detail.name}
@@ -287,8 +287,12 @@ export default function CreateAiPlan() {
                 {detail.name} - {detail.address}
               </Text>
             </View>
-            <VerticalDashLine />
-            <View style={{ marginLeft: 10, height: 10 }}></View>
+            {index !== item.details.length - 1 && (
+              <>
+                <VerticalDashLine />
+                <View style={{ marginLeft: 10, height: 10 }}></View>
+              </>
+            )}
           </>
         ))}
         <View style={styles.loginButtonContainer}>

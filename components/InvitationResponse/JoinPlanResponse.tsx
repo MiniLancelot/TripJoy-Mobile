@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 100,
+    justifyContent: "space-between",
     marginTop: 10,
   },
   avatarContainer: {

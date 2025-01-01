@@ -213,7 +213,7 @@ const SuggestedTripCard = ({ item, scrollX, id, total, _JoinRequest, _RevokeRequ
                       style={{
                         color: "#ff7324",
                         fontWeight: "700",
-                        fontSize: 20,
+                        fontSize: 15,
                       }}
                     >
                       Hủy yêu cầu
@@ -260,7 +260,7 @@ const style = StyleSheet.create({
   },
   titleStyle: {
     color: "white",
-    fontSize: 30,
+    fontSize: 27,
     fontWeight: "700",
   },
   descriptionStyle: {

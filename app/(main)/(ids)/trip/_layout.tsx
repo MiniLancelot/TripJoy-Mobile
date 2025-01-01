@@ -64,7 +64,7 @@ const _layout = () => {
         name="invite-people"
         options={{
           title: "Mời",
-          headerShown: true,
+          headerShown: false,
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "people" : "people-outline"}

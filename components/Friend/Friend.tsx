@@ -56,7 +56,7 @@ const Friend = ({
           </Pressable>
         </View>
       </View> */}
-      <View style={[styles.outerEditContainer, { flexDirection: "row" }]}>
+      <View style={[styles.outerEditContainer, { flexDirection: "row", right: 20 }]}>
         <View>
           <Pressable
             onPress={() => _onOpenChat(id)}
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 100,
+    width: "100%",
     marginTop: 10,
   },
   avatarContainer: {
@@ -107,9 +107,9 @@ const styles = StyleSheet.create({
   },
   outerEditContainer: {
     alignItems: "flex-end",
-    justifyContent: "center",
+    justifyContent: "flex-end",
     flex: 1,
-    transform: [{ translateX: -30 }],
+    
     // marginTop: -15,
   },
   editContainer: {
