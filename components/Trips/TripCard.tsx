@@ -270,14 +270,14 @@ const style = StyleSheet.create({
   statusContainer: {
     position: "absolute",
     top: -100,
-    right: -5,
+    right: 70,
     padding: 5,
     paddingHorizontal: 10,
     borderRadius: 10,
   },
   shareContainer: {
     position: "absolute",
-    top: -55,
+    top: -100,
     right: -5,
     padding: 5,
     paddingHorizontal: 10,

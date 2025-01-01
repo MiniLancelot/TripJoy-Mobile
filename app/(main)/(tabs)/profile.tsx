@@ -434,7 +434,7 @@ const profile = () => {
         onClose={() => setIsModalOpen(false)}
       >
         <View style={styles.modalContainer}>
-          <Pressable
+          {/* <Pressable
             onPress={() => Alert.alert("Đổi mật khẩu")}
             style={styles.modalOptionContainer}
           >
@@ -444,10 +444,10 @@ const profile = () => {
               style={{ transform: [{ translateX: -3 }] }}
             />
             <Text style={styles.modalText}>Quên mật khẩu?</Text>
-          </Pressable>
+          </Pressable> */}
           <Pressable
             onPress={confirmLogout}
-            style={[styles.modalOptionContainer, { marginTop: 20 }]}
+            style={[styles.modalOptionContainer, { marginTop: 0 }]}
           >
             <Ionicons name="log-out-outline" size={20} />
             <Text style={styles.modalText}>Đăng xuất</Text>

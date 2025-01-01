@@ -64,8 +64,8 @@ const CreatePost = () => {
 
   const getImageWidth = (numImages: number) => {
     if (numImages === 1) return "100%";
-    if (numImages === 2) return "100%";
-    if (numImages === 3) return "32.5%";
+    if (numImages === 2) return "48.5%";
+    // if (numImages === 3) return "32.5%";
     return "32.5%";
   };
   const _createPost = async () => {
@@ -134,7 +134,7 @@ const CreatePost = () => {
 
       <View style={styles.avatarContainer}>
       {images.map((image, index) => (
-        <View style={{ width: "48.5%" }}>
+        <View style={{  width: getImageWidth(images.length)}} key={index}>
           <Pressable
             onPress={() =>
               setImages((prev) => prev.filter((_, i) => i !== index))
@@ -147,7 +147,7 @@ const CreatePost = () => {
             source={{
               uri: image == null ? tempAvatar : image,
             }}
-            style={[styles.image, { width: getImageWidth(images.length) }]}
+            style={[styles.image, { width: "100%" }]}
           />
         </View>
       ))}
@@ -259,5 +259,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "semibold",
     lineHeight: 28,
+    color: "white"
   },
 });

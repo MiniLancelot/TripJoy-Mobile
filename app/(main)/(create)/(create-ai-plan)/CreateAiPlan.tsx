@@ -72,7 +72,7 @@ const getVehicleIcon = (vehicle: string) => {
       return <TrainIcon width={40} height={40} />;
     case "boat":
       return <BoatIcon width={40} height={40} />;
-    case "airplane":
+    case "plane":
       return <PlaneIcon width={40} height={40} />;
     default:
       return null; // Fallback if vehicle type is not recognized
@@ -186,15 +186,15 @@ export default function CreateAiPlan() {
       if (response) {
         Toast.show({
           type: "success",
-          text1: "Success",
-          text2: "Plan created successfully",
+          text1: "Thành công",
+          text2: "Tạo chuyến đi thành công",
         });
         resetForm();
         router.replace("/home");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Something went wrong");
+      Alert.alert("Lỗi", "Tạo chuyến đi không thành công");
     }
   };
 
@@ -226,6 +226,10 @@ export default function CreateAiPlan() {
       }}
     />
   );
+
+  const formatBudget = (budget: number): string => {
+    return budget.toLocaleString("en-US");
+  };
 
   const renderItems = (item: AIPlanSuggestion) => {
     return (
@@ -380,7 +384,7 @@ export default function CreateAiPlan() {
           >
             <FontAwesome6 name="money-bill" size={20} color={"#13c892"} />
             <Text style={styles.summaryLocationText}>
-              Kinh phí dự tính: {estimatedBudget} đ
+              Kinh phí dự tính: {formatBudget(estimatedBudget)} đ
             </Text>
           </View>
         </View>

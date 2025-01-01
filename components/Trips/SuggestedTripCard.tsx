@@ -196,7 +196,8 @@ const SuggestedTripCard = ({ item, scrollX, id, total, _JoinRequest, _RevokeRequ
                       style={{
                         color: "#ff7324",
                         fontWeight: "700",
-                        fontSize: 20,
+                        fontSize: 14,
+                        transform: [{ translateX: -45 }],
                       }}
                     >
                       Gửi yêu cầu tham gia

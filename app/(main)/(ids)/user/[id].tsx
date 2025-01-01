@@ -555,12 +555,16 @@ const User = () => {
                   case FriendStatus.FRIEND:
                     return (
                       <View style={styles.outerEditContainer}>
-                        <View style={styles.editContainer}>
+                        <View style={[ {position: "absolute", top: 63, right: 100,}]}>
                           <Pressable
                             onPress={handleCreateChatRoom}
                             style={styles.innerEditContainer}
                           >
-                            <Text style={styles.editText}>Nhắn tin</Text>
+                            <Ionicons
+                              name="chatbubbles-outline"
+                              size={24}
+                              color={"#13c892"}
+                            />
 
                           </Pressable>
                         </View>

@@ -220,16 +220,16 @@ const Trip = () => {
               style={styles.gradient}
             />
             <View style={styles.bannerInnerContainer}>
-              <View style={styles.bannerIcon}>
+              {/* <View style={styles.bannerIcon}>
                 <Ionicons name="location-outline" size={40} color={"#fff"} />
                 <Text style={styles.bannerText1}>Đà Nẵng</Text>
-              </View>
+              </View> */}
               <Text style={styles.bannerText2}>Chuyến đi của tôi</Text>
             </View>
           </View>
           <View style={styles.mainContainer}>
-            <Text style={styles.mainText1}>Hiện tại</Text>
-            <View style={styles.main1Container}>
+            {/* <Text style={styles.mainText1}>Hiện tại</Text> */}
+            {/* <View style={styles.main1Container}>
               <CurrentTripCard
                 name={"Lủng Cú"}
                 startTime={"20/12"}
@@ -249,16 +249,16 @@ const Trip = () => {
                   Tạo mới
                 </Text>
               </Pressable>
-            </View>
-            <View style={{ flexDirection: "row", gap: 226 }}>
+            </View> */}
+            <Pressable style={{ flexDirection: "row", gap: 226 }} onPress={() => fetchPlans()}>
               <Text style={styles.mainText2}>Chuyến đi</Text>
               {/* <Text style={styles.seeMore}>Tất cả</Text> */}
-            </View>
+            </Pressable>
           </View>
           {/* <Carousel width={width} /> */}
           <View style={{ paddingBottom: 50 }}>
             <TripCarousel data={data} _changeJoinStatus={_changeJoinStatus}/>
-            <Text style={styles.mainText2}>Gợi ý</Text>
+            <Text style={[styles.mainText2, {marginLeft: 10, marginBottom: 16}]}>Gợi ý</Text>
             <SuggestedTripCarousel
               data={suggestData}
               _JoinRequest={_handleOpen}
@@ -277,7 +277,7 @@ const Trip = () => {
           <BottomSheetScrollView
             style={{ flex: 1, paddingBottom: 30, paddingHorizontal: 10 }}
           >
-            <Text style={{ fontSize: 20, fontWeight: "500" }}>Nội dung</Text>
+            <Text style={{ fontSize: 20, fontWeight: "500", textAlign: "center" }}>Yêu cầu tham gia</Text>
             <TextInput
               placeholder="Nội dung"
               value={content}
@@ -295,9 +295,33 @@ const Trip = () => {
                 maxHeight: 200,
               }}
             />
-            <Pressable onPress={handleJoinRequest}>
+            {/* <Pressable onPress={handleJoinRequest}>
               <Text>Gửi yêu cầu</Text>
-            </Pressable>
+            </Pressable> */}
+            <View style={styles.loginButtonContainer}>
+                            <Pressable
+                              onPress={handleJoinRequest}
+                              // android_ripple={{ color: "gray" }}
+                            >
+                              <View
+                                style={[
+                                  styles.innerLoginButtonContainer,
+                                ]}
+                              >
+                                {isLoading ? (
+                                  <ActivityIndicator color="#fff" size={28} />
+                                ) : (
+                                  <Text
+                                    style={[
+                                      styles.loginButtonText,
+                                    ]}
+                                  >
+                                    Gửi yêu cầu
+                                  </Text>
+                                )}
+                              </View>
+                            </Pressable>
+                          </View>
           </BottomSheetScrollView>
         </BottomSheet>
       </BottomSheetModalProvider>
@@ -326,8 +350,29 @@ const styles = StyleSheet.create({
   },
   bannerInnerContainer: {
     position: "absolute",
-    top: 90,
+    top: 100,
     left: 20,
+  },
+  loginButtonContainer: {
+    backgroundColor: "#13c892",
+    borderRadius: 12,
+    overflow: "hidden",
+    margin: 10,
+    width: "93%",
+    marginTop: 180,
+    bottom: 20,
+
+  },
+  innerLoginButtonContainer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginButtonText: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: "semibold",
+    lineHeight: 28,
   },
   bannerIcon: {
     flexDirection: "row",

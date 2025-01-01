@@ -554,7 +554,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
             ))}
           </View>
           <View style={styles.interactionBar}>
-            {item.planPost != null &&
+            {/* {item.planPost != null &&
               item.userId != session.userInfo.user.profile.id && (
                 <Pressable
                   onPress={() => {
@@ -563,7 +563,7 @@ const StarRailChar2 = ({ _userId }: Params) => {
                 >
                   <Text>Xin gia nhập</Text>
                 </Pressable>
-              )}
+              )} */}
             <View style={styles.likeContainer}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <ReactionBox

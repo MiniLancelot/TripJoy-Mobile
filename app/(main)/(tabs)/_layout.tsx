@@ -148,7 +148,8 @@ const Layout = () => {
               <Tabs.Screen
                 name="notification"
                 options={{
-                  title: "Notification",
+                  title: "Lời mời tham gia",
+                  headerShown: true,
                   tabBarIcon: ({ color, size, focused }) => (
                     <Ionicons
                       name={focused ? "mail" : "mail-outline"}
@@ -251,7 +252,7 @@ const Layout = () => {
                         borderRadius: 100,
                       }}
                     >
-                      <FontAwesome6 name="android" size={35} color="#34d9b8" />
+                      <FontAwesome6 name="robot" size={35} color="#34d9b8" />
                     </Pressable>
                     <Text style={styles.buttonUnderText}>
                       Tạo chuyến đi bằng AI

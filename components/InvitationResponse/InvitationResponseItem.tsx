@@ -2,6 +2,7 @@ import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import React from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+
 interface PlanInvitation {
   planId: string;
   inviterId: string;
@@ -13,7 +14,16 @@ interface PlanInvitation {
   _onClick: any;
 }
 
-const InvitationResponse = ({ planId, inviterId, title, startDate, endDate, inviterName, inviterAvatar, _onClick }: PlanInvitation) => {
+const InvitationResponse = ({
+  planId,
+  inviterId,
+  title,
+  startDate,
+  endDate,
+  inviterName,
+  inviterAvatar,
+  _onClick,
+}: PlanInvitation) => {
   const tempAvatar =
     "https://pbs.twimg.com/media/GSNsL59WIAAxJrr?format=jpg&name=medium";
   const avatarUri = inviterAvatar == null ? tempAvatar : inviterAvatar;
@@ -27,63 +37,51 @@ const InvitationResponse = ({ planId, inviterId, title, startDate, endDate, invi
         <View style={styles.avatarContainer}>
           <Image source={{ uri: avatarUri }} style={styles.avatar} />
         </View>
-        <View>
-          <Text>{inviterName} mời bạn vào {title}</Text>
-          <Text>{startDate} đến {endDate}</Text>
+        <View style={styles.textContainer}>
+          <Text style={styles.invitationText}>
+            <Text style={{ fontWeight: "500" }}>{inviterName}</Text> đã mời bạn
+            tham gia
+          </Text>
+          <Text style={{ fontWeight: "500" }}>{title}</Text>
+          <Text style={styles.dateText}>
+            {startDate.split("-").reverse().join("-")} - {endDate.split("-")
+                                  .reverse()
+                                  .join("-")}
+          </Text>
         </View>
       </Pressable>
       <View style={styles.invitationContainer}>
-        <View style={styles.invitationOuterEditContainer}>
-          <View style={styles.editContainer}>
-            <Pressable
-              onPress={() => _onClick(planId, true)}
-              style={styles.innerEditContainer}
-            >
-              {/* <Ionicons
-                                name="person-add-outline"
-                                size={15}
-                                color={"#13c892"}
-                              /> */}
-              {/* <Text style={styles.editText}>Xác nhận</Text> */}
-              <Ionicons name="checkmark-outline" size={20}  color={"#13c892"}/>
-            </Pressable>
-          </View>
-        </View>
-        <View style={styles.invitationOuterEditContainer}>
-          <View style={styles.editContainer}>
-            <Pressable
-              onPress={() => _onClick(planId, false)}
-              style={styles.innerEditContainer}
-            >
-              {/* <Ionicons
-                                name="person-add-outline"
-                                size={15}
-                                color={"#13c892"}
-                              /> */}
-              {/* <Text style={styles.editText}>Từ chối</Text> */}
-              <Ionicons name="close-outline" size={20}  color={"#13c892"}/>
-            </Pressable>
-          </View>
-        </View>
+        <Pressable
+          onPress={() => _onClick(planId, true)}
+          style={styles.actionButton}
+        >
+          <Ionicons name="checkmark-outline" size={20} color={"#13c892"} />
+        </Pressable>
+        <Pressable
+          onPress={() => _onClick(planId, false)}
+          style={styles.actionButton}
+        >
+          <Ionicons name="close-outline" size={20} color={"#13c892"} />
+        </Pressable>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    width: "100%",
+    backgroundColor: "#fff", // Optional: Set a background color
+  },
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    // marginBottom: 10,
-    // marginTop: 10,
-    marginHorizontal: 20,
-  },
-  container: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 100,
-    marginTop: 10,
+    flex: 1,
   },
   avatarContainer: {
     marginRight: 10,
@@ -92,45 +90,32 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    // borderWidth: 1,
-    // borderColor: "black",
   },
-  outerEditContainer: {
-    alignItems: "flex-end",
-    justifyContent: "center",
+  textContainer: {
     flex: 1,
-    marginRight: 30,
-    // marginTop: -15,
   },
-  editContainer: {
-    borderRadius: 30,
-    borderColor: "#bfbfbf",
-    borderWidth: 1,
+  invitationText: {
+    fontSize: 14,
+    color: "#000",
+    flexWrap: "wrap",
   },
-  innerEditContainer: {
-    flexDirection: "row",
-    gap: 7,
-    padding: 7,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  editText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "#bfbfbf",
-  },
-
-  invitationOuterEditContainer: {
-    // alignItems: "flex-end",
-    // justifyContent: "center",
-    // flex: 1,
-    marginRight: 15,
-    // marginTop: 50,
+  dateText: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 5,
   },
   invitationContainer: {
     flexDirection: "row",
-    marginLeft: -40,
+    alignItems: "center",
+    gap: 10,
+  },
+  actionButton: {
+    padding: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#bfbfbf",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
