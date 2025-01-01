@@ -516,10 +516,9 @@ const register = () => {
           
         </View>
 
-        <SeparateLine text="Đăng nhập bằng phương thức khác" />
+        {/* <SeparateLine text="Đăng nhập bằng phương thức khác" />
         <View
           style={styles.loginMethodContainer}
-          // style={styles.shadow}
         >
           <Pressable>
             <View style={styles.googleButton}>
@@ -527,14 +526,12 @@ const register = () => {
             </View>
           </Pressable>
           <Pressable
-          // onPress={handleGoogleLogin}
-          // android_ripple={{ color: "gray" }}
           >
             <View style={styles.facebookButton}>
               <FacebookIcon width={40} height={40} />
             </View>
           </Pressable>
-        </View>
+        </View> */}
       </View>
     </ScrollView>
   );

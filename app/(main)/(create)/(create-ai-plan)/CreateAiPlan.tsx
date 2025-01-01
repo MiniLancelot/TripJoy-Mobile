@@ -19,6 +19,12 @@ import { useAuth } from "@/app/(auth)/AuthContext";
 import Toast from "react-native-toast-message";
 import { Trips } from "@/constants/Trip";
 import PlanImageCarousel from "@/components/PlanCarousel/PlanImageCarousel";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MotorIcon from "@/components/Icons/MotorIcon";
+import BoatIcon from "@/components/Icons/BoatIcon";
+import CarIcon from "@/components/Icons/CarIcon";
+import PlaneIcon from "@/components/Icons/PlaneIcon";
+import TrainIcon from "@/components/Icons/TrainIcon";
 
 interface PlanLocation {
   latitude: number;
@@ -52,9 +58,26 @@ const getVehicleLabel = (vehicle: string) => {
   return vehicleMap[vehicle] || vehicle; // Default to original value if not found
 };
 
+const getVehicleIcon = (vehicle: string) => {
+  switch (vehicle) {
+    case "motor":
+      return <MotorIcon width={40} height={40} />;
+    case "car":
+      return <CarIcon width={40} height={40} />;
+    case "train":
+      return <TrainIcon width={40} height={40} />;
+    case "boat":
+      return <BoatIcon width={40} height={40} />;
+    case "airplane":
+      return <PlaneIcon width={40} height={40} />;
+    default:
+      return null; // Fallback if vehicle type is not recognized
+  }
+};
+
 const convertDateFormat = (dateString: string) => {
-  const [day, month, year] = dateString.split("/"); // Tách chuỗi
-  return `${year}-${month}-${day}`; // Ghép lại theo định dạng yyyy-MM-dd
+  const [day, month, year] = dateString.split("/");
+  return `${year}-${month}-${day}`;
 };
 
 const formatDate = (dateString: string) => {
@@ -171,6 +194,21 @@ export default function CreateAiPlan() {
     }
   };
 
+  const DashLine = () => (
+    <View
+      style={{
+        borderStyle: "dashed",
+        borderWidth: 1,
+        height: 1,
+        width: 50,
+        borderColor: "#ccc",
+        marginVertical: 8,
+        marginHorizontal: 20,
+        borderRadius: 1,
+      }}
+    />
+  );
+
   const renderItems = (item: AIPlanSuggestion) => {
     return (
       <View
@@ -190,8 +228,13 @@ export default function CreateAiPlan() {
       >
         <Text>{item.theme}</Text>
         {item.details.map((detail) => (
-          <View key={detail.name} style={{ flexDirection: "row", marginLeft: 10 }}>
-            <Text style={{fontWeight: 600}}>{detail.estimatedStartDate}: </Text>
+          <View
+            key={detail.name}
+            style={{ flexDirection: "row", marginLeft: 10 }}
+          >
+            <Text style={{ fontWeight: 600 }}>
+              {detail.estimatedStartDate}:{" "}
+            </Text>
             <Text>
               {detail.name} - {detail.address}
             </Text>
@@ -206,14 +249,40 @@ export default function CreateAiPlan() {
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <View style={{ gap: 5 }}>
-          <Text>Điểm bắt đầu: {provinceStart.provinceName}</Text>
-          <Text>Điểm kết thúc: {provinceEnd.provinceName}</Text>
+          {/* <Text>Điểm bắt đầu: {provinceStart.provinceName}</Text> */}
+          {/* <Text>Điểm kết thúc: {provinceEnd.provinceName}</Text> */}
+          <View style={styles.summaryLocationContainer}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Ionicons name="location" size={24} color="#17a1fa" />
+              <Text style={styles.summaryLocationText}>Đà Nẵng</Text>
+            </View>
+            <DashLine />
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Ionicons name="location" size={24} color="#ff6188" />
+              <Text style={styles.summaryLocationText}>Đà Nẵng</Text>
+            </View>
+          </View>
+          <View style={styles.summaryVehicleContainer}>
+            {getVehicleIcon(vehicle)}
+          </View>
+
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <Ionicons name={"calendar-outline"} size={30} color={"#6b707b"} />
+            <Text>
+              {startDate.split("-")[2]}-${startDate.split("-")[1]}-$
+              {startDate.split("-")[0]}
+            </Text>
+          </View>
           <Text>Kinh phí dự tính: {estimatedBudget} đ</Text>
         </View>
         <Text>Thời gian khởi hành: {startDate}</Text>
         <Text>Thời gian kết thúc: {endDate}</Text>
 
-        <Text>Phương tiện: {getVehicleLabel(vehicle)}</Text>
+        {/* <Text>Phương tiện: {getVehicleLabel(vehicle)}</Text> */}
       </View>
 
       {/* <Button
@@ -324,8 +393,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#b2b2b2",
     borderRadius: 10,
-    padding: 5,
+    padding: 10,
+    paddingVertical: 10,
     backgroundColor: "#fff",
     elevation: 3,
+  },
+  summaryLocationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  summaryLocationText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  summaryVehicleContainer: {
+    position: "absolute",
+    right: 5,
+    top: 5,
   },
 });

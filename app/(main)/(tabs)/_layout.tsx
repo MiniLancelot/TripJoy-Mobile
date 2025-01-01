@@ -273,7 +273,7 @@ const Layout = () => {
                         color="#55d4ff"
                       />
                     </Pressable>
-                    <Text style={styles.buttonUnderText}>Tạo bài đăng</Text>
+                    <Text style={styles.buttonUnderText}>Tạo bài viết</Text>
                   </View>
 
                   {/* <Pressable
