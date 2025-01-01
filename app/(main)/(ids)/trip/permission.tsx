@@ -25,7 +25,9 @@ const PAGE_SIZE = 10;
 
 interface _Members extends Member {
   avatar: any;
+  name: string;
   role: number;
+  userId: string;
 }
 
 enum Role {
@@ -33,6 +35,13 @@ enum Role {
   VICE_OWNER = 1,
   MEMBER = 2,
 }
+
+const truncateText = (text: string, maxLength: number) => {
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength) + "...";
+  }
+  return text;
+};
 
 const permission = () => {
   const { session } = useAuth();
@@ -43,9 +52,16 @@ const permission = () => {
 
   const [_members, setMembers] = useState<_Members[]>([]);
   const [pageIndex, setPageIndex] = useState(0);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [myRole, setMyRole] = useState<_Members>({
+    userId: "",
+    name: "",
+    avatar: "",
+    role: 0,
+  });
   // const [content, setContent] = useState("");
 
   const fetchMembers = async (isLoadMore = false) => {
@@ -94,6 +110,14 @@ const permission = () => {
   useEffect(() => {
     fetchMembers();
   }, []);
+
+  useEffect(() => {
+    if (isSuccess) {
+      fetchMembers(false);
+      setPageIndex(0);
+      setIsSuccess(false);
+    }
+  }, [isSuccess]);
 
   const _changePermission = async (userId: string) => {
     try {
@@ -162,15 +186,16 @@ const permission = () => {
             );
             if (response.status === 200) {
               // navigation.goBack();
-              console.log("Rời nhóm thành công");
-              router.replace("/home");
+              console.log("Loại thành công");
+              // router.replace("/home");
+              setIsSuccess(true);
             }
           } catch (error) {
             console.log("Leave group error: " + error);
-            Alert.alert(
-              "Lỗi",
-              "Bạn không thể loại người này vì người này có thể có tham gia chi tiêu"
-            );
+            // Alert.alert(
+            //   "Lỗi",
+            //   "Bạn không thể loại người này vì người này có thể có tham gia chi tiêu"
+            // );
           }
         },
       },
@@ -199,7 +224,7 @@ const permission = () => {
                     />
                   </View>
                   <View>
-                    <Text>{item.name}</Text>
+                    <Text>{truncateText(item.name, 10)}</Text>
                   </View>
                 </Pressable>
                 <View style={styles.invitationContainer}>
@@ -209,11 +234,11 @@ const permission = () => {
                       let color = "";
                       switch (item.role) {
                         case Role.OWNER:
-                          role = "trưởng đoàn";
+                          role = "Trưởng đoàn";
                           color = "#ff6188";
                           break;
                         case Role.VICE_OWNER:
-                          role = "Phó chủ nhóm";
+                          role = "Phó đoàn";
                           color = "green";
                           break;
                         case Role.MEMBER:
@@ -224,10 +249,12 @@ const permission = () => {
                           return null;
                       }
                       return (
-                        <View style={[styles.editContainer, { borderColor: color }]} >
+                        <View
+                          style={[styles.editContainer, { borderColor: color }]}
+                        >
                           <Pressable
                             onPress={() => _changePermission(item.userId)}
-                            disabled={item.role != Role.OWNER}
+                            disabled={item.role == Role.OWNER}
                             style={[styles.innerEditContainer]}
                           >
                             <Text style={{ color: color }}>{role}</Text>
@@ -238,19 +265,19 @@ const permission = () => {
                   </View>
                   <View style={styles.invitationOuterEditContainer}>
                     <View style={styles.editContainer}>
-                      {item.role == Role.OWNER ? (
+                      {item.userId == session.userInfo.user.profile.id ? (
+                        <Pressable
+                          onPress={() => leaveGroup()}
+                          style={styles.innerEditContainer}
+                        >
+                          <Text>Rời</Text>
+                        </Pressable>
+                      ) : item.role != Role.OWNER ? (
                         <Pressable
                           onPress={() => _removeMember(item.userId)}
                           style={styles.innerEditContainer}
                         >
                           <Text>Loại</Text>
-                        </Pressable>
-                      ) : item.userId == session.userInfo.user.profile.id ? (
-                        <Pressable
-                          onPress={() => leaveGroup()}
-                          style={styles.innerEditContainer}
-                        >
-                          <Text>Rời nhóm</Text>
                         </Pressable>
                       ) : null}
                     </View>
@@ -365,7 +392,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 100,
+    justifyContent: "space-between",
     marginTop: 10,
   },
   avatarContainer: {
@@ -380,9 +407,10 @@ const styles = StyleSheet.create({
   },
   outerEditContainer: {
     alignItems: "flex-end",
-    justifyContent: "center",
+    justifyContent: "flex-end",
+    transform: [{ translateX: -10 }],
     flex: 1,
-    marginRight: 30,
+    // marginRight: 30,
     // marginTop: -15,
   },
   editContainer: {
@@ -408,7 +436,7 @@ const styles = StyleSheet.create({
     // alignItems: "flex-end",
     // justifyContent: "center",
     // flex: 1,
-    marginRight: 15,
+    marginRight: 10,
     // marginTop: 50,
   },
   invitationContainer: {
