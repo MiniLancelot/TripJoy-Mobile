@@ -156,7 +156,7 @@ const ReactionBox = ({_current, _setCurrent}: ReactionBoxProps) => {
           </PanGestureHandler>
         )}
       </AnimatePresence>
-      {show && <Hint hint={showHint} />}
+      {/* {show && <Hint hint={showHint} />} */}
       {show && <Backdrop onPress={onClose} />}
       <CustomButton
         onLongPress={btnPressHandler}
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     left: 0,
-    height: 180,
+    height: 150,
     // backgroundColor: "red",
     justifyContent: "center",
     zIndex: 10,
@@ -198,10 +198,7 @@ const styles = StyleSheet.create({
     borderRadius: 33,
     backgroundColor: "#fff",
     // shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    elevation: 5,
     shadowOpacity: 0.24,
     shadowRadius: 1,
   },
