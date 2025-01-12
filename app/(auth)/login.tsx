@@ -44,8 +44,6 @@ const Login = () => {
     setText("");
   };
 
-
-
   const emailValidate = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isLoginDisabled =
     !enteredUserName ||
@@ -89,21 +87,11 @@ const Login = () => {
         router.replace("/home");
       }, 500);
     } catch (error: any) {
-      if (error.response && error.response.data) {
-        const values = Object.values(error.response.data.errors);
-        if (Array.isArray(values[0])) {
-          // console.error(values[0][0]);
-          Toast.show({
-            type: "failure",
-            text1: "Tài khỏan hoặc mật khẩu không đúng",
-            // text2: "Welcome!",
-          });
-        }
-      } else if (error.request) {
-        console.error("No response received from the server.");
-      } else {
-        console.error(error.message);
-      }
+      Toast.show({
+        type: "failure",
+        text1: "Tài khoản hoặc mật khẩu không đúng",
+        // text2: "Welcome!",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -154,30 +142,28 @@ const Login = () => {
               onChangeText={(text) => setEnteredPassword(text)}
             />
             {enteredPassword.length > 0 && (
-                <Pressable
-                  style={styles.clearPasswordButton}
-                  onPress={() => clearText(setEnteredPassword)}
-                >
-                  <Ionicons
-                    name="close-circle-outline"
-                    size={21}
-                    color="#9FB7B9"
-                  />
-                </Pressable>
-              )}
               <Pressable
-                style={styles.passwordToggle}
-                onPress={togglePasswordVisibility}
+                style={styles.clearPasswordButton}
+                onPress={() => clearText(setEnteredPassword)}
               >
                 <Ionicons
-                  name={isPasswordVisible ? "eye-outline" : "eye-off-outline"}
+                  name="close-circle-outline"
                   size={21}
                   color="#9FB7B9"
                 />
               </Pressable>
+            )}
+            <Pressable
+              style={styles.passwordToggle}
+              onPress={togglePasswordVisibility}
+            >
+              <Ionicons
+                name={isPasswordVisible ? "eye-outline" : "eye-off-outline"}
+                size={21}
+                color="#9FB7B9"
+              />
+            </Pressable>
           </View>
-
-          
         </View>
 
         <View style={styles.loginButtonContainer}>
@@ -236,8 +222,6 @@ const Login = () => {
             </View>
           </Pressable>
         </View> */}
-
-        
       </View>
     </ScrollView>
   );
@@ -344,7 +328,7 @@ const styles = StyleSheet.create({
   passwordInput: {
     backgroundColor: "#fff",
     borderRadius: 8,
-    
+
     marginVertical: 10,
     padding: 10,
     justifyContent: "center",
