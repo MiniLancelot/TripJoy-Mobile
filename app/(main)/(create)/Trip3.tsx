@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     margin: 10,
     width: "95%",
-    marginTop: 75,
+    marginTop: 25,
   },
   innerLoginButtonContainer: {
     padding: 10,

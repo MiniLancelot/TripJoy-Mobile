@@ -43,7 +43,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MyProfileModal from "@/components/Modals/MyProfileModal";
 import CalendarModal from "@/components/Modals/CalendarModal";
 import { Calendar } from "react-native-calendars";
-import { ca } from "date-fns/locale";
+import { ca, te } from "date-fns/locale";
 import { set } from "date-fns";
 import { Locations } from "@/constants/Locations";
 import * as Location from "expo-location";
@@ -516,7 +516,7 @@ const ChosenTrip = () => {
     }));
 
     const images = memberLocations.reduce((acc, location) => {
-      acc[`icon-${location.userId}`] = { uri: location.avatar };
+      acc[`icon-${location.userId}`] = { uri: memberIcon };
       return acc;
     }, {});
 
