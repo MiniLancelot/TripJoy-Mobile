@@ -75,7 +75,7 @@ const Index = () => {
     } else {
       // console.log("No userToken: ", session.userToken);
       console.log("No userInfo: ", session.userInfo);
-      router.replace("/onboarding");
+      router.replace("/login");
       // router.replace("/(create)/(create-ai-plan)/AiStep2");
     }
   };

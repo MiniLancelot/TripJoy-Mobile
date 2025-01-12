@@ -92,7 +92,12 @@ const Login = () => {
       if (error.response && error.response.data) {
         const values = Object.values(error.response.data.errors);
         if (Array.isArray(values[0])) {
-          console.error(values[0][0]);
+          // console.error(values[0][0]);
+          Toast.show({
+            type: "failure",
+            text1: "Tài khỏan hoặc mật khẩu không đúng",
+            // text2: "Welcome!",
+          });
         }
       } else if (error.request) {
         console.error("No response received from the server.");

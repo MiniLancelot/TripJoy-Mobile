@@ -8,6 +8,7 @@ import {
   Touchable,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView
 } from "react-native";
 import { useState } from "react";
 import { useAuth } from "@/app/(auth)/AuthContext";
@@ -94,7 +95,7 @@ const CreatePost = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Stack.Screen
         options={{
           headerShown: true,
@@ -194,7 +195,7 @@ const CreatePost = () => {
                   </View>
                 </Pressable>
               </View>
-    </View>
+    </ScrollView>
   );
 };
 
