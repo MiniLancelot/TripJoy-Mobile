@@ -203,7 +203,7 @@ const UpdateProfile = () => {
   );
 
   const formatDate = (dateStr: string) => {
-    const [month, day, year] = dateStr.split("/");
+    const [year, month, day] = dateStr.split("-");
     return `${day}-${month}-${year}`;
   };
 
@@ -310,7 +310,7 @@ const UpdateProfile = () => {
                   <Text style={{ fontSize: 16, fontWeight: "700" }}>
                     {profile.dateOfBirth === null
                       ? "Chưa có thông tin ngày sinh"
-                      : formatDate(profile.dateOfBirth.split(" ")[0])}
+                      : formatDate(profile.dateOfBirth)}
                   </Text>
                 </View>
               </Pressable>
