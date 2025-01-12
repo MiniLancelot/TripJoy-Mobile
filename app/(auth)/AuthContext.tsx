@@ -10,6 +10,8 @@ import Toast from "react-native-toast-message";
 import get_user_profile from "@/services/user/userProfile";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { socketURL } from "@/utils/baseUrl";
+import get_health from "@/services/user/health";
+import refreshingToken from "@/services/identity/refresh";
 interface AuthProps {
   session: {
     userToken: any | null;
@@ -88,6 +90,51 @@ export const AuthProvider = ({ children }: any) => {
     };
     loadUser();
   }, []);
+
+  const getHealthStatus = async () => {
+    if (userToken !== null) {
+      const health = await get_health(userToken.accessToken);
+      if (health) {
+        console.log("Health: ", health.data.status);
+        return true;
+      } else {
+        try {
+          const result = await refreshingToken({
+            refreshToken: userToken.refreshToken,
+          });
+          if (result) {
+            console.log("RefreshToken result: ", result);
+            const newToken = {
+              accessToken: result.data.accessToken,
+              refreshToken: result.data.refreshToken,
+            };
+            setUserToken(newToken);
+            await AsyncStorage.setItem("user", JSON.stringify(newToken));
+            // Retry health check with new token
+            const retryHealth = await get_health(newToken.accessToken);
+            if (retryHealth) {
+              console.log("Retry Health: ", retryHealth.data.status);
+            }
+          }
+          return false;
+        } catch (error) {
+          console.error("Error refreshing token: ", error);
+          setUserToken(null);
+          setUserInfo(null);
+          await AsyncStorage.clear();
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getHealthStatus(); // Call immediately on mount
+    const interval = setInterval(() => {
+      getHealthStatus();
+    }, 15 * 60 * 1000); // Call every 15 minutes
+
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, [userToken]);
 
   const user_login = async (data: any) => {
     try {
